@@ -1,0 +1,25 @@
+[bits 32]
+[extern timer_handler] 
+[extern keyboard_handler]
+[extern stub_mouse_handler]
+
+global timer_wrapper
+global keyboard_wrapper
+global mouse_wrapper
+timer_wrapper:
+    pusha               
+    call timer_handler  
+    popa                
+    iret    
+
+keyboard_wrapper:
+    pusha
+    call keyboard_handler
+    popa
+    iret
+
+mouse_wrapper:
+    pusha
+    call stub_mouse_handler
+    popa
+    iret   
