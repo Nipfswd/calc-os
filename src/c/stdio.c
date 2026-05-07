@@ -16,7 +16,7 @@ int is_button_files = 1;
 
 void screen_clear() {
     unsigned int *fb = VIDEO_MEMORY_PTR;
-    int total_pixels = 1024 * 768;
+    int total_pixels = 640 * 480;
 
     for (int i = 0; i < total_pixels; i++) {
         fb[i] = 0x00000000; 
@@ -33,12 +33,12 @@ void put_char(char s, unsigned int color) {
         return;
     }
 
-    if (x >= 1024) {
+    if (x >= 640) {
         x = 0;
         y += 8;
     }
 
-    if (y >= 768) {
+    if (y >= 480) {
         screen_clear();
     }
 
