@@ -323,6 +323,10 @@ void __attribute__((section(".text.entry"))) kernel_main() {
     init_mouse();
 	screen_clear();
     init_idt();
+    copy_string(apps[0].name, "power");
+    apps[0].start_lba = 200;
+    apps[0].size_sectors = 1;
+    apps[0].exists = 1;
     asm volatile("sti");
 	prompt();
 }

@@ -35,6 +35,17 @@ start:
     int 0x13
     jc disk_error
 
+    mov ax, 0xFFFF
+    mov es, ax
+    mov bx, 0x0010
+    mov ah, 0x02
+    mov al, 1
+    mov ch, 0
+    mov dh, 0
+    mov cl, 200
+    mov dl, [boot_drive]
+    int 0x13
+
     cli
     lgdt [gdt_ptr]
     mov eax, cr0
