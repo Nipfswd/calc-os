@@ -160,7 +160,7 @@ refresh:
                 print("  draw - draw a rectangle\n", 0xFFFFFF);
                 print("  cat - view a specific value\n", 0xFFFFFF);
                 print("  status - check system status\n", 0xFFFFFF);
-                print("  livetime - print system livetime (irq0 ticks)\n", 0xFFFFFF);
+                print("  livetime - print system livetime irq0 ticks\n", 0xFFFFFF);
             }
             else if (compare_strings(command, "cln")) {
                 screen_clear();
