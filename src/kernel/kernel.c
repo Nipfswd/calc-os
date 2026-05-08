@@ -1,13 +1,25 @@
-#include <disk.h>
+#include <cmos.h>
 #include <stdio.h>
 #include <utils.h>
 #include <mouse.h>
 #include <keyboard.h>
 #include <idt.h>
 
+void apply_settings() {
+    if (read(0x59) != 0xA5) {
+        write(0x55, 0x07); 
+        write(0x56, 0);   
+        write(0x59, 0xA5); 
+    }
+
+    unsigned char boots = read(0x56);
+    write(0x56, boots + 1);
+
+    unsigned char theme = read(0x55);
+}
+
 char command[256];
-char filename[8];
-char filecontent[256];
+char value[128];
 
 void prompt() {
 refresh:
@@ -34,12 +46,14 @@ refresh:
         draw_button(20, 48, 136, 26, "Terminal", 0x0000FFUL, 0x000000);
         draw_button(190, 48, 136, 26, "Explorer", 0xFF0000UL, 0x000000);
 
-        draw_button(0, 440, 640, 40, "F2 - Create a new file", 0x000080UL, 0xFFFFFF);
+        draw_button(0, 440, 640, 40, "F2 - create a new value", 0x000080UL, 0xFFFFFF);
 
         int file_count = 0;
 
-        for (int i = 0; i < MAX_FILES; i++) {
-            if (files[i].exists == 1) {
+        for (int i = 0; i < 5; i++) {
+            unsigned char data = read(0x50 + i);
+
+            if (data == 1) {
                 int col = file_count % 3;
                 int row = file_count / 3;
 
@@ -51,13 +65,17 @@ refresh:
                 x = icon_x + 16;
                 y = icon_y + 16;
 
-                print(files[i].name, 0x000000);
+                int data_str[16];
+                itoa(data, data_str);
+
+                print(data_str, 0x000000);
 
                 file_count++;
             }
         }
 
         if (show_crt_window == 1) {
+            is_window_crt = 1;
             draw_rect(104, 100, 432, 260, 0x808080UL);
             draw_rect(100, 96, 432, 260, 0xC0C0C0UL);
             draw_rect(104, 100, 424, 252, 0xFFFFFFUL);
@@ -91,25 +109,16 @@ refresh:
         draw_button(20, 48, 136, 26, "Terminal", 0x0000FFUL, 0x000000);
         draw_button(190, 48, 136, 26, "Explorer", 0xFF0000UL, 0x000000);
 
-        int file_count = 0;
-
-        for (int i = 0; i < MAX_APPS; i++) {
-            if (apps[i].exists == 1) {
-                int col = file_count % 3;
-                int row = file_count / 3;
-
-                int icon_x = (16 + col * 100) * 2;
-                int icon_y = (50 + row * 34) * 2;
-
-                draw_rect(icon_x, icon_y, 160, 48, 0xFFFFFFUL);
-
-                x = icon_x + 16;
-                y = icon_y + 16;
-                print(apps[i].name, 0x000000);
-
-                file_count++;
-            }
-        }
+          x = 0;
+          y = 96;
+          print("System Information:\n", 0xFFFFFF);
+          print("Battery Status: ", 0xFFFFFF);
+          unsigned char battery_status = check_battery();
+          if (battery_status) {
+              print("OK\n", 0xFFFFFF);
+          } else {
+              print("BAD (Please insert a new 2032 battery)\n", 0xFFFFFF);
+          }
     }
     else {
         draw_rect(0, 80, 640, 480, 0x00BFFFUL);
@@ -118,12 +127,12 @@ refresh:
         draw_button(190, 48, 136, 26, "Explorer", 0xFF0000UL, 0x000000);
 
         if (is_button_files == 1) {
-            draw_button(156, 100, 320, 36, "Files", 0x000000UL, 0xFFFFFF);
-            draw_button(156, 200, 320, 36, "Apps", 0x808080UL, 0xFFFFFF);
+            draw_button(156, 100, 320, 36, "Values", 0x000000UL, 0xFFFFFF);
+            draw_button(156, 200, 320, 36, "System", 0x808080UL, 0xFFFFFF);
         }
         else if (is_button_apps == 1) {
-            draw_button(156, 100, 320, 36, "Files", 0x808080UL, 0xFFFFFF);
-            draw_button(156, 200, 320, 36, "Apps", 0x000000UL, 0xFFFFFF);
+            draw_button(156, 100, 320, 36, "Values", 0x808080UL, 0xFFFFFF);
+            draw_button(156, 200, 320, 36, "System", 0x000000UL, 0xFFFFFF);
         }
     }
 
@@ -146,12 +155,11 @@ refresh:
                 print("Available commands:\n", 0xFFFFFF);
                 print("  help - show this message\n", 0xFFFFFF);
                 print("  cln  - clear the screen\n", 0xFFFFFF);
-                print("  dir  - list all files\n", 0xFFFFFF);
-                print("  crt  - create a new text file\n", 0xFFFFFF);
+                print("  dir  - list all values\n", 0xFFFFFF);
+                print("  crt  - create a new value\n", 0xFFFFFF);
                 print("  draw - draw a rectangle\n", 0xFFFFFF);
-                print("  run  - run program from disk\n", 0xFFFFFF);
-                print("  apps - available apps\n", 0xFFFFFF);
-                print("  cat - view the contents of the file\n", 0xFFFFFF);
+                print("  cat - view a specific value\n", 0xFFFFFF);
+                print("  status - check system status\n", 0xFFFFFF);
                 print("  livetime - print system livetime (irq0 ticks)\n", 0xFFFFFF);
             }
             else if (compare_strings(command, "cln")) {
@@ -159,9 +167,12 @@ refresh:
                 ncount = 1;
             }
             else if (compare_strings(command, "dir")) {
-                for (int i = 0; i < MAX_FILES; i++) {
-                    if (files[i].exists == 1) {
-                        print(files[i].name, 0xFFFFFF);
+                for (int i = 0; i < 5; i++) {
+                    unsigned char data_str[16];
+                    unsigned char data = read(0x50 + i);
+                    if (data != 0) {
+                        itoa(data, data_str);
+                        print(data_str, 0xFFFFFF);
                         print("\n", 0xFFFFFF);
                     }
                 }
@@ -169,38 +180,38 @@ refresh:
             else if (compare_strings(command, "cat")) {
                 char name[8];
 
-                print("Enter file name: ", 0xFFFFFF);
+                print("Enter index: ", 0xFFFFFF);
                 input_wait_string(name);
                 print("\n", 0xFFFFFF);
 
-                for (int i = 0; i < MAX_FILES; i++) {
-                    if (files[i].exists == 1 && compare_strings(name, files[i].name)) {
-                        print(files[i].content, 0xFFFFFF);
+                for (int i = 0; i < 5; i++) {
+                    unsigned char data = read(0x50 + i);
+                    unsigned char data_str[16];
+                    if (data != 0) {
+                        itoa(data, data_str);
+                    }
+                    if (data != 0 && compare_strings(name, data_str)) {
+                        print(data_str, 0xFFFFFF);
                         print("\n", 0xFFFFFF);
                     }
                 }
             }
             else if (compare_strings(command, "crt")) {
-                int free_index = -1;
-                for (int i = 0; i < MAX_FILES; i++) {
-                    if (files[i].exists == 0) {
-                        free_index = i;
+                print("Value: ", 0xFFFFFF);
+                input_wait_string(value);
+                print("\n", 0xFFFFFF);
+
+                unsigned char value_int = atoi(value);
+
+                for (int i = 0; i < 5; i++) {
+                    unsigned char data = read(0x50 + i);
+
+                    if (data == 0) {
+                        write(0x50 + i, value_int);
                         break;
                     }
                 }
-
-                print("Name: ", 0xFFFFFF);
-                input_wait_string(filename);
-                print("\nContent: ", 0xFFFFFF);
-                input_wait_string(filecontent);
-                print("\n", 0xFFFFFF);
-
-                if (free_index >= 0) {
-                    copy_string(files[free_index].name, filename);
-                    copy_string(files[free_index].content, filecontent);
-                    files[free_index].exists = 1;
-                }
-            }
+            }    
             else if (compare_strings(command, "draw")) {
                 char val[16];
                 int r_w, r_h, r_x, r_y;
@@ -224,34 +235,19 @@ refresh:
                 print("\n", 0xFFFFFF);
                 draw_rect(r_x, r_y, r_w, r_h, 0xFFFFFF);
             }
-            else if (compare_strings(command, "run")) {
-                char appname[32];
-                print("App name: ", 0xFFFFFF);
-                input_wait_string(appname);
-                run_app(appname);
-            }
-            else if (compare_strings(command, "apps")) {
-                int apps_found = 0;
-
-                print("\n", 0xFFFFFF);
-
-                for (int i = 0; i < MAX_APPS; i++) {
-                    if (apps[i].exists == 1) {
-                        print(apps[i].name, 0xFFFFFF);
-                        print("\n", 0xFFFFFF);
-                        apps_found++;
-                    }
-                }
-
-                if (apps_found == 0) {
-                    print("No apps installed.\n", 0xFFFFFF);
-                }
-            }
             else if (compare_strings(command, "livetime")) {
                 itoa(timer_ticks / 18, timer_str);
                 print(timer_str, 0xFFFFFF);
                 print("\n", 0xFFFFFF);
             }
+                else if (compare_strings(command, "status")) {
+                    unsigned char battery_status = check_battery();
+                    if (battery_status) {
+                        print("Battery: OK\n", 0xFFFFFF);
+                    } else {
+                        print("Battery: BAD (Please insert a new 2032 battery)\n", 0xFFFFFF);
+                    }
+                }
             else {
                 if (command[0] != '\0') {
                     print("Uncnown command. Type 'help'\n", 0xFFFFFF);
@@ -271,37 +267,26 @@ refresh:
             if (ncount == 1) goto refresh;
 
             if (show_crt_window == 1) {
-                int free_index = -1;
-                for (int i = 0; i < MAX_FILES; i++) {
-                    if (files[i].exists == 0) {
-                        free_index = i;
-                        break;
-                    }
-                }
-
                 is_window_crt = 1;
 
                 for (int i = 0; i < 256; i++) {
-                    filename[i] = 0;
-                    filecontent[i] = 0;
+                    value[i] = 0;
                 }
 
                 x = 126;
                 y = 156;
-                input_wait_string(filename);
+                input_wait_string(value);
+
+                unsigned char value_int = atoi(value);
 
                 if (ncount == 1) goto refresh;
 
-                x = 126;
-                y = 214;
-                input_wait_string(filecontent);
-
-                if (ncount == 1) goto refresh;
-
-                if (free_index >= 0) {
-                    copy_string(files[free_index].name, filename);
-                    copy_string(files[free_index].content, filecontent);
-                    files[free_index].exists = 1;
+                for (int i = 0; i < 5; i++) {
+                    unsigned char data = read(0x50 + i);
+                    if (data == 0) {
+                        write(0x50 + i, value_int);
+                        break;
+                    }
                 }
 
                 show_crt_window = 0;
@@ -322,11 +307,8 @@ void __attribute__((section(".text.entry"))) kernel_main() {
     asm volatile("cli");
     init_mouse();
 	screen_clear();
+    apply_settings();
     init_idt();
-    copy_string(apps[0].name, "power");
-    apps[0].start_lba = 200;
-    apps[0].size_sectors = 1;
-    apps[0].exists = 1;
     asm volatile("sti");
 	prompt();
 }

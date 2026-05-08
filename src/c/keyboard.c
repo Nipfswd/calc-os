@@ -1,5 +1,5 @@
 #include <keyboard.h>
-#include <disk.h>
+#include <cmos.h>
 #include <stdio.h>
 #include <mouse.h>
 #include <utils.h>

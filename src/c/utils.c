@@ -1,4 +1,4 @@
-#include <disk.h>
+#include <cmos.h>
 #include <stdio.h>
 #include <mouse.h>
 #include <utils.h>
@@ -94,4 +94,12 @@ void htoa(int n, char str[]) {
         n >>= 4;
     }
     str[10] = '\0';
+}
+
+unsigned char check_battery() {
+    unsigned char status = read(0x0D);
+    if (!(status & 0x80)) {
+        return 0; 
+    }
+    return 1; 
 }

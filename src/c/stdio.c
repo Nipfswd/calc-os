@@ -1,4 +1,4 @@
-#include <disk.h>
+#include <cmos.h>
 #include <stdio.h>
 #include <mouse.h>
 #include <utils.h>
@@ -40,6 +40,7 @@ void put_char(char s, unsigned int color) {
 
     if (y >= 480) {
         screen_clear();
+        ncount = 1;
     }
 
     unsigned short pitch = *(unsigned short*)0x8010; 
