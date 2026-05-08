@@ -7,8 +7,10 @@ global timer_wrapper
 global keyboard_wrapper
 global mouse_wrapper
 timer_wrapper:
-    pusha               
+    pusha    
+    push esp           
     call timer_handler  
+    mov esp, eax
     popa                
     iret    
 

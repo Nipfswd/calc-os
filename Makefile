@@ -10,7 +10,7 @@ CFLAGS = -m32 -ffreestanding -fno-stack-protector -fno-leading-underscore \
 		 -fno-pic -fno-asynchronous-unwind-tables
 LDFLAGS = -m elf_i386 -T linker.ld --nostdlib --static
 
-OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o
+OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o task.o
 
 all: os-image.img
 
@@ -58,6 +58,9 @@ font.o: src/c/font.c
 	$(CC) $(CFLAGS) $< -o $@
 
 idt.o: src/c/idt.c
+	$(CC) $(CFLAGS) $< -o $@
+
+task.o: src/c/task.c
 	$(CC) $(CFLAGS) $< -o $@
 
 irq_hndlr.o: src/arch/irq_hndlr.asm

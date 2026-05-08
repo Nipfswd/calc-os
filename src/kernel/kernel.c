@@ -5,19 +5,6 @@
 #include <keyboard.h>
 #include <idt.h>
 
-void apply_settings() {
-    if (read(0x59) != 0xA5) {
-        write(0x55, 0x07); 
-        write(0x56, 0);   
-        write(0x59, 0xA5); 
-    }
-
-    unsigned char boots = read(0x56);
-    write(0x56, boots + 1);
-
-    unsigned char theme = read(0x55);
-}
-
 char command[256];
 char value[128];
 
@@ -51,9 +38,9 @@ refresh:
         int file_count = 0;
 
         for (int i = 0; i < 5; i++) {
-            unsigned char data = read(0x50 + i);
+            unsigned char data = read(0x60 + i);
 
-            if (data == 1) {
+            if (data != 0) {
                 int col = file_count % 3;
                 int row = file_count / 3;
 
@@ -84,23 +71,13 @@ refresh:
 
             x = 118;
             y = 104;
-            print("Create a new file", 0xFFFFFF);
+            print("Create a new value", 0xFFFFFF);
 
             x = 118;
             y = 140;
-            print("Name:", 0x000000);
-            draw_rect(118, 152, 404, 24, 0xA0A0A0UL);
-            draw_rect(120, 154, 400, 20, 0xF0F0F0UL);
-
-            x = 118;
-            y = 190;
-            print("Text:", 0x000000);
-            draw_rect(118, 202, 404, 80, 0xA0A0A0UL);
-            draw_rect(120, 204, 400, 76, 0xF8F8F8UL);
-
-            x = 118;
-            y = 290;
-            print("Press Enter to save", 0x505050);
+            print("Value:", 0x000000);
+            draw_rect(118, 152, 404, 24, 0x1E4B8BUL);
+            draw_rect(120, 154, 400, 20, 0x000000UL);
         }
     }
     else if (current_mode == 3) {
@@ -117,7 +94,7 @@ refresh:
           if (battery_status) {
               print("OK\n", 0xFFFFFF);
           } else {
-              print("BAD (Please insert a new 2032 battery)\n", 0xFFFFFF);
+              print("BAD. Please insert a new 2032 battery\n", 0xFFFFFF);
           }
     }
     else {
@@ -155,10 +132,9 @@ refresh:
                 print("Available commands:\n", 0xFFFFFF);
                 print("  help - show this message\n", 0xFFFFFF);
                 print("  cln  - clear the screen\n", 0xFFFFFF);
-                print("  dir  - list all values\n", 0xFFFFFF);
+                print("  vals  - list all values\n", 0xFFFFFF);
                 print("  crt  - create a new value\n", 0xFFFFFF);
                 print("  draw - draw a rectangle\n", 0xFFFFFF);
-                print("  cat - view a specific value\n", 0xFFFFFF);
                 print("  status - check system status\n", 0xFFFFFF);
                 print("  livetime - print system livetime irq0 ticks\n", 0xFFFFFF);
             }
@@ -166,31 +142,12 @@ refresh:
                 screen_clear();
                 ncount = 1;
             }
-            else if (compare_strings(command, "dir")) {
+            else if (compare_strings(command, "vals")) {
                 for (int i = 0; i < 5; i++) {
                     unsigned char data_str[16];
-                    unsigned char data = read(0x50 + i);
+                    unsigned char data = read(0x60 + i);
                     if (data != 0) {
                         itoa(data, data_str);
-                        print(data_str, 0xFFFFFF);
-                        print("\n", 0xFFFFFF);
-                    }
-                }
-            }
-            else if (compare_strings(command, "cat")) {
-                char name[8];
-
-                print("Enter index: ", 0xFFFFFF);
-                input_wait_string(name);
-                print("\n", 0xFFFFFF);
-
-                for (int i = 0; i < 5; i++) {
-                    unsigned char data = read(0x50 + i);
-                    unsigned char data_str[16];
-                    if (data != 0) {
-                        itoa(data, data_str);
-                    }
-                    if (data != 0 && compare_strings(name, data_str)) {
                         print(data_str, 0xFFFFFF);
                         print("\n", 0xFFFFFF);
                     }
@@ -204,10 +161,10 @@ refresh:
                 unsigned char value_int = atoi(value);
 
                 for (int i = 0; i < 5; i++) {
-                    unsigned char data = read(0x50 + i);
+                    unsigned char data = read(0x60 + i);
 
                     if (data == 0) {
-                        write(0x50 + i, value_int);
+                        write(0x60 + i, value_int);
                         break;
                     }
                 }
@@ -236,7 +193,7 @@ refresh:
                 draw_rect(r_x, r_y, r_w, r_h, 0xFFFFFF);
             }
             else if (compare_strings(command, "livetime")) {
-                itoa(timer_ticks / 18, timer_str);
+                itoa(timer_ticks, timer_str); 
                 print(timer_str, 0xFFFFFF);
                 print("\n", 0xFFFFFF);
             }
@@ -245,7 +202,7 @@ refresh:
                     if (battery_status) {
                         print("Battery: OK\n", 0xFFFFFF);
                     } else {
-                        print("Battery: BAD (Please insert a new 2032 battery)\n", 0xFFFFFF);
+                        print("Battery: BAD Please insert a new 2032 battery\n", 0xFFFFFF);
                     }
                 }
             else {
@@ -282,9 +239,9 @@ refresh:
                 if (ncount == 1) goto refresh;
 
                 for (int i = 0; i < 5; i++) {
-                    unsigned char data = read(0x50 + i);
+                    unsigned char data = read(0x60 + i);
                     if (data == 0) {
-                        write(0x50 + i, value_int);
+                        write(0x60 + i, value_int);
                         break;
                     }
                 }
@@ -307,7 +264,6 @@ void __attribute__((section(".text.entry"))) kernel_main() {
     asm volatile("cli");
     init_mouse();
 	screen_clear();
-    apply_settings();
     init_idt();
     asm volatile("sti");
 	prompt();

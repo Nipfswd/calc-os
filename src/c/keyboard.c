@@ -121,7 +121,7 @@ void input_wait_string(char *buffer) {
 					}
 				}
 			}
-			else if (is_window_crt == 1) {
+			else if (is_window_crt != 0) {
 				if (i > 0) {
 					i = i - 1;
 					if (x > 48) {
@@ -138,13 +138,13 @@ void input_wait_string(char *buffer) {
 		}
 
 		if (letter != 0 && i < 255) {
-			if (is_window_crt == 0) {
-				put_char(letter, 0xFFFFFF);
+			if (is_window_crt != 0) {
+				put_char(letter, 0x000000);
 				buffer[i] = letter;
 				i++;
 			}
-			else if (is_window_crt == 1) {
-				put_char(letter, 0x000000);
+			else if (is_window_crt == 0) {
+				put_char(letter, 0xFFFFFF);
 				buffer[i] = letter;
 				i++;
 			}

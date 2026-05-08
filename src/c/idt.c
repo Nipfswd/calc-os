@@ -4,6 +4,7 @@
 #include <utils.h>
 #include <keyboard.h>
 #include <idt.h>
+#include <task.h>
 
 struct idt_entry   idt_entry[256];
 struct idt_pointer idtp;
@@ -35,9 +36,45 @@ void pic_remap() {
     outb(0xA1, 0x0);
 }
 
-void timer_handler() {
+unsigned int task2_stack[1024]; 
+
+void task2_main() {
+    while(1) {
+        if (current_mode != 0) {
+            x = 600;
+            y = 15;
+
+            itoa(timer_ticks / 18, timer_str);
+            print(timer_str, 0xFFFFFF);
+
+            draw_rect(0, 0, 640, 40, 0x000080UL);
+        }
+    }
+}
+
+void prepare_task2() {
+    unsigned int* st = &task2_stack[1024];
+
+    *(--st) = 0x202;       
+    *(--st) = 0x08;    
+    *(--st) = (unsigned int)task2_main; 
+
+    for(int i = 0; i < 8; i++) {
+        *(--st) = 0;
+    }
+
+    task_list[1].esp = (unsigned int)st;
+}
+
+unsigned int timer_handler(unsigned int current_esp) {
+    task_list[current_task].esp = current_esp;
+
+    current_task = (current_task + 1) % 2;
+
     timer_ticks++;
     outb(0x20, 0x20); 
+
+    return task_list[current_task].esp;
 }
 
 void keyboard_handler() {
@@ -122,5 +159,11 @@ void init_idt() {
     set_idt_gate(33, (unsigned int)keyboard_wrapper, 0x08, 0x8E);
     set_idt_gate(44, (unsigned int)mouse_wrapper, 0x08, 0x8E);
 
+    prepare_task2();
+
+    current_task = 0; 
+    task_list[0].id = 0;
+
     __asm__ __volatile__("lidt (%0)" : : "r" (&idtp));
+    __asm__ __volatile__("sti");
 }
