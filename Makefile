@@ -24,49 +24,49 @@ os-image.img: boot.bin kernel.bin
 	
 	@rm temp_image.bin app_struct.bin
 
-boot.bin: src/boot/stub.asm
+boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@
 
-io.o: src/arch/io.asm
+io.o: drivers/keyboard/asm/io.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
-inout.o: src/arch/inout.asm
+inout.o: utils/asm/inout.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
-mouse.o: src/arch/mouse.asm
+mouse.o: drivers/mouse/asm/mouse.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
-kernel.o: src/kernel/kernel.c
+kernel.o: kernel/main/kernel.c
 	$(CC) $(CFLAGS) $< -o $@
 
-cmos.o: src/c/cmos.c
+cmos.o: drivers/cmos/cmos.c
 	$(CC) $(CFLAGS) $< -o $@
 
-stdio.o: src/c/stdio.c
+stdio.o: drivers/video/video.c
 	$(CC) $(CFLAGS) $< -o $@
 
-mouse2.o: src/c/mouse.c
+mouse2.o: drivers/mouse/mouse.c
 	$(CC) $(CFLAGS) $< -o $@
 
-utils.o: src/c/utils.c
+utils.o: utils/utils.c
 	$(CC) $(CFLAGS) $< -o $@
 
-keyboard.o: src/c/keyboard.c
+keyboard.o: drivers/keyboard/keyboard.c
 	$(CC) $(CFLAGS) $< -o $@
 
-font.o: src/c/font.c
+font.o: drivers/video/font/font.c
 	$(CC) $(CFLAGS) $< -o $@
 
-idt.o: src/c/idt.c
+idt.o: cpu/idt/idt.c
 	$(CC) $(CFLAGS) $< -o $@
 
-task.o: src/c/task.c
+task.o: cpu/idt/tasks/task.c
 	$(CC) $(CFLAGS) $< -o $@
 
-irq_hndlr.o: src/arch/irq_hndlr.asm
+irq_hndlr.o: cpu/idt/asm/irq_hndlr.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
-isr.o: src/arch/isr.asm
+isr.o: cpu/idt/asm/isr.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
 kernel.bin: $(OBJ)

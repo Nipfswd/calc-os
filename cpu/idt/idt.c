@@ -1,5 +1,5 @@
 #include <cmos.h>
-#include <stdio.h>
+#include <video.h>
 #include <mouse.h>
 #include <utils.h>
 #include <keyboard.h>
@@ -45,9 +45,9 @@ void task2_main() {
             y = 15;
 
             itoa(timer_ticks / 18, timer_str);
-            print(timer_str, 0xFFFFFF);
+            print(timer_str, 1);
 
-            draw_rect(0, 0, 640, 40, 0x000080UL);
+            draw_rect(400, 0, 240, 40, 0);
         }
     }
 }
@@ -87,55 +87,55 @@ void stub_mouse_handler() {
 }
 
 void exception_handler(struct registers regs) {
-    draw_rect(0, 0, 640, 480, 0xFF0000); 
+    draw_rect(0, 0, 640, 480, 1); 
 
     x = 10;
     y = 10;
     
-    print("KERNEL FATAL: ", 0x000000);
+    print("KERNEL FATAL: ", 0);
     
-    if (regs.int_no == 0) print("DIVISION BY ZERO", 0xFFFFFF);
-    else if (regs.int_no == 1) print("DEBUG", 0xFFFFFF);
-    else if (regs.int_no == 2) print("NON MASKABLE INTERRUPT", 0xFFFFFF);
-    else if (regs.int_no == 3) print("BREAKPOINT", 0xFFFFFF);
-    else if (regs.int_no == 4) print("INTO DETECTED OVERFLOW", 0xFFFFFF);
-    else if (regs.int_no == 5) print("OUT OF BOUNDS", 0xFFFFFF);
-    else if (regs.int_no == 6) print("INVALID OPCODE", 0xFFFFFF);
-    else if (regs.int_no == 7) print("NO COPROCESSOR", 0xFFFFFF);
-    else if (regs.int_no == 8) print("DOUBLE FAULT", 0xFFFFFF);
-    else if (regs.int_no == 9) print("COPROCESSOR SEGMENT OVERRUN", 0xFFFFFF);
-    else if (regs.int_no == 10) print("BAD TSS", 0xFFFFFF);
-    else if (regs.int_no == 11) print("SEGMENT NOT PRESENT", 0xFFFFFF);
-    else if (regs.int_no == 12) print("STACK FAULT", 0xFFFFFF);
-    else if (regs.int_no == 13) print("GENERAL PROTECTION FAULT", 0xFFFFFF);
-    else if (regs.int_no == 14) print("PAGE FAULT", 0xFFFFFF);
-    else if (regs.int_no == 15) print("UNKNOWN INTERRUPT (RESERVED)", 0xFFFFFF);
-    else if (regs.int_no == 16) print("FLOATING POINT ERROR", 0xFFFFFF);
-    else if (regs.int_no == 17) print("ALIGNMENT CHECK", 0xFFFFFF);
-    else if (regs.int_no == 18) print("MACHINE CHECK", 0xFFFFFF);
-    else if (regs.int_no == 19) print("SIMD FLOATING POINT EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 20) print("VIRTUALIZATION EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 21) print("CONTROL PROTECTION EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no >= 22 && regs.int_no <= 27) print("RESERVED EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 28) print("HYPERVISOR INJECTION EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 29) print("VMM COMMUNICATION EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 30) print("SECURITY EXCEPTION", 0xFFFFFF);
-    else if (regs.int_no == 31) print("RESERVED EXCEPTION", 0xFFFFFF);
-    else print("UNKNOWN EXCEPTION\n", 0xFFFFFF);
+    if (regs.int_no == 0) print("DIVISION BY ZERO", 1);
+    else if (regs.int_no == 1) print("DEBUG", 1);
+    else if (regs.int_no == 2) print("NON MASKABLE INTERRUPT", 1);
+    else if (regs.int_no == 3) print("BREAKPOINT", 1);
+    else if (regs.int_no == 4) print("INTO DETECTED OVERFLOW", 1);
+    else if (regs.int_no == 5) print("OUT OF BOUNDS", 1);
+    else if (regs.int_no == 6) print("INVALID OPCODE", 1);
+    else if (regs.int_no == 7) print("NO COPROCESSOR", 1);
+    else if (regs.int_no == 8) print("DOUBLE FAULT", 1);
+    else if (regs.int_no == 9) print("COPROCESSOR SEGMENT OVERRUN", 1);
+    else if (regs.int_no == 10) print("BAD TSS", 1);
+    else if (regs.int_no == 11) print("SEGMENT NOT PRESENT", 1);
+    else if (regs.int_no == 12) print("STACK FAULT", 1);
+    else if (regs.int_no == 13) print("GENERAL PROTECTION FAULT", 1);
+    else if (regs.int_no == 14) print("PAGE FAULT", 1);
+    else if (regs.int_no == 15) print("UNKNOWN INTERRUPT (RESERVED)", 1);
+    else if (regs.int_no == 16) print("FLOATING POINT ERROR", 1);
+    else if (regs.int_no == 17) print("ALIGNMENT CHECK", 1);
+    else if (regs.int_no == 18) print("MACHINE CHECK", 1);
+    else if (regs.int_no == 19) print("SIMD FLOATING POINT EXCEPTION", 1);
+    else if (regs.int_no == 20) print("VIRTUALIZATION EXCEPTION", 1);
+    else if (regs.int_no == 21) print("CONTROL PROTECTION EXCEPTION", 1);
+    else if (regs.int_no >= 22 && regs.int_no <= 27) print("RESERVED EXCEPTION", 1);
+    else if (regs.int_no == 28) print("HYPERVISOR INJECTION EXCEPTION", 1);
+    else if (regs.int_no == 29) print("VMM COMMUNICATION EXCEPTION", 1);
+    else if (regs.int_no == 30) print("SECURITY EXCEPTION", 1);
+    else if (regs.int_no == 31) print("RESERVED EXCEPTION", 1);
+    else print("UNKNOWN EXCEPTION\n", 1);
 
     x = 10;
     y = 70;
-    print("TECHICAL INFORMATION: ", 0x000000);
+    print("TECHICAL INFORMATION: ", 0);
     char buf[3];
     itoa(regs.int_no, buf);
-    print("\nINTERRUPT NO: ", 0xFFFFFF); 
-    print(buf, 0xFFFF00); 
+    print("\nINTERRUPT NO: ", 1); 
+    print(buf, 1); 
 
 
-    print("\nEIP: ", 0xFFFFFF);
+    print("\nEIP: ", 1);
     char eip_buf[10];
     htoa(regs.eip, eip_buf);
-    print(eip_buf, 0x00FF00);
+    print(eip_buf, 1);
     
     while(1); 
 }

@@ -12,15 +12,8 @@ start:
     mov ax, 0x2401
     int 0x15
 
-    mov ax, 0x4F01        
-    mov cx, 0x4112      
-    mov di, 0x8000  
+    mov ax, 0x0011
     int 0x10
-    mov ax, 0x4F02     
-    mov bx, 0x4112       
-    int 0x10
-    cmp ax, 0x004F       
-    jne vbe_error
 
     mov ax, 0x1000
     mov es, ax
@@ -52,9 +45,6 @@ start:
     or eax, 0x1
     mov cr0, eax
     jmp 0x08:init_32bit
-
-vbe_error:
-    jmp $
 
 disk_error:
     jmp $
