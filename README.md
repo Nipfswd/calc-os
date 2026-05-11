@@ -1,0 +1,3 @@
+What's the point of a digital calculator in the OS if there's a physical calculator? Why write an ACPI driver if there's a power button? What's the point of Windows if there's CalcOS? People didn't create processors to play around with basic things, but to perform complex operations.
+
+Project Description: CalcOS is a minimalist, bare-metal operating system built with a focus on raw performance and hardware control

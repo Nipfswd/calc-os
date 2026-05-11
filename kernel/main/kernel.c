@@ -193,7 +193,7 @@ refresh:
                 draw_rect(r_x, r_y, r_w, r_h, 1);
             }
             else if (compare_strings(command, "livetime")) {
-                itoa(timer_ticks, timer_str); 
+                itoa(timer_ticks / 18, timer_str);
                 print(timer_str, 1);
                 print("\n", 1);
             }

@@ -18,8 +18,6 @@ void write(unsigned char addr, unsigned char value) {
 }
 
 unsigned char read(unsigned char addr) {
-    if (!is_safe_cmos_addr(addr)) return 0;
-
     unsigned char res;
     __asm__ volatile ("cli");
     
