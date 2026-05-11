@@ -82,3 +82,6 @@ cleane:
 
 run: os-image.img
 	qemu-system-i386 -drive file=os-image.img,format=raw
+
+boch:
+	bochs -f bochsrc.txt
