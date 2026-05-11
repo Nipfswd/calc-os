@@ -12,5 +12,8 @@ void htoa(int n, char str[]);
 void draw_button(int _x, int _y, int _width, int _height, char *_msg, unsigned char color, unsigned char text_color);
 
 unsigned char check_battery();
+unsigned char bcd_to_bin(unsigned char val);
+void get_time(int *h, int *m);
+
 
 #endif

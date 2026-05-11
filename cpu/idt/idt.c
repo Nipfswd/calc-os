@@ -32,22 +32,31 @@ void pic_remap() {
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    outb(0x21, 0xFC);
+    outb(0xA1, 0xFF);
 }
 
 unsigned int task2_stack[1024]; 
 
 void task2_main() {
+    int hours, minutes;
+    char h_str[3], m_str[3];
+
     while(1) {
         if (current_mode != 0) {
-            x = 600;
-            y = 15;
+            get_time(&hours, &minutes);
 
-            itoa(timer_ticks / 18, timer_str);
-            print(timer_str, 1);
+            x = 600; y = 15;
+            
+            itoa(hours, h_str);
+            print(h_str, 1);
+            print(":", 1);
+            
+            itoa(minutes, m_str);
+            if (minutes < 10) print("0", 1); 
+            print(m_str, 1);
 
-            draw_rect(400, 0, 240, 40, 0);
+            draw_rect(500, 0, 140, 40, 0); 
         }
     }
 }
@@ -59,7 +68,7 @@ void prepare_task2() {
     *(--st) = 0x08;    
     *(--st) = (unsigned int)task2_main; 
 
-    for(int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         *(--st) = 0;
     }
 
@@ -136,8 +145,23 @@ void exception_handler(struct registers regs) {
     char eip_buf[10];
     htoa(regs.eip, eip_buf);
     print(eip_buf, 0);
+
+    print("\nCS: ", 0);
+    htoa(regs.cs, buf); 
+    print(buf, 0);
+
+    print("\nERR CODE: ", 0);
+    itoa(regs.err_code, buf); 
+    print(buf, 0);
     
     while(1); 
+}
+
+void init_timer() {
+    outb(0x43, 0x36); 
+
+    outb(0x40, 0xFF); 
+    outb(0x40, 0xFF); 
 }
 
 void init_idt() {
@@ -149,6 +173,7 @@ void init_idt() {
     }
 
     pic_remap();
+    init_timer();
 
     set_idt_gate(0,  (unsigned int)isr0,  0x08, 0x8E);
     set_idt_gate(8,  (unsigned int)isr8,  0x08, 0x8E);

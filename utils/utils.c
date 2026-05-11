@@ -77,3 +77,17 @@ unsigned char check_battery() {
     }
     return 1; 
 }
+
+unsigned char bcd_to_bin(unsigned char val) {
+    return (val & 0x0F) + ((val >> 4) * 10);
+}
+
+void get_time(int *h, int *m) {
+    while (read(0x0A) & 0x80);
+
+    unsigned char raw_h = read(0x04);
+    unsigned char raw_m = read(0x02);
+
+    *h = bcd_to_bin(raw_h);
+    *m = bcd_to_bin(raw_m);
+}
