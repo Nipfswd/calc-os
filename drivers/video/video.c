@@ -4,6 +4,7 @@
 #include <utils.h>
 #include <keyboard.h>
 #include <font.h>
+#include <stdint.h>
 
 int x = 0;
 int y = 0;
@@ -14,7 +15,7 @@ int is_window_crt = 0;
 int is_button_apps = 0;
 int is_button_files = 1;
 
-void set_palette_color(unsigned char index, unsigned char r, unsigned char g, unsigned char b) {
+void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
     outb(0x03C8, index);
     outb(0x03C9, r);
     outb(0x03C9, g);
@@ -37,7 +38,7 @@ void screen_clear() {
 	ncount = 1;
 }
 
-void put_char(char s, unsigned char color) {
+void put_char(char s, uint8_t color) {
     if (s == '\n') {
         x = 0;
         y = y + 8;
@@ -75,7 +76,7 @@ void put_char(char s, unsigned char color) {
     x = x + 8;
 }
 
-void print(char *msg, unsigned char color) {
+void print(char *msg, uint8_t color) {
 	for (int i = 0; msg[i] != 0; i++) {
 		put_char(msg[i], color);
 	}
@@ -90,8 +91,8 @@ void draw_gray_rect(int x, int y, int width, int height) {
             if (curr_x >= 0 && curr_x < 640 && curr_y >= 0 && curr_y < 480) {
                 int is_white = (curr_x + curr_y) % 2 == 0;
                 
-                unsigned char *row = &VIDEO_MEMORY[curr_y * 80];
-                unsigned char mask = 128 >> (curr_x % 8);
+                uint8_t *row = &VIDEO_MEMORY[curr_y * 80];
+                uint8_t mask = 128 >> (curr_x % 8);
 
                 if (is_white) {
                     row[curr_x / 8] = row[curr_x / 8] | mask;
@@ -103,7 +104,7 @@ void draw_gray_rect(int x, int y, int width, int height) {
     }
 }
 
-void draw_rect(int x, int y, int width, int height, unsigned char color) {
+void draw_rect(int x, int y, int width, int height, uint8_t color) {
     if (color == 2) {
         draw_gray_rect(x, y, width, height);
         return;
@@ -115,8 +116,8 @@ void draw_rect(int x, int y, int width, int height, unsigned char color) {
             int curr_y = y + i;
 
             if (curr_x >= 0 && curr_x < 640 && curr_y >= 0 && curr_y < 480) {
-                unsigned char *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
-                unsigned char mask = 128 >> (curr_x % 8);
+                uint8_t *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
+                uint8_t mask = 128 >> (curr_x % 8);
 
                 if (color > 0) {
                     *ptr = *ptr | mask;   

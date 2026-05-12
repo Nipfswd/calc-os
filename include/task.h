@@ -1,10 +1,11 @@
 #ifndef TASK_H
 #define TASK_H
+#include <stdint.h>
 
 typedef struct {
     void* esp; 
-    unsigned char id;
-    unsigned char state;
+    uint8_t id;
+    uint8_t state;
 } Task;
 
 extern Task task_list[2];

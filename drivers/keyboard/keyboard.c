@@ -3,6 +3,7 @@
 #include <video.h>
 #include <mouse.h>
 #include <utils.h>
+#include <stdint.h>
 
 int shift_pressed = 0;
 

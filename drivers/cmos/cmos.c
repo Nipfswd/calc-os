@@ -3,12 +3,13 @@
 #include <mouse.h>
 #include <utils.h>
 #include <keyboard.h>
+#include <stdint.h>
 
-static int is_safe_cmos_addr(unsigned char addr) {
+static int is_safe_cmos_addr(uint8_t addr) {
     return addr >= 0x50 && addr <= 0x54;
 }
 
-void write(unsigned char addr, unsigned char value) {
+void write(uint8_t addr, uint8_t value) {
     if (!is_safe_cmos_addr(addr)) return;
 
     __asm__ volatile ("cli");
@@ -17,8 +18,8 @@ void write(unsigned char addr, unsigned char value) {
     __asm__ volatile ("sti");
 }
 
-unsigned char read(unsigned char addr) {
-    unsigned char res;
+uint8_t read(uint8_t addr) {
+    uint8_t res;
     __asm__ volatile ("cli");
     
     outb(0x70, addr | 0x80);  

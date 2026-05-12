@@ -3,6 +3,7 @@
 #include <mouse.h>
 #include <utils.h>
 #include <keyboard.h>
+#include <stdint.h>
 
 unsigned char mouse_cursor[16][16] = {
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -27,15 +28,15 @@ unsigned char mouse_cursor[16][16] = {
 void draw_cursor(int mx, int my) {
     for (int row = 0; row < 16; row = row + 1) {
         for (int col = 0; col < 16; col = col + 1) {
-            unsigned char c = mouse_cursor[row][col];
+            uint8_t c = mouse_cursor[row][col];
             
             if (c == 1 || c == 2) {
                 int curr_x = mx + col;
                 int curr_y = my + row;
 
                 if (curr_x >= 0 && curr_x < 640 && curr_y >= 0 && curr_y < 480) {
-                    unsigned char *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
-                    unsigned char mask = 128 >> (curr_x % 8);
+                    uint8_t *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
+                    uint8_t mask = 128 >> (curr_x % 8);
 
                     if (c == 1) {
                         *ptr = *ptr | mask;
@@ -54,21 +55,21 @@ int mouse_y = 200;
 int old_mouse_x = 320;
 int old_mouse_y = 200;
 int mouse_left_button = 0;
-unsigned char cursor_back_buffer[256];
+uint8_t cursor_back_buffer[256];
 
 void mouse_handler() {
 	if ((inb(0x64) & 1) == 0) {
 		return;
 	}
 
-	unsigned char mouse_packet[3];
-	unsigned char status = inb(0x64);
+	uint8_t mouse_packet[3];
+	uint8_t status = inb(0x64);
 
 	if (!(status & 0x01) || !(status & 0x20)) {
 		return;
 	}
 
-	unsigned char first_byte = inb(0x60);
+	uint8_t first_byte = inb(0x60);
 
 	if (!(first_byte & 0x08)) {
 		return;
@@ -104,8 +105,8 @@ void save_background() {
             int cur_y = mouse_y + i;
 
             if (cur_x >= 0 && cur_x < 640 && cur_y >= 0 && cur_y < 480) {
-                unsigned char p_byte = VIDEO_MEMORY[cur_y * 80 + (cur_x / 8)];
-                unsigned char mask = 128 >> (cur_x % 8);
+                uint8_t p_byte = VIDEO_MEMORY[cur_y * 80 + (cur_x / 8)];
+                uint8_t mask = 128 >> (cur_x % 8);
 
                 if (p_byte & mask) {
                     cursor_back_buffer[i * 16 + j] = 1;
@@ -124,8 +125,8 @@ void restore_background() {
             int old_y = old_mouse_y + i;
 
             if (old_x >= 0 && old_x < 640 && old_y >= 0 && old_y < 480) {
-                unsigned char *ptr = &VIDEO_MEMORY[old_y * 80 + (old_x / 8)];
-                unsigned char mask = 128 >> (old_x % 8);
+                uint8_t *ptr = &VIDEO_MEMORY[old_y * 80 + (old_x / 8)];
+                uint8_t mask = 128 >> (old_x % 8);
 
                 if (cursor_back_buffer[i * 16 + j] == 1) {
                     *ptr = *ptr | mask;    

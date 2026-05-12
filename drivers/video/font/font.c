@@ -4,8 +4,9 @@
 #include <utils.h>
 #include <keyboard.h>
 #include <font.h>
+#include <stdint.h>
 
-unsigned char font[256][8] = {
+uint8_t font[256][8] = {
 	['0'] = {
 		0b00111100,
 		0b01000010,

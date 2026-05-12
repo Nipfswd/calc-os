@@ -5,6 +5,7 @@
 #include <keyboard.h>
 #include <idt.h>
 #include <task.h>
+#include <stdint.h>
 
 struct idt_entry   idt_entry[256];
 struct idt_pointer idtp;
@@ -12,7 +13,9 @@ struct idt_pointer idtp;
 unsigned int timer_ticks = 0;
 unsigned char *timer_str[16];
 
-void set_idt_gate(unsigned char number, unsigned int base, unsigned short selector, unsigned char flags) {
+volatile int ata_interrupt_received = 0;
+
+void set_idt_gate(uint8_t number, uint32_t base, uint16_t selector, uint8_t flags) {
     idt_entry[number].base_low = (base & 0xFFFF);
     idt_entry[number].base_high = (base >> 16) & 0xFFFF;
     idt_entry[number].selector = selector;
@@ -33,7 +36,7 @@ void pic_remap() {
     outb(0xA1, 0x01);
     
     outb(0x21, 0xFC);
-    outb(0xA1, 0xFF);
+    outb(0xA1, 0x40);
 }
 
 unsigned int task2_stack[1024]; 
@@ -62,20 +65,20 @@ void task2_main() {
 }
 
 void prepare_task2() {
-    unsigned int* st = &task2_stack[1024];
+    uint32_t* st = &task2_stack[1024];
 
     *(--st) = 0x202;       
     *(--st) = 0x08;    
-    *(--st) = (unsigned int)task2_main; 
+    *(--st) = (uint32_t)task2_main; 
 
     for (int i = 0; i < 8; i++) {
         *(--st) = 0;
     }
 
-    task_list[1].esp = (unsigned int)st;
+    task_list[1].esp = (uint32_t)st;
 }
 
-unsigned int timer_handler(unsigned int current_esp) {
+uint32_t timer_handler(uint32_t current_esp) {
     task_list[current_task].esp = current_esp;
 
     current_task = (current_task + 1) % 2;
@@ -164,8 +167,15 @@ void init_timer() {
     outb(0x40, 0xFF); 
 }
 
+void ata_handler() {
+    ata_interrupt_received = 1;
+
+    outb(0xA0, 0x20);
+    outb(0x20, 0x20);
+}
+
 void init_idt() {
-    idtp.idt_ptr = (unsigned int)&idt_entry;
+    idtp.idt_ptr = (uint32_t)&idt_entry;
     idtp.idt_size = (sizeof(struct idt_entry) * 256) - 1;
 
     for (int i = 0; i < 256; i++) {
@@ -175,14 +185,15 @@ void init_idt() {
     pic_remap();
     init_timer();
 
-    set_idt_gate(0,  (unsigned int)isr0,  0x08, 0x8E);
-    set_idt_gate(8,  (unsigned int)isr8,  0x08, 0x8E);
-    set_idt_gate(13, (unsigned int)isr13, 0x08, 0x8E);
-    set_idt_gate(14, (unsigned int)isr14, 0x08, 0x8E);
+    set_idt_gate(0,  (uint32_t)isr0,  0x08, 0x8E);
+    set_idt_gate(8,  (uint32_t)isr8,  0x08, 0x8E);
+    set_idt_gate(13, (uint32_t)isr13, 0x08, 0x8E);
+    set_idt_gate(14, (uint32_t)isr14, 0x08, 0x8E);
 
-    set_idt_gate(32, (unsigned int)timer_wrapper, 0x08, 0x8E);
-    set_idt_gate(33, (unsigned int)keyboard_wrapper, 0x08, 0x8E);
-    set_idt_gate(44, (unsigned int)mouse_wrapper, 0x08, 0x8E);
+    set_idt_gate(32, (uint32_t)timer_wrapper, 0x08, 0x8E);
+    set_idt_gate(33, (uint32_t)keyboard_wrapper, 0x08, 0x8E);
+    set_idt_gate(44, (uint32_t)mouse_wrapper, 0x08, 0x8E);
+    set_idt_gate(46, (uint32_t)ata_wrapper, 0x08, 0x8E);
 
     prepare_task2();
 

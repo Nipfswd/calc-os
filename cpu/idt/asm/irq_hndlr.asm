@@ -2,10 +2,12 @@
 [extern timer_handler] 
 [extern keyboard_handler]
 [extern stub_mouse_handler]
+[extern ata_handler]
 
 global timer_wrapper
 global keyboard_wrapper
 global mouse_wrapper
+global ata_wrapper
 timer_wrapper:
     pusha    
     push esp           
@@ -25,3 +27,9 @@ mouse_wrapper:
     call stub_mouse_handler
     popa
     iret   
+
+ata_wrapper:
+    pusha
+    call ata_handler
+    popa
+    iret

@@ -3,6 +3,7 @@
 #include <mouse.h>
 #include <utils.h>
 #include <keyboard.h>
+#include <stdint.h>
 
 int compare_strings(const char *str1, const char *str2) {
 	int i = 0;
@@ -34,7 +35,7 @@ int atoi(char *str) {
 	return res;
 }
 
-void draw_button(int _x, int _y, int _width, int _height, char *_msg, unsigned char color, unsigned char text_color) {
+void draw_button(int _x, int _y, int _width, int _height, char *_msg, uint8_t color, uint8_t text_color) {
     draw_rect(_x, _y, _width, _height, color);
     x = _x + 4;
     y = _y + 4;
@@ -42,7 +43,7 @@ void draw_button(int _x, int _y, int _width, int _height, char *_msg, unsigned c
     print(_msg, text_color);
 }
 
-void itoa(unsigned int n, char* s) {
+void itoa(uint32_t n, char* s) {
     int i = 0;
     if (n == 0) s[i++] = '0';
     while (n > 0) {
@@ -70,23 +71,23 @@ void htoa(int n, char str[]) {
     str[10] = '\0';
 }
 
-unsigned char check_battery() {
-    unsigned char status = read(0x0D);
+uint8_t check_battery() {
+    uint8_t status = read(0x0D);
     if (!(status & 0x80)) {
         return 0; 
     }
     return 1; 
 }
 
-unsigned char bcd_to_bin(unsigned char val) {
+uint8_t bcd_to_bin(uint8_t val) {
     return (val & 0x0F) + ((val >> 4) * 10);
 }
 
 void get_time(int *h, int *m) {
     while (read(0x0A) & 0x80);
 
-    unsigned char raw_h = read(0x04);
-    unsigned char raw_m = read(0x02);
+    uint8_t raw_h = read(0x04);
+    uint8_t raw_m = read(0x02);
 
     *h = bcd_to_bin(raw_h);
     *m = bcd_to_bin(raw_m);
