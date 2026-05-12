@@ -92,3 +92,12 @@ void get_time(int *h, int *m) {
     *h = bcd_to_bin(raw_h);
     *m = bcd_to_bin(raw_m);
 }
+
+int memcmp(const char *s1, const char *s2, int n) {
+    for (int i = 0; i < n; i++) {
+        if (s1[i] != s2[i]) {
+            return 0; 
+        }
+    }
+    return 1; 
+}

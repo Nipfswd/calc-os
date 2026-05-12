@@ -15,6 +15,6 @@ void draw_button(int _x, int _y, int _width, int _height, char *_msg, uint8_t co
 uint8_t check_battery();
 uint8_t bcd_to_bin(uint8_t val);
 void get_time(int *h, int *m);
-
+int memcmp(const char *s1, const char *s2, int n);
 
 #endif
