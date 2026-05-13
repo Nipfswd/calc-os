@@ -38,4 +38,8 @@ void read_file(const char* filename_11, uint8_t* buffer);
 void create_file(const char* name_11, uint8_t* data, int size);
 void list_files();
 
+extern int disk_initialized;
+extern uint8_t cached_fat[512 * 9];
+extern struct fat12_bpb cached_bpb;
+
 #endif

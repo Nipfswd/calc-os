@@ -88,7 +88,7 @@ refresh:
                 x = icon_x + 16;
                 y = icon_y + 16;
 
-                int data_str[16];
+                int data_str[16]; 
                 itoa(data, data_str);
 
                 print(data_str, 0);
