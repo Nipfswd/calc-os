@@ -11,10 +11,6 @@ void ata_wait_bsy() {
     while (inb(0x1F7) & 0x80);
 }
 
-void ata_wait_drdy() {
-    while (!(inb(0x1F7) & 0x40));
-}
-
 void ata_wait_drq() {
     while (!(inb(0x1F7) & 0x08));
 }
