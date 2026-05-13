@@ -42,7 +42,7 @@ start_code:
     mov bx, 0
 
     mov ah, 0x02
-    mov al, 50
+    mov al, 60
     mov ch, 0
     mov dh, 0
     mov cl, 2

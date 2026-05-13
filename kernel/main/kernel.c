@@ -6,10 +6,23 @@
 #include <idt.h>
 #include <fat.h>
 #include <stdint.h>
+#include <ata.h>
 
 char command[256];
-char value[128];
+char name[128];
 char content[512];
+
+void name_clear() {
+    for (int i = 0; i < 128; i++) {
+        name[i] = 0;
+    }
+}
+
+void content_clear() {
+    for (int i = 0; i < 512; i++) {
+        content[i] = 0;
+    }
+}
 
 static void format_fat_name(const char* src, char dest[11]) {
     for (int i = 0; i < 11; i++) {
@@ -44,6 +57,64 @@ static void format_fat_name(const char* src, char dest[11]) {
     }
 }
 
+static void draw_file_icons() {
+    uint16_t buffer[256];
+    ata_read_sector(0, buffer);
+    struct fat12_bpb* bpb = (struct fat12_bpb*)buffer;
+
+    uint32_t root_lba = bpb->reserved_sectors + (bpb->num_fats * bpb->fat_size_sectors);
+    uint32_t root_sectors = ((bpb->root_entries * 32) + (bpb->bytes_per_sector - 1)) / bpb->bytes_per_sector;
+
+    int icon_index = 0;
+    for (uint32_t s = 0; s < root_sectors; s++) {
+        ata_read_sector(root_lba + s, buffer);
+        struct fat12_entry* entries = (struct fat12_entry*)buffer;
+
+        for (int i = 0; i < 16; i++) {
+            if (entries[i].name[0] == 0x00) return;
+            if ((uint8_t)entries[i].name[0] == 0xE5) continue;
+            if (entries[i].attributes == 0x0F) continue;
+
+            int col = icon_index % 3;
+            int row = icon_index / 3;
+            int icon_x = 20 + col * 180;
+            int icon_y = 100 + row * 100;
+
+            draw_rect(icon_x, icon_y, 130, 30, 1);
+
+            char name_buf[9];
+            char ext_buf[4];
+            int name_len = 0;
+            int ext_len = 0;
+
+            for (int j = 0; j < 8; j++) {
+                if (entries[i].name[j] != ' ') {
+                    name_buf[name_len++] = entries[i].name[j];
+                }
+            }
+            name_buf[name_len] = '\0';
+
+            for (int j = 0; j < 3; j++) {
+                if (entries[i].ext[j] != ' ') {
+                    ext_buf[ext_len++] = entries[i].ext[j];
+                }
+            }
+            ext_buf[ext_len] = '\0';
+
+            x = icon_x + 8;
+            y = icon_y + 8;
+            print(name_buf, 0);
+            if (ext_len > 0) {
+                print(".", 0);
+                print(ext_buf, 0);
+            }
+
+            icon_index++;
+            if (icon_index >= 6) return;
+        }
+    }
+}
+
 void prompt() {
 refresh:
     ncount = 0;
@@ -71,24 +142,7 @@ refresh:
 
         draw_button(0, 440, 640, 40, "F2 - create a new file", 1, 0);
 
-        int file_count = 0;
-
-
-        int col = file_count % 3;
-        int row = file_count / 3;
-
-        int icon_x = (16 + col * 100) * 2;
-        int icon_y = (50 + row * 34) * 2;
-
-        draw_rect(icon_x, icon_y, 160, 48, 1);
-
-        x = icon_x + 16;
-        y = icon_y + 16;
-
-
-        //print(, 0);
-
-        file_count++;
+        draw_file_icons();
 
         if (show_crt_window == 1) {
             is_window_crt = 1;
@@ -100,13 +154,19 @@ refresh:
 
             x = 118;
             y = 104;
-            print("Create a new value", 1);
+            print("Create a new file", 1);
 
             x = 118;
             y = 140;
-            print("Value:", 0);
+            print("Name:", 1);
             draw_rect(118, 152, 404, 24, 1);
             draw_rect(120, 154, 400, 20, 0);
+
+            x = 118;
+            y = 190;
+            print("Content:", 1);
+            draw_rect(118, 242, 404, 24, 1);
+            draw_rect(120, 244, 400, 20, 0);
         }
     }
     else if (current_mode == 3) {
@@ -133,11 +193,11 @@ refresh:
         draw_button(190, 48, 136, 26, "Explorer", 0, 1);
 
         if (is_button_files == 1) {
-            draw_button(156, 100, 320, 36, "Values", 1, 0);
+            draw_button(156, 100, 320, 36, "Files", 1, 0);
             draw_button(156, 200, 320, 36, "System", 2, 0);
         }
         else if (is_button_apps == 1) {
-            draw_button(156, 100, 320, 36, "Values", 2, 0);
+            draw_button(156, 100, 320, 36, "Files", 2, 0);
             draw_button(156, 200, 320, 36, "System", 1, 0);
         }
     }
@@ -175,8 +235,10 @@ refresh:
                 list_files();
             }
             else if (compare_strings(command, "crt")) {
+                name_clear();
+                content_clear();
                 print("Name: ", 1);
-                input_wait_string(value);
+                input_wait_string(name);
                 print("\n", 1);
                 print("Content: ", 1);
                 input_wait_string(content);
@@ -187,7 +249,7 @@ refresh:
                 if (len > 512) len = 512;
 
                 char name_11[11];
-                format_fat_name(value, name_11);
+                format_fat_name(name, name_11);
 
                 uint8_t buffer[512] = {0};
                 for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
@@ -250,26 +312,34 @@ refresh:
 
             if (show_crt_window == 1) {
                 is_window_crt = 1;
-
-                for (int i = 0; i < 256; i++) {
-                    value[i] = 0;
-                }
-
-                x = 126;
-                y = 156;
-                input_wait_string(value);
-
-                unsigned char value_int = atoi(value);
+                name_clear();
+                content_clear();
 
                 if (ncount == 1) goto refresh;
 
-                for (int i = 0; i < 5; i++) {
-                    unsigned char data = read(0x50 + i);
-                    if (data == 0) {
-                        write(0x50 + i, value_int);
-                        break;
-                    }
-                }
+                x = 126;
+                y = 156;
+                input_wait_string(name);
+
+                x = 176;
+                y = 246;
+                input_wait_string(content);
+
+                if (ncount == 1) goto refresh;
+
+                print("\n", 1);
+
+                int len = 0;
+                while (content[len] != '\0') len++;
+                if (len > 512) len = 512;
+
+                char name_11[11];
+                format_fat_name(name, name_11);
+
+                uint8_t buffer[512] = {0};
+                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
+
+                create_file(name_11, buffer, len);
 
                 show_crt_window = 0;
                 is_window_crt = 0;
