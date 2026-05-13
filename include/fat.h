@@ -34,4 +34,8 @@ struct fat12_entry {
     uint32_t    file_size;
 } __attribute__((packed));
 
+void read_file(const char* filename_11, uint8_t* buffer);
+void create_file(const char* name_11, uint8_t* data, int size);
+void list_files();
+
 #endif

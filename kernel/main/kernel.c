@@ -4,9 +4,45 @@
 #include <mouse.h>
 #include <keyboard.h>
 #include <idt.h>
+#include <fat.h>
+#include <stdint.h>
 
 char command[256];
 char value[128];
+char content[512];
+
+static void format_fat_name(const char* src, char dest[11]) {
+    for (int i = 0; i < 11; i++) {
+        dest[i] = ' ';
+    }
+
+    int name_idx = 0;
+    int ext_idx = 0;
+    int i = 0;
+    int in_ext = 0;
+
+    while (src[i] != '\0' && (name_idx < 8 || ext_idx < 3)) {
+        char c = src[i++];
+        if (c == '.') {
+            in_ext = 1;
+            continue;
+        }
+
+        if (c >= 'a' && c <= 'z') {
+            c -= 32;
+        }
+
+        if (!in_ext) {
+            if (name_idx < 8) {
+                dest[name_idx++] = c;
+            }
+        } else {
+            if (ext_idx < 3) {
+                dest[8 + ext_idx++] = c;
+            }
+        }
+    }
+}
 
 void prompt() {
 refresh:
@@ -132,8 +168,8 @@ refresh:
                 print("Available commands:\n", 0xFFFFFF);
                 print("  help - show this message\n", 0xFFFFFF);
                 print("  cln  - clear the screen\n", 0xFFFFFF);
-                print("  vals  - list all values\n", 0xFFFFFF);
-                print("  crt  - create a new value\n", 0xFFFFFF);
+                print("  ls  - list all files\n", 0xFFFFFF);
+                print("  crt  - create a new file\n", 0xFFFFFF);
                 print("  draw - draw a rectangle\n", 0xFFFFFF);
                 print("  status - check system status\n", 0xFFFFFF);
                 print("  livetime - print system livetime irq0 ticks\n", 0xFFFFFF);
@@ -142,32 +178,28 @@ refresh:
                 screen_clear();
                 ncount = 1;
             }
-            else if (compare_strings(command, "vals")) {
-                for (int i = 0; i < 5; i++) {
-                    unsigned char data_str[16];
-                    unsigned char data = read(0x50 + i);
-                    if (data != 0) {
-                        itoa(data, data_str);
-                        print(data_str, 1);
-                        print("\n", 1);
-                    }
-                }
+            else if (compare_strings(command, "ls")) {
+                list_files();
             }
             else if (compare_strings(command, "crt")) {
-                print("Value: ", 1);
+                print("Name: ", 1);
                 input_wait_string(value);
                 print("\n", 1);
+                print("Content: ", 1);
+                input_wait_string(content);
+                print("\n", 1);
 
-                unsigned char value_int = atoi(value);
+                int len = 0;
+                while (content[len] != '\0') len++;
+                if (len > 512) len = 512;
 
-                for (int i = 0; i < 5; i++) {
-                    unsigned char data = read(0x50 + i);
+                char name_11[11];
+                format_fat_name(value, name_11);
 
-                    if (data == 0) {
-                        write(0x50 + i, value_int);
-                        break;
-                    }
-                }
+                uint8_t buffer[512] = {0};
+                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
+
+                create_file(name_11, buffer, len);
             }    
             else if (compare_strings(command, "draw")) {
                 char val[16];

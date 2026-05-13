@@ -19,10 +19,9 @@ os-image.img: boot.bin kernel.bin
 
 	cat boot.bin kernel.bin > temp_image.bin
 	dd if=temp_image.bin of=os-image.img conv=notrunc
-	dd if=/dev/zero of=app_struct.bin bs=512 count=1
 	
 	
-	@rm temp_image.bin app_struct.bin
+	@rm temp_image.bin
 
 boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@
@@ -87,7 +86,7 @@ cleane:
 	rm -f *.o *.bin *.elf *.img
 
 run: os-image.img
-	qemu-system-i386 -drive file=os-image.img,format=raw
+	qemu-system-i386 -drive file=os-image.img,format=raw -display gtk
 
 boch:
 	bochs -f bochsrc.txt

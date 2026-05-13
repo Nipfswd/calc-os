@@ -1,7 +1,29 @@
 [bits 16]
 [org 0x7c00]
 
-start:
+jmp start_code
+nop
+OEM_ID db "MSDOS5.0"
+bytes_per_sector dw 512
+sectors_per_cluster db 1
+reserved_sectors dw 52
+num_fats db 2
+root_entries dw 224
+total_sectors_short dw 2880
+media_type db 0xF0
+fat_size_sectors dw 9
+sectors_per_track dw 18
+num_heads dw 2
+hidden_sectors dd 0
+total_sectors_long dd 0
+boot_drive_number db 0
+reserved1 db 0
+boot_signature db 0x29
+volume_id dd 0x12345678
+volume_label db "NO NAME    "
+file_system_type db "FAT12   "
+
+start_code:
     xor ax, ax
     mov ds, ax
     mov es, ax
@@ -52,7 +74,6 @@ init_32bit:
     jmp 0x10000
 
 boot_drive db 0
-vbe_info_block equ 0x8000
 
 gdt_start:
     dq 0

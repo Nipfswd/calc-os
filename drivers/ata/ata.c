@@ -15,6 +15,10 @@ void ata_wait_drdy() {
     while (!(inb(0x1F7) & 0x40));
 }
 
+void ata_wait_drq() {
+    while (!(inb(0x1F7) & 0x08));
+}
+
 void ata_read_sector(uint32_t lba, uint16_t* buffer) {
     ata_wait_bsy(); 
 
@@ -48,7 +52,7 @@ void ata_write_sector(uint32_t lba, uint16_t* buffer) {
     outb(0x1F7, 0x30); 
 
     ata_wait_bsy();
-    ata_wait_drdy(); 
+    ata_wait_drq(); 
 
     for (int i = 0; i < 256; i++) {
         outw(0x1F0, buffer[i]); 
