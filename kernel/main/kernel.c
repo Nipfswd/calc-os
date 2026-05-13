@@ -69,33 +69,26 @@ refresh:
         draw_button(20, 48, 136, 26, "Terminal", 2, 0);
         draw_button(190, 48, 136, 26, "Explorer", 0, 1);
 
-        draw_button(0, 440, 640, 40, "F2 - create a new value", 1, 0);
+        draw_button(0, 440, 640, 40, "F2 - create a new file", 1, 0);
 
         int file_count = 0;
 
-        for (int i = 0; i < 5; i++) {
-            unsigned char data = read(0x50 + i);
 
-            if (data != 0) {
-                int col = file_count % 3;
-                int row = file_count / 3;
+        int col = file_count % 3;
+        int row = file_count / 3;
 
-                int icon_x = (16 + col * 100) * 2;
-                int icon_y = (50 + row * 34) * 2;
+        int icon_x = (16 + col * 100) * 2;
+        int icon_y = (50 + row * 34) * 2;
 
-                draw_rect(icon_x, icon_y, 160, 48, 1);
+        draw_rect(icon_x, icon_y, 160, 48, 1);
 
-                x = icon_x + 16;
-                y = icon_y + 16;
+        x = icon_x + 16;
+        y = icon_y + 16;
 
-                int data_str[16]; 
-                itoa(data, data_str);
 
-                print(data_str, 0);
+        //print(, 0);
 
-                file_count++;
-            }
-        }
+        file_count++;
 
         if (show_crt_window == 1) {
             is_window_crt = 1;
