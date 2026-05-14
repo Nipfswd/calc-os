@@ -115,7 +115,7 @@ static void draw_file_icons() {
     }
 }
 
-void prompt() {
+void shell() {
 refresh:
     ncount = 0;
 
@@ -385,5 +385,11 @@ void __attribute__((section(".text.entry"))) kernel_main() {
     init_idt();
     asm volatile("sti");
     init_palette();
-	prompt();
+    if (test_disk_at_offset(2048)) {
+        ata_set_offset(2048);
+        shell();
+    } else {
+        ata_set_offset(0); 
+        shell();
+    }
 }

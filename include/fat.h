@@ -1,6 +1,8 @@
 #ifndef FAT_H
 #define FAT_H
 
+#define PARTITION_OFFSET 2048
+
 struct fat12_bpb {
     uint8_t  jmp[3];           
     char     oem_id[8];        
