@@ -218,14 +218,35 @@ refresh:
             print("\n", 0xFFFFFF);
 
             if (compare_strings(command, "help")) {
-                print("Available commands:\n", 0xFFFFFF);
-                print("  help - show this message\n", 0xFFFFFF);
-                print("  cln  - clear the screen\n", 0xFFFFFF);
-                print("  ls  - list all files\n", 0xFFFFFF);
-                print("  crt  - create a new file\n", 0xFFFFFF);
-                print("  draw - draw a rectangle\n", 0xFFFFFF);
-                print("  status - check system status\n", 0xFFFFFF);
-                print("  livetime - print system livetime irq0 ticks\n", 0xFFFFFF);
+                print("Available commands:\n", 1);
+                print("  help - show this message\n", 1);
+                print("  cln  - clear the screen\n", 1);
+                print("  ls  - list all files\n", 1);
+                print("  crt  - create a new file\n", 1);
+                print("  draw - draw a rectangle\n", 1);
+                print("  status - check system status\n", 1);
+                print("  livetime - print system livetime irq0 ticks\n", 1);
+                print("  cat - print file content\n", 1);
+            }
+            else if (compare_strings(command, "cat")) {
+                content_clear();
+                print("Name: ", 1);
+                input_wait_string(name);
+                print("\n", 1);
+
+                int len = 0;
+                while (content[len] != '\0') len++;
+                if (len > 512) len = 512;
+
+                char name_11[11];
+                format_fat_name(name, name_11);
+
+                uint8_t buffer[512] = {0};
+                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
+
+                read_file(name_11, content);
+                print(content, 1);
+                print("\n", 1);
             }
             else if (compare_strings(command, "cln")) {
                 screen_clear();
@@ -284,14 +305,14 @@ refresh:
                 print(timer_str, 1);
                 print("\n", 1);
             }
-                else if (compare_strings(command, "status")) {
-                    unsigned char battery_status = check_battery();
-                    if (battery_status) {
-                        print("Battery: OK\n", 1);
-                    } else {
-                        print("Battery: BAD Please insert a new CMOS battery\n", 1);
-                    }
+            else if (compare_strings(command, "status")) {
+                unsigned char battery_status = check_battery();
+                if (battery_status) {
+                    print("Battery: OK\n", 1);
+                } else {
+                    print("Battery: BAD Please insert a new CMOS battery\n", 1);
                 }
+            }
             else {
                 if (command[0] != '\0') {
                     print("Uncnown command. Type 'help'\n", 1);
@@ -317,13 +338,15 @@ refresh:
 
                 if (ncount == 1) goto refresh;
 
+                asm volatile("cli");
                 x = 126;
                 y = 156;
                 input_wait_string(name);
 
-                x = 176;
+                x = 156;
                 y = 246;
                 input_wait_string(content);
+                asm volatile("sti");
 
                 if (ncount == 1) goto refresh;
 
