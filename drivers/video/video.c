@@ -29,7 +29,7 @@ void init_palette() {
 
 
 void screen_clear() {
-	for (int i = 0; i < 64000; i = i + 1) {
+	for (int i = 0; i < 38400; i = i + 1) {
 		VIDEO_MEMORY[i] = 0;
 	}
 
