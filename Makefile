@@ -92,13 +92,13 @@ cleane:
 	rm -f *.o *.bin *.elf *.img
 
 run: os-image.img
-	qemu-system-i386 -drive file=os-image.img,format=raw -display gtk
+	qemu-system-i386 -drive file=os-image.img,format=raw 
 
 boch:
 	bochs -f bochsrc.txt
 
 real: os-image.img
-	sudo qemu-system-i386 -drive file=/dev/sda4,format=raw -display gtk
+	sudo qemu-system-i386 -drive file=/dev/sda4,format=raw
 
 help:
 	echo real - start on sda4

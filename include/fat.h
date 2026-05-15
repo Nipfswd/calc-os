@@ -1,5 +1,6 @@
 #ifndef FAT_H
 #define FAT_H
+#include <stdint.h>
 
 #define PARTITION_OFFSET 2048
 

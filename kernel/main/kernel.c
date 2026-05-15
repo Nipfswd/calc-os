@@ -1,10 +1,10 @@
+#include <fat.h>
 #include <cmos.h>
 #include <video.h>
 #include <utils.h>
 #include <mouse.h>
 #include <keyboard.h>
 #include <idt.h>
-#include <fat.h>
 #include <stdint.h>
 #include <ata.h>
 
@@ -124,7 +124,7 @@ refresh:
 
     x = 276;
     y = 10;
-    print("CalcOS", 0xFFFFFF);
+    print("CalcOS", 1);
 
     if (current_mode == 0) {
         draw_rect(0, 80, 640, 480, 0);
@@ -210,12 +210,12 @@ refresh:
         if (ncount == 1) goto refresh;
 
         if (current_mode == 0) {
-            print("> ", 0xFFFFFF);
+            print("> ", 1);
             input_wait_string(command);
 
             if (ncount == 1) goto refresh;
 
-            print("\n", 0xFFFFFF);
+            print("\n", 1);
 
             if (compare_strings(command, "help")) {
                 print("Available commands:\n", 1);

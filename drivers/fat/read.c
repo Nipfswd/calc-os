@@ -49,8 +49,8 @@ void read_file(const char* filename_11, uint8_t* buffer) {
 }
 
 void list_files() {
-    uint16_t buffer[256]; 
-    
+    uint8_t buffer[512];
+
     ata_read_sector(0, buffer);
     struct fat12_bpb* bpb = (struct fat12_bpb*)buffer;
 
@@ -58,35 +58,38 @@ void list_files() {
     uint32_t root_sectors = ((bpb->root_entries * 32) + (bpb->bytes_per_sector - 1)) / bpb->bytes_per_sector;
 
     for (uint32_t s = 0; s < root_sectors; s++) {
+
         ata_read_sector(root_lba + s, buffer);
         struct fat12_entry* entries = (struct fat12_entry*)buffer;
 
-        for (int i = 0; i < 16; i++) {
+        int entries_per_sector = bpb->bytes_per_sector / sizeof(struct fat12_entry);
+
+        for (int i = 0; i < entries_per_sector; i++) {
+
             if (entries[i].name[0] == 0x00) return;
-            
             if ((uint8_t)entries[i].name[0] == 0xE5) continue;
-            if (entries[i].attributes == 0x0F) continue; 
+            if (entries[i].attributes == 0x0F) continue;
+            if (entries[i].attributes & 0x08) continue;
 
             char name_buf[9];
             char ext_buf[4];
             int name_len = 0;
             int ext_len = 0;
 
-            for(int j = 0; j < 8; j++) {
-                if(entries[i].name[j] != ' ') {
-                    name_buf[name_len++] = entries[i].name[j]; 
-                }
-            }
+            for(int j = 0; j < 8; j++)
+                if(entries[i].name[j] != ' ')
+                    name_buf[name_len++] = entries[i].name[j];
+
             name_buf[name_len] = '\0';
 
-            for(int j = 0; j < 3; j++) {
-                if(entries[i].ext[j] != ' ') {
+            for(int j = 0; j < 3; j++)
+                if(entries[i].ext[j] != ' ')
                     ext_buf[ext_len++] = entries[i].ext[j];
-                }
-            }
+
             ext_buf[ext_len] = '\0';
 
             print(name_buf, 1);
+
             if(ext_len > 0) {
                 print(".", 1);
                 print(ext_buf, 1);
