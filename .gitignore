@@ -8,7 +8,6 @@
 *.d
 
 *.iso
-*.img
 *.bin
 *.vmdk
 *.vdi
