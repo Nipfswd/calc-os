@@ -39,6 +39,7 @@ void screen_clear() {
 }
 
 void put_char(char s, uint8_t color) {
+    asm volatile("cli");
     if (s == '\n') {
         x = 0;
         y = y + 8;
@@ -74,6 +75,7 @@ void put_char(char s, uint8_t color) {
         }
     }
     x = x + 8;
+    asm volatile("sti");
 }
 
 void print(char *msg, uint8_t color) {
@@ -83,6 +85,7 @@ void print(char *msg, uint8_t color) {
 }
 
 void draw_gray_rect(int x, int y, int width, int height) {
+    asm volatile("sti");
     for (int i = 0; i < height; i = i + 1) {
         for (int j = 0; j < width; j = j + 1) {
             int curr_x = x + j;
@@ -102,9 +105,11 @@ void draw_gray_rect(int x, int y, int width, int height) {
             }
         }
     }
+    asm volatile("sti");
 }
 
 void draw_rect(int x, int y, int width, int height, uint8_t color) {
+    asm volatile("cli");
     if (color == 2) {
         draw_gray_rect(x, y, width, height);
         return;
@@ -127,4 +132,5 @@ void draw_rect(int x, int y, int width, int height, uint8_t color) {
             }
         }
     }
+    asm volatile("sti");
 }

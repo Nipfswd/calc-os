@@ -96,3 +96,11 @@ run: os-image.img
 
 boch:
 	bochs -f bochsrc.txt
+
+real: os-image.img
+	sudo qemu-system-i386 -drive file=/dev/sda4,format=raw -display gtk
+
+help:
+	echo real - start on sda4
+	echo boch - start with bochs
+	echo run - start

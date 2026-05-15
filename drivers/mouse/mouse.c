@@ -178,6 +178,7 @@ void check_ui_clicks() {
 }
 
 void update_system() {
+    asm volatile("cli");
 	mouse_handler();
 	if (mouse_x != old_mouse_x || mouse_y != old_mouse_y) {
 		restore_background();
@@ -187,4 +188,5 @@ void update_system() {
 		old_mouse_y = mouse_y;
 	}
 	check_ui_clicks();
+    asm volatile("sti");
 }

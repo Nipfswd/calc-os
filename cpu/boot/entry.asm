@@ -31,22 +31,24 @@ start_code:
     mov sp, 0x7c00
     mov [boot_drive], dl
 
-    mov ax, 0x2401
-    int 0x15
+    in al, 0x92
+    or al, 2
+    out 0x92, al
 
     mov ax, 0x0011
     int 0x10
+
+    mov eax, [hidden_sectors]
+    add eax, 1
+    mov [disk_packet + 8], eax 
 
     mov ax, 0x1000
     mov es, ax
     mov bx, 0
 
-    mov ah, 0x02
-    mov al, 60
-    mov ch, 0
-    mov dh, 0
-    mov cl, 2
+    mov ah, 0x42
     mov dl, [boot_drive]
+    mov si, disk_packet
     int 0x13
     jc disk_error
 
@@ -58,7 +60,9 @@ start_code:
     jmp 0x08:init_32bit
 
 disk_error:
-    jmp $
+    cli
+    hlt
+    jmp disk_error
 
 [bits 32]
 init_32bit:
@@ -74,6 +78,15 @@ init_32bit:
     jmp 0x10000
 
 boot_drive db 0
+
+align 4
+disk_packet:
+    db 0x10      
+    db 0             
+    dw 60               
+    dw 0x0000        
+    dw 0x1000       
+    dq 0            
 
 gdt_start:
     dq 0
