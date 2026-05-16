@@ -102,3 +102,8 @@ help:
 	echo run - start
 	echo clean - clear files
 	echo cleane - clear all files
+
+push:
+	git add .
+	git commit -m "CalcOS"
+	git push origin main --force
