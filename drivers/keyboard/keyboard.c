@@ -49,6 +49,7 @@ void handle_hotkeys(int code) {
 
 void input_wait_string(char *buffer) {
 	int i = 0;
+	asm volatile("cli");
 	while (1) {
 		update_system();
 
@@ -144,4 +145,5 @@ void input_wait_string(char *buffer) {
 			i++;
 		}
 	}
+	asm volatile("sti");
 }

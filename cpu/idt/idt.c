@@ -46,7 +46,7 @@ void task2_main() {
     char h_str[3], m_str[3];
 
     while(1) {
-        if (current_mode != 0) {
+        if (current_mode != 0 && is_window_crt == 0) {
             get_time(&hours, &minutes);
 
             x = 600; y = 15;

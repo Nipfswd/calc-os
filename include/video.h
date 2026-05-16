@@ -29,8 +29,8 @@ void init_palette();
 
 extern int get_scancode();
 extern void outb( uint16_t port, uint8_t val);
-extern uint8_t inb(uint16_t port);
+extern volatile uint8_t inb(uint16_t port);
 extern void outw(uint16_t port, uint16_t val);
-extern uint16_t inw(uint16_t port);
+extern volatile uint16_t inw(uint16_t port);
 
 #endif
