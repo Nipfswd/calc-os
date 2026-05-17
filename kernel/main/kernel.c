@@ -120,25 +120,30 @@ refresh:
     ncount = 0;
 
     draw_rect(0, 0, 640, 400, 1);
-    draw_rect(0, 0, 640, 40, 0);
 
-    x = 276;
-    y = 10;
-    print("CalcOS", 1);
+    draw_button(10, 5, 56, 26, "CalcOS", 0, 1);
 
     if (current_mode == 0) {
-        draw_rect(0, 80, 640, 480, 0);
+        draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(20, 48, 136, 26, "Terminal", 0, 1);
-        draw_button(190, 48, 136, 26, "Explorer", 2, 0);
+        draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+        draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+
+        if (is_button_calc == 1) {
+            draw_rect(10, 31, 72, 70, 2);
+
+            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
+            draw_button(10, 51, 70, 26, "Explorer", 2, 0);
+        }
+
         x = 0;
-        y = 96;
+        y = 50;
     }
     else if (current_mode == 2) {
-        draw_rect(0, 80, 640, 480, 0);
+        draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(20, 48, 136, 26, "Terminal", 2, 0);
-        draw_button(190, 48, 136, 26, "Explorer", 0, 1);
+        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
+        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
 
         draw_button(0, 440, 640, 40, "F2 - create a new file", 1, 0);
 
@@ -170,10 +175,10 @@ refresh:
         }
     }
     else if (current_mode == 3) {
-        draw_rect(0, 80, 640, 480, 0);
+        draw_rect(0, 40, 640, 480, 0);
         
-        draw_button(20, 48, 136, 26, "Terminal", 2, 0);
-        draw_button(190, 48, 136, 26, "Explorer", 0, 1);
+        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
+        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
 
           x = 0;
           y = 96;
@@ -187,10 +192,10 @@ refresh:
           }
     }
     else {
-        draw_rect(0, 80, 640, 480, 0);
+        draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(20, 48, 136, 26, "Terminal", 2, 0);
-        draw_button(190, 48, 136, 26, "Explorer", 0, 1);
+        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
+        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
 
         if (is_button_files == 1) {
             draw_button(156, 100, 320, 36, "Files", 1, 0);

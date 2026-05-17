@@ -14,6 +14,7 @@ int show_crt_window = 0;
 int is_window_crt = 0;
 int is_button_apps = 0;
 int is_button_files = 1;
+int is_button_calc = 0;
 
 void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
     outb(0x03C8, index);
@@ -23,8 +24,24 @@ void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void init_palette() {
-    set_palette_color(0, 8, 10, 12);
-    set_palette_color(1, 45, 50, 58);
+    inb(0x03DA); 
+
+    
+    outb(0x03C0, 0); 
+    outb(0x03C0, 0);
+    
+    for (uint8_t i = 1; i < 16; i++) {
+        outb(0x03C0, i); 
+        outb(0x03C0, 1);
+    }
+
+    outb(0x03C0, 0x20);
+
+    set_palette_color(0, 10, 11, 10);
+
+    for (uint8_t i = 1; i < 16; i++) {
+        set_palette_color(i, 57, 43, 21);
+    }
 }
 
 
@@ -85,7 +102,7 @@ void print(char *msg, uint8_t color) {
 }
 
 void draw_gray_rect(int x, int y, int width, int height) {
-    asm volatile("sti");
+    asm volatile("cli");
     for (int i = 0; i < height; i = i + 1) {
         for (int j = 0; j < width; j = j + 1) {
             int curr_x = x + j;

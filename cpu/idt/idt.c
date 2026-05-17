@@ -59,7 +59,7 @@ void task2_main() {
             if (minutes < 10) print("0", 1); 
             print(m_str, 1);
 
-            draw_rect(500, 0, 140, 40, 0); 
+            draw_rect(602, 5, 38, 30, 0); 
         }
     }
 }

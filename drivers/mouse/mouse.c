@@ -138,22 +138,16 @@ void restore_background() {
     }
 }
 
-int check_keyboard() {
-	int code = get_scancode();
-	if (code == 0) return 0;
-	return code;
-}
-
 void check_ui_clicks() {
 	if (mouse_left_button == 1) {
-		if (mouse_x >= 190 && mouse_x <= 326 && mouse_y >= 48 && mouse_y <= 74) {
+		if (mouse_x >= 238 && mouse_x <= 374 && mouse_y >= 5 && mouse_y <= 31) {
 			if (current_mode != 1) {
 				current_mode = 1;
 				ncount = 1;
 			}
 		}
 		
-		if (mouse_x >= 20 && mouse_x <= 156 && mouse_y >= 48 && mouse_y <= 74) {
+		if (mouse_x >= 78 && mouse_x <= 214 && mouse_y >= 5 && mouse_y <= 31) {
 			if (current_mode != 0) {
 				current_mode = 0;
 				ncount = 1;
@@ -174,11 +168,15 @@ void check_ui_clicks() {
 			show_crt_window = 1;
 			ncount = 1;
 		}
+
+        if (mouse_x >= 10 && mouse_x <= 66 && mouse_y >= 5 && mouse_y <= 31) {
+            is_button_calc = 1;
+            ncount = 1;
+        }
 	}
 }
 
 void update_system() {
-    asm volatile("cli");
 	mouse_handler();
 	if (mouse_x != old_mouse_x || mouse_y != old_mouse_y) {
 		restore_background();
@@ -188,5 +186,4 @@ void update_system() {
 		old_mouse_y = mouse_y;
 	}
 	check_ui_clicks();
-    asm volatile("sti");
 }
