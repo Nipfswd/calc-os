@@ -127,18 +127,28 @@ refresh:
         if (draw_0 == 1) {
             draw_rect(0, 40, 640, 480, 0);
 
-            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+            if (draw_0 == 1) {
+                draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+                draw_button(191, 11, 15, 15, "x", 1, 0);
+            }
+
+            if (draw_1 == 1) {
+                draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+                draw_button(351, 11, 15, 15, "x", 1, 0);
+            }
 
             if (is_button_calc == 1) {
                 draw_rect(10, 31, 72, 70, 2);
 
                 draw_button(10, 31, 70, 26, "Terminal", 0, 1);
                 draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+
+                draw_button(10, 85, 15, 15, "x", 0, 1);
             }
 
             x = 0;
             y = 50;
+
         } else {
             current_mode = 5;
             ncount = 1;
@@ -147,8 +157,25 @@ refresh:
     else if (current_mode == 2) {
         draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
-        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
+        if (draw_0 == 1) {
+            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+            draw_button(191, 11, 15, 15, "x", 1, 0);
+        }
+
+        if (draw_1 == 1) {
+            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+            draw_button(351, 11, 15, 15, "x", 1, 0);
+        }
+
+        if (is_button_calc == 1) {
+            draw_rect(10, 31, 72, 70, 2);
+
+            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
+            draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+
+
+            draw_button(10, 85, 15, 15, "x", 0, 1);
+        }
 
         draw_button(0, 440, 640, 40, "F2 - create a new file", 1, 0);
 
@@ -182,8 +209,24 @@ refresh:
     else if (current_mode == 3) {
         draw_rect(0, 40, 640, 480, 0);
         
-        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
-        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
+        if (draw_0 == 1) {
+            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+            draw_button(191, 11, 15, 15, "x", 1, 0);
+        }
+
+        if (draw_1 == 1) {
+            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+            draw_button(351, 11, 15, 15, "x", 1, 0);
+        }
+
+        if (is_button_calc == 1) {
+            draw_rect(10, 31, 72, 70, 2);
+
+            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
+            draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+
+            draw_button(10, 85, 15, 15, "x", 0, 1);
+        }
 
           x = 0;
           y = 96;
@@ -200,8 +243,24 @@ refresh:
         if (draw_1 == 1) {
            draw_rect(0, 40, 640, 480, 0);
 
-            draw_button(78, 5, 136, 26, "Terminal", 2, 0);
-            draw_button(238, 5, 136, 26, "Explorer", 0, 1);
+            if (draw_0 == 1) {
+                draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+                draw_button(191, 11, 15, 15, "x", 1, 0);
+            }
+
+            if (draw_1 == 1) {
+                draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+                draw_button(351, 11, 15, 15, "x", 1, 0);
+            }
+
+            if (is_button_calc == 1) {
+                draw_rect(10, 31, 72, 70, 2);
+
+                draw_button(10, 31, 70, 26, "Terminal", 0, 1);
+                draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+
+                draw_button(10, 85, 15, 15, "x", 0, 1);
+            }
 
             if (is_button_files == 1) {
                 draw_button(156, 100, 320, 36, "Files", 1, 0);
@@ -215,6 +274,7 @@ refresh:
             current_mode = 0;
             ncount = 1;
         }
+        is_button_calc = 0;
     }
 
     while (1) {

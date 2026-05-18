@@ -174,15 +174,30 @@ void check_ui_clicks() {
             ncount = 1;
         }
 
-        if (mouse_x >= 10 && mouse_x >= 80 && mouse_y >= 31 && mouse_y <= 57) {
-            draw_0 = 1;
+        if (mouse_x >= 10 && mouse_x <= 80 && mouse_y >= 31 && mouse_y <= 57) {
             current_mode = 0;
+            draw_0 = 1;
             ncount = 1;
         }
 
-        if (mouse_x >= 10 && mouse_x >= 80 && mouse_y >= 51 && mouse_y <= 77) {
+        if (mouse_x >= 10 && mouse_x <= 80 && mouse_y >= 51 && mouse_y <= 77) {
+            current_mode = 4;
             draw_1 = 1;
-            current_mode = 5;
+            ncount = 1;
+        }
+
+        if (mouse_x >= 10 && mouse_x <= 25 && mouse_y >= 85 && mouse_y <= 100) {
+            is_button_calc = 0;
+            ncount = 1;
+        }
+
+        if (mouse_x >= 191 && mouse_x <= 206 && mouse_y >= 5 && mouse_y <= 20) {
+            draw_0 = 0;
+            ncount = 1;
+        }
+
+        if (mouse_x >= 351 && mouse_x <= 366 && mouse_y >= 5 && mouse_y <= 20) {
+            draw_1 = 4;
             ncount = 1;
         }
 	}
