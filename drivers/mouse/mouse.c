@@ -173,6 +173,18 @@ void check_ui_clicks() {
             is_button_calc = 1;
             ncount = 1;
         }
+
+        if (mouse_x >= 10 && mouse_x >= 80 && mouse_y >= 31 && mouse_y <= 57) {
+            draw_0 = 1;
+            current_mode = 0;
+            ncount = 1;
+        }
+
+        if (mouse_x >= 10 && mouse_x >= 80 && mouse_y >= 51 && mouse_y <= 77) {
+            draw_1 = 1;
+            current_mode = 5;
+            ncount = 1;
+        }
 	}
 }
 

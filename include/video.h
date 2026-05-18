@@ -16,6 +16,8 @@ extern int mouse_left_button;
 extern int is_button_apps;
 extern int is_button_files;
 extern int is_button_calc;
+extern int draw_0;
+extern int draw_1;
 
 void screen_clear();
 void put_char(char s, uint8_t color);

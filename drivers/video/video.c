@@ -15,6 +15,8 @@ int is_window_crt = 0;
 int is_button_apps = 0;
 int is_button_files = 1;
 int is_button_calc = 0;
+int draw_0 = 1;
+int draw_1 = 1;
 
 void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
     outb(0x03C8, index);

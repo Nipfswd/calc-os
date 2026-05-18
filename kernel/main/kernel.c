@@ -124,20 +124,25 @@ refresh:
     draw_button(10, 5, 56, 26, "CalcOS", 0, 1);
 
     if (current_mode == 0) {
-        draw_rect(0, 40, 640, 480, 0);
+        if (draw_0 == 1) {
+            draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-        draw_button(238, 5, 136, 26, "Explorer", 2, 0);
+            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
+            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
 
-        if (is_button_calc == 1) {
-            draw_rect(10, 31, 72, 70, 2);
+            if (is_button_calc == 1) {
+                draw_rect(10, 31, 72, 70, 2);
 
-            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
-            draw_button(10, 51, 70, 26, "Explorer", 2, 0);
+                draw_button(10, 31, 70, 26, "Terminal", 0, 1);
+                draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+            }
+
+            x = 0;
+            y = 50;
+        } else {
+            current_mode = 5;
+            ncount = 1;
         }
-
-        x = 0;
-        y = 50;
     }
     else if (current_mode == 2) {
         draw_rect(0, 40, 640, 480, 0);
@@ -192,18 +197,23 @@ refresh:
           }
     }
     else {
-        draw_rect(0, 40, 640, 480, 0);
+        if (draw_1 == 1) {
+           draw_rect(0, 40, 640, 480, 0);
 
-        draw_button(78, 5, 136, 26, "Terminal", 2, 0);
-        draw_button(238, 5, 136, 26, "Explorer", 0, 1);
+            draw_button(78, 5, 136, 26, "Terminal", 2, 0);
+            draw_button(238, 5, 136, 26, "Explorer", 0, 1);
 
-        if (is_button_files == 1) {
-            draw_button(156, 100, 320, 36, "Files", 1, 0);
-            draw_button(156, 200, 320, 36, "System", 2, 0);
-        }
-        else if (is_button_apps == 1) {
-            draw_button(156, 100, 320, 36, "Files", 2, 0);
-            draw_button(156, 200, 320, 36, "System", 1, 0);
+            if (is_button_files == 1) {
+                draw_button(156, 100, 320, 36, "Files", 1, 0);
+                draw_button(156, 200, 320, 36, "System", 2, 0);
+            }
+            else if (is_button_apps == 1) {
+                draw_button(156, 100, 320, 36, "Files", 2, 0);
+                draw_button(156, 200, 320, 36, "System", 1, 0);
+            } 
+        } else {
+            current_mode = 0;
+            ncount = 1;
         }
     }
 
