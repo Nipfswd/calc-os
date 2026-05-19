@@ -17,6 +17,7 @@ int is_button_files = 1;
 int is_button_calc = 0;
 int draw_0 = 1;
 int draw_1 = 1;
+int is_scaled = 0;
 
 void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
     outb(0x03C8, index);
@@ -58,43 +59,96 @@ void screen_clear() {
 }
 
 void put_char(char s, uint8_t color) {
-    asm volatile("cli");
-    if (s == '\n') {
-        x = 0;
-        y = y + 8;
-        return;
-    }
+    if (is_scaled == 1) {
+        asm volatile("cli");
+    
+        int scale = 3; 
 
-    if (x >= 640) {
-        x = 0;
-        y = y + 8;
-    }
+        if (s == '\n') {
+            x = 0;
+            y = y + (8 * scale);
+            asm volatile("sti");
+            return;
+        }
 
-    if (y >= 480) {
-        screen_clear();
-        y = 0;
-    }
+        if (x + (8 * scale) > 640) {
+            x = 0;
+            y = y + (8 * scale);
+        }
 
-    for (int i = 0; i < 8; i = i + 1) {
-        unsigned char bits = font[(int)s][i];
-        unsigned char *row = &VIDEO_MEMORY[(y + i) * 80];
+        if (y + (8 * scale) > 480) {
+            screen_clear();
+            y = 0;
+        }
 
-        for (int j = 0; j < 8; j = j + 1) {
-            int pos = x + j;
-            unsigned char mask = 128 >> (pos % 8);
+        for (int i = 0; i < 8; i++) {
+            
+            for (int v_scale = 0; v_scale < scale; v_scale++) {
+                
+                unsigned char bits = font[(int)s][i];
+                unsigned char *row = &VIDEO_MEMORY[(y + (i * scale) + v_scale) * 80];
 
-            if (bits > 127) {
-                if (color > 0) {
-                    row[pos / 8] = row[pos / 8] | mask;
-                } else {
-                    row[pos / 8] = row[pos / 8] & ~mask;
+                for (int j = 0; j < 8; j++) {
+                    for (int h_scale = 0; h_scale < scale; h_scale++) {
+                        
+                        int pos = x + (j * scale) + h_scale;
+                        unsigned char mask = 128 >> (pos & 7);
+
+                        if (bits > 127) { 
+                            if (color > 0) {
+                                row[pos >> 3] |= mask;
+                            } else {
+                                row[pos >> 3] &= ~mask;
+                            }
+                        }
+                    }
+                    bits = bits << 1; 
                 }
             }
-            bits = bits << 1;
         }
+        
+        x = x + (8 * scale);
+        
+        asm volatile("sti");
+    } else {
+        asm volatile("cli");
+        if (s == '\n') {
+            x = 0;
+            y = y + 8;
+            return;
+        }
+
+        if (x >= 640) {
+            x = 0;
+            y = y + 8;
+        }
+
+        if (y >= 480) {
+            screen_clear();
+            y = 0;
+        }
+
+        for (int i = 0; i < 8; i = i + 1) {
+            unsigned char bits = font[(int)s][i];
+            unsigned char *row = &VIDEO_MEMORY[(y + i) * 80];
+
+            for (int j = 0; j < 8; j = j + 1) {
+                int pos = x + j;
+                unsigned char mask = 128 >> (pos & 7);
+
+                if (bits > 127) {
+                    if (color > 0) {
+                        row[pos >> 3] = row[pos >> 3] | mask;
+                    } else {
+                        row[pos >> 3] = row[pos >> 3] & ~mask;
+                    }
+                }
+                bits = bits << 1;
+            }
+        }
+        x = x + 8;
+        asm volatile("sti");
     }
-    x = x + 8;
-    asm volatile("sti");
 }
 
 void print(char *msg, uint8_t color) {
@@ -114,12 +168,12 @@ void draw_gray_rect(int x, int y, int width, int height) {
                 int is_white = (curr_x + curr_y) % 2 == 0;
                 
                 uint8_t *row = &VIDEO_MEMORY[curr_y * 80];
-                uint8_t mask = 128 >> (curr_x % 8);
+                uint8_t mask = 128 >> (curr_x & 7);
 
                 if (is_white) {
-                    row[curr_x / 8] = row[curr_x / 8] | mask;
+                    row[curr_x >> 3] = row[curr_x >> 3] | mask;
                 } else {
-                    row[curr_x / 8] = row[curr_x / 8] & ~mask;
+                    row[curr_x >> 3] = row[curr_x >> 3] & ~mask;
                 }
             }
         }
@@ -140,8 +194,8 @@ void draw_rect(int x, int y, int width, int height, uint8_t color) {
             int curr_y = y + i;
 
             if (curr_x >= 0 && curr_x < 640 && curr_y >= 0 && curr_y < 480) {
-                uint8_t *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
-                uint8_t mask = 128 >> (curr_x % 8);
+                uint8_t *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x >> 3)];
+                uint8_t mask = 128 >> (curr_x & 7);
 
                 if (color > 0) {
                     *ptr = *ptr | mask;   

@@ -136,7 +136,6 @@ refresh:
     draw_rect(0, 0, 640, 400, 1);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 1);
-    play_startup_sound();
 
     if (current_mode == 0) {
         if (draw_0 == 1) {
@@ -467,15 +466,41 @@ refresh:
     }
 }
 
+void boot() {
+    is_scaled = 1;
+    screen_clear();
+    print("Booting CalcOS...\n", 1);
+    init_mouse();
+    print("[OK]\n", 1);
 
-void __attribute__((section(".text.entry"))) kernel_main() {
     init_identity_paging();
     enable_paging();
+    print("[OK]\n", 1);
+    delay_ticks(15);
+
+    screen_clear();
+    init_palette();
+    is_scaled = 0;
+    print("Success!", 1);
+    is_scaled = 1;
+    delay_ticks(15);
+
+    draw_rect(0, 0, 640, 480, 1);
+
+    x = 0;
+    y = 10;
+
+    print("Welcome to CalcOS!", 0);
+    play_startup_sound();
+
+    is_scaled = 0;
+}
+
+void __attribute__((section(".text.entry"))) kernel_main() {
     asm volatile("cli");
-    init_mouse();
 	screen_clear();
     init_idt();
     asm volatile("sti");
-    init_palette();
+    boot();
     shell();
 }

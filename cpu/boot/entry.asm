@@ -6,7 +6,7 @@ nop
 OEM_ID db "MSDOS5.0"
 bytes_per_sector dw 512
 sectors_per_cluster db 1
-reserved_sectors dw 52
+reserved_sectors dw 1
 num_fats db 2
 root_entries dw 224
 total_sectors_short dw 2880
@@ -38,8 +38,7 @@ start_code:
     mov ax, 0x0011
     int 0x10
 
-    mov eax, [hidden_sectors]
-    add eax, 1
+    mov eax, 33
     mov [disk_packet + 8], eax 
 
     mov ax, 0x1000
