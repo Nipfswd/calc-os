@@ -174,6 +174,13 @@ void ata_handler() {
     outb(0x20, 0x20);
 }
 
+void delay_ticks(uint32_t ticks) {
+    uint32_t target_ticks = timer_ticks + ticks;
+    while (timer_ticks < target_ticks) {
+        __asm__ __volatile__("hlt");
+    }
+}
+
 void init_idt() {
     idtp.idt_ptr = (uint32_t)&idt_entry;
     idtp.idt_size = (sizeof(struct idt_entry) * 256) - 1;

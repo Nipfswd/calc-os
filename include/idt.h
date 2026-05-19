@@ -36,6 +36,7 @@ extern void isr0();
 extern void isr8();
 extern void isr13();
 extern void isr14();
+void delay_ticks(uint32_t ticks);
 
 extern unsigned int timer_ticks;
 extern uint8_t *timer_str[16];

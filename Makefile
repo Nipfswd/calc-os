@@ -10,7 +10,7 @@ CFLAGS = -m32 -ffreestanding -fno-stack-protector -fno-leading-underscore \
 		 -fno-pic -fno-asynchronous-unwind-tables
 LDFLAGS = -m elf_i386 -T linker.ld --nostdlib --static
 
-OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o
+OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o page.o page2.o sound.o
 
 all: os-image.img
 
@@ -80,6 +80,15 @@ read.o: drivers/fat/read.c
 write.o: drivers/fat/write.c
 	$(CC) $(CFLAGS) $< -o $@
 
+page.o: cpu/mm/page.c
+	$(CC) $(CFLAGS) $< -o $@
+
+page2.o: cpu/mm/asm/page.asm
+	$(AS) $(ASFLAGS_ELF) $< -o $@
+
+sound.o: drivers/sound/sound.c
+	$(CC) $(CFLAGS) $< -o $@
+
 kernel.bin: $(OBJ)
 	$(LD) $(LDFLAGS) -o kernel.elf $(OBJ)
 	$(OBJCOPY) -O binary kernel.elf kernel.bin
@@ -92,7 +101,7 @@ cleane:
 	rm -f *.o *.bin *.elf *.img
 
 run: os-image.img
-	qemu-system-i386 -drive file=os-image.img,format=raw 
+	qemu-system-i386 -drive file=os-image.img,format=raw -audiodev pa,id=snd0 -machine pcspk-audiodev=snd0
 
 boch:
 	bochs -f bochsrc.txt

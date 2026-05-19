@@ -7,6 +7,8 @@
 #include <idt.h>
 #include <stdint.h>
 #include <ata.h>
+#include <mm.h>
+#include <sound.h>
 
 char command[256];
 char name[128];
@@ -115,6 +117,18 @@ static void draw_file_icons() {
     }
 }
 
+void play_startup_sound() {
+    beep(233, 4); 
+    beep(349, 4); 
+    beep(311, 4);
+    beep(466, 4); 
+    beep(523, 4);
+    
+    beep(698, 6); 
+    beep(695, 3); 
+    beep(690, 3);
+}
+
 void shell() {
 refresh:
     ncount = 0;
@@ -122,6 +136,7 @@ refresh:
     draw_rect(0, 0, 640, 400, 1);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 1);
+    play_startup_sound();
 
     if (current_mode == 0) {
         if (draw_0 == 1) {
@@ -454,6 +469,8 @@ refresh:
 
 
 void __attribute__((section(".text.entry"))) kernel_main() {
+    init_identity_paging();
+    enable_paging();
     asm volatile("cli");
     init_mouse();
 	screen_clear();
