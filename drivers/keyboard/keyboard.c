@@ -113,6 +113,11 @@ void input_wait_string(char *buffer) {
 		case 0x0D: letter = '='; break;
 		case 0x34: letter = '.'; break;
 		case 0x35: letter = '/'; break;
+		case 0x1A: letter = '['; break;
+        case 0x1B: letter = ']'; break;
+        case 0x33: letter = ','; break;
+        case 0x28: letter = '\''; break;
+		case 0x27: letter = ';'; break;
 		case 0x0E:
 			if (is_window_crt == 0) {
 				if (i > 0) {
