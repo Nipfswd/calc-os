@@ -42,7 +42,7 @@ void init_palette() {
     set_palette_color(0, 10, 11, 10);
 
     for (uint8_t i = 1; i < 16; i++) {
-        set_palette_color(i, 57, 43, 21);
+        set_palette_color(i, 62, 48, 26);
     }
 }
 
