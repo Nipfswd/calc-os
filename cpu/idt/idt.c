@@ -6,6 +6,7 @@
 #include <idt.h>
 #include <task.h>
 #include <stdint.h>
+#include <sound.h>
 
 struct idt_entry   idt_entry[256];
 struct idt_pointer idtp;
@@ -98,8 +99,23 @@ void stub_mouse_handler() {
     outb(0x20, 0x20); 
 }
 
+void delay_ticks(uint32_t ticks) {
+    uint32_t target_ticks = timer_ticks + ticks;
+    while (timer_ticks < target_ticks) {
+        __asm__ __volatile__("hlt");
+    }
+}
+
+void play_error_sound() {
+    beep(150, 10); 
+    delay_ticks(2);     
+    beep(150, 10);
+}
+
 void exception_handler(struct registers regs) {
     draw_rect(0, 0, 640, 480, 1); 
+
+    play_error_sound();
 
     x = 10;
     y = 10;
@@ -140,20 +156,20 @@ void exception_handler(struct registers regs) {
     print("TECHICAL INFORMATION: ", 0);
     char buf[3];
     itoa(regs.int_no, buf);
-    print("\nINTERRUPT NO: ", 0); 
+    print("\n  INTERRUPT NO: ", 0); 
     print(buf, 0); 
 
 
-    print("\nEIP: ", 0);
+    print("\n  EIP: ", 0);
     char eip_buf[10];
     htoa(regs.eip, eip_buf);
     print(eip_buf, 0);
 
-    print("\nCS: ", 0);
+    print("\n  CS: ", 0);
     htoa(regs.cs, buf); 
     print(buf, 0);
 
-    print("\nERR CODE: ", 0);
+    print("\n  ERR CODE: ", 0);
     itoa(regs.err_code, buf); 
     print(buf, 0);
     
@@ -172,13 +188,6 @@ void ata_handler() {
 
     outb(0xA0, 0x20);
     outb(0x20, 0x20);
-}
-
-void delay_ticks(uint32_t ticks) {
-    uint32_t target_ticks = timer_ticks + ticks;
-    while (timer_ticks < target_ticks) {
-        __asm__ __volatile__("hlt");
-    }
 }
 
 void init_idt() {
