@@ -154,14 +154,14 @@ void exception_handler(struct registers regs) {
     x = 10;
     y = 70;
     print("TECHICAL INFORMATION: ", 0);
-    char buf[3];
+    char buf[16];
     itoa(regs.int_no, buf);
     print("\n  INTERRUPT NO: ", 0); 
     print(buf, 0); 
 
 
     print("\n  EIP: ", 0);
-    char eip_buf[10];
+    char eip_buf[32];
     htoa(regs.eip, eip_buf);
     print(eip_buf, 0);
 
