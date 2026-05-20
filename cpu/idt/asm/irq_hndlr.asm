@@ -10,33 +10,34 @@ global mouse_wrapper
 global ata_wrapper
 timer_wrapper:
     cli
-    push byte 0
-    push byte 32
+    push dword 0   
+    push dword 32  
     pusha
-
     mov ax, ds
-    push eax
-    mov ax, 0x10
+    push eax         
+
+    mov ax, 0x10        
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    push esp
+    push esp          
+    call timer_handler  
+    
+    add esp, 4         
 
-    call timer_handler
-    mov esp, eax
+    mov esp, eax       
 
-    pop eax
+    pop eax          
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-
-    popa
-    add esp, 8
+    popa                
+    add esp, 8          
     iret
-
+    
 keyboard_wrapper:
     pusha
     call keyboard_handler

@@ -84,11 +84,10 @@ void prepare_task2() {
     task_list[1].esp = (uint32_t)st;
 }
 
-uint32_t timer_handler(uint32_t current_esp) {
-    task_list[current_task].esp = current_esp;
+uint32_t timer_handler(struct registers *regs) {
+    task_list[current_task].esp = (uint32_t)regs; 
 
     current_task = (current_task + 1) % 2;
-
     timer_ticks++;
     outb(0x20, 0x20); 
 
