@@ -72,9 +72,14 @@ void prepare_task2() {
     *(--st) = 0x08;    
     *(--st) = (uint32_t)task2_main; 
 
+    *(--st) = 0;
+    *(--st) = 0;
+
     for (int i = 0; i < 8; i++) {
         *(--st) = 0;
     }
+
+    *(--st) = 0x10;
 
     task_list[1].esp = (uint32_t)st;
 }
