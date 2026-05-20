@@ -25,7 +25,7 @@ struct registers {
 void init_idt();
 void set_idt_gate(uint8_t number, uint32_t base, uint16_t selector, uint8_t flags);
 void pic_remap();
-void exception_handler(struct registers regs);
+void exception_handler(struct registers *regs);
 
 extern void timer_wrapper();
 extern void keyboard_wrapper();

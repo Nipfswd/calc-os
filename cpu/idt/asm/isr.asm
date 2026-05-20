@@ -5,8 +5,8 @@ extern exception_handler
 global isr%1
 isr%1:
     cli
-    push byte 0
-    push byte %1
+    push dword 0
+    push dword %1
     jmp isr_common
 %endmacro
 
@@ -14,7 +14,7 @@ isr%1:
 global isr%1
 isr%1:
     cli
-    push byte %1
+    push dword %1
     jmp isr_common
 %endmacro
 
