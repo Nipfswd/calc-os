@@ -51,6 +51,28 @@ start_code:
     int 0x13
     jc disk_error
 
+find_ahci:
+    mov ax, 0xB103
+    mov ecx, 0x010601
+    xor si, si
+    int 0x1A
+    jc ahci_not_found
+
+read_bar5:
+    mov ax, 0xB10A
+    mov di, 0x24
+    int 0x1A
+    jc ahci_not_found
+
+save_address:
+    and ecx, 0xFFFFFFF0
+    mov [0x8000], ecx
+    jmp continue_boot
+
+ahci_not_found:
+    mov [0x8000], dword 0
+
+continue_boot:
     cli
     lgdt [gdt_ptr]
     mov eax, cr0
