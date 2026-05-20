@@ -14,14 +14,14 @@ OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mo
 
 all: os-image.img
 
-os-image.img: boot.bin KERNEL.BIN
+os-image.img: boot.bin KERNEL.SYS
 	dd if=/dev/zero of=os-image.img bs=512 count=2880
 	
 	mformat -i os-image.img -f 1440 ::
 	
 	dd if=boot.bin of=os-image.img conv=notrunc bs=512 count=1
 	
-	mcopy -i os-image.img KERNEL.BIN ::KERNEL.BIN
+	mcopy -i os-image.img KERNEL.SYS ::KERNEL.SYS
 
 boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@
@@ -89,16 +89,16 @@ page2.o: cpu/mm/asm/page.asm
 sound.o: drivers/sound/sound.c
 	$(CC) $(CFLAGS) $< -o $@
 
-KERNEL.BIN: $(OBJ)
+KERNEL.SYS: $(OBJ)
 	$(LD) $(LDFLAGS) -o kernel.elf $(OBJ)
-	$(OBJCOPY) -O binary kernel.elf KERNEL.BIN
+	$(OBJCOPY) -O binary kernel.elf KERNEL.SYS
 
 
 clean:
-	rm -f *.o *.bin *.elf KERNEL.BIN 
+	rm -f *.o *.bin *.elf KERNEL.SYS	 
 
 cleane:
-	rm -f *.o *.bin *.elf *.img KERNEL.BIN
+	rm -f *.o *.bin *.elf *.img KERNEL.SYS
 
 run: os-image.img
 	qemu-system-i386 -drive file=os-image.img,format=raw -audiodev pa,id=snd0 -machine pcspk-audiodev=snd0
