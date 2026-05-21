@@ -9,6 +9,7 @@
 #include <ata.h>
 #include <mm.h>
 #include <sound.h>
+#include <pci.h>
 
 char command[256];
 char name[128];
@@ -404,7 +405,7 @@ refresh:
                 }
             }
             else if (compare_strings(command, "devices")) {
-                pci_scan();
+                pci_print_devices();
             }
             else {
                 if (command[0] != '\0') {
@@ -485,7 +486,8 @@ void boot() {
     screen_clear();
     init_palette();
     is_scaled = 0;
-    print("Success!", 1);
+    print("Scanning for PCI devices...", 1);
+    pci_scan();
     is_scaled = 1;
     delay_ticks(15);
 
