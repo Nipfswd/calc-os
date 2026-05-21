@@ -44,7 +44,7 @@ void pci_scan() {
                         
                         char vendor_str[9];
                         char device_str[9];
-                        itoa(vendor_id, vendor_str);
+                        htoa(vendor_id, vendor_str);
                         print("\nPCI Device Found: Vendor ID = ", 1);
                         print(vendor_str, 1);
                         itoa(device_id, device_str);
