@@ -10,7 +10,7 @@ CFLAGS = -m32 -ffreestanding -fno-stack-protector -fno-leading-underscore \
 		 -fno-pic -fno-asynchronous-unwind-tables
 LDFLAGS = -m elf_i386 -T linker.ld --nostdlib --static
 
-OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o page.o page2.o sound.o
+OBJ = kernel.o cmos.o stdio.o mouse2.o utils.o keyboard.o font.o io.o inout.o mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o page.o page2.o sound.o pci.o
 
 all: os-image.img
 
@@ -87,6 +87,9 @@ page2.o: cpu/mm/asm/page.asm
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
 sound.o: drivers/sound/sound.c
+	$(CC) $(CFLAGS) $< -o $@
+
+pci.o: drivers/pci/pci.c
 	$(CC) $(CFLAGS) $< -o $@
 
 KERNEL.SYS: $(OBJ)

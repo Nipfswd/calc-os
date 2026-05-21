@@ -316,6 +316,7 @@ refresh:
                 print("  status - check system status\n", 1);
                 print("  livetime - print system livetime irq0 ticks\n", 1);
                 print("  cat - print file content\n", 1);
+                print("  devices - print PCI devices\n", 1);
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
@@ -401,6 +402,9 @@ refresh:
                 } else {
                     print("Battery: BAD Please insert a new CMOS battery\n", 1);
                 }
+            }
+            else if (compare_strings(command, "devices")) {
+                pci_scan();
             }
             else {
                 if (command[0] != '\0') {
