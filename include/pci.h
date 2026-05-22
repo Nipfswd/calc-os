@@ -39,4 +39,8 @@ struct rtl8111_tx_desc {
     uint32_t buf_addr_high;
 } __attribute__((packed));
 
+void rtl8111_init();
+void rtl8111_recv();
+void rtl8111_send(uint8_t byte_to_send, uint8_t* dest_mac);
+
 #endif

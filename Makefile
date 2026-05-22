@@ -48,10 +48,14 @@ clean:
 	$(RM) *.o *.bin *.elf KERNEL.SYS
 
 cleane:
-	$(RM) *.o *.bin *.elf *.img KERNEL.SYS
+	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS
 
 run: os-image.img
-	qemu-system-i386 -drive file=os-image.img,format=raw -audiodev pa,id=snd0 -machine pcspk-audiodev=snd0
+	qemu-system-i386 -drive file=os-image.img,format=raw \
+	-audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
+	-netdev user,id=net0 \
+    -object filter-dump,id=f1,netdev=net0,file=traffic.pcap \
+    -device rtl8139,netdev=net0
 
 boch:
 	bochs -f bochsrc.txt
@@ -66,3 +70,6 @@ push:
 	git add .
 	git commit -m "CalcOS"
 	git push origin main --force
+
+test:
+	tcpdump -XX -r traffic.pcap

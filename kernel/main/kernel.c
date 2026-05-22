@@ -318,6 +318,7 @@ refresh:
                 print("  livetime - print system livetime irq0 ticks\n", 1);
                 print("  cat - print file content\n", 1);
                 print("  devices - print PCI devices\n", 1);
+                print("  send - send a byte to the network\n", 1);
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
@@ -407,9 +408,13 @@ refresh:
             else if (compare_strings(command, "devices")) {
                 pci_print_devices();
             }
+            else if (compare_strings(command, "send")) {
+                uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+                rtl8111_send('A', dest_mac);
+            }
             else {
                 if (command[0] != '\0') {
-                    print("Uncnown command. Type 'help'\n", 1);
+                    print("Unknown command. Type 'help'\n", 1);
                 }
             }
         }
@@ -475,19 +480,25 @@ void boot() {
     is_scaled = 1;
     screen_clear();
     print("Booting CalcOS...\n", 1);
+
+    print("Scanning devices...", 1);
+    pci_scan();
+
     init_mouse();
     print("[OK]\n", 1);
 
     init_identity_paging();
     enable_paging();
     print("[OK]\n", 1);
+
+    rtl8111_init();
+    print("[OK]\n", 1);
     delay_ticks(15);
 
     screen_clear();
     init_palette();
     is_scaled = 0;
-    print("Scanning for PCI devices...", 1);
-    pci_scan();
+    print("Success!", 1);
     is_scaled = 1;
     delay_ticks(15);
 

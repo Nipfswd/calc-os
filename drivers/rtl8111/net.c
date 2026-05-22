@@ -17,9 +17,11 @@ void rtl8111_init() {
     pci_device_t* dev = NULL; 
 
     for (int i = 0; i < device_count; i++) {
-        if (devices[i].vendor_id == 0x10EC && devices[i].device_id == 0x8168) {
-            dev = &devices[i];
-            break;
+        if (devices[i].vendor_id == 0x10EC) {
+            if (devices[i].device_id == 0x8168 || devices[i].device_id == 0x8169) {
+                dev = &devices[i];
+                break;
+            }
         }
     }
 
