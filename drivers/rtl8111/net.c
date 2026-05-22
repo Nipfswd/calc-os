@@ -32,7 +32,7 @@ void rtl8111_init() {
     }
 
     uint32_t pci_command = pci_read_config_dword(dev->bus, dev->slot, dev->func, 0x04);
-    pci_command |= 0x0006; 
+    pci_command = pci_command | 0x0006; 
     pci_write_config_dword(dev->bus, dev->slot, dev->func, 0x04, pci_command);
 
     uint32_t bar2 = pci_read_config_dword(dev->bus, dev->slot, dev->func, 0x18);
@@ -60,7 +60,7 @@ void rtl8111_init() {
         rx_ring[i].buf_addr_high = 0;                 
         rx_ring[i].status = 0x80000000 | 1536; 
     }
-    rx_ring[3].status |= 0x40000000;
+    rx_ring[3].status = rx_ring[3].status | 0x40000000;
 
     mmio_write32(mmio_base + 0xE4, (uint32_t)&rx_ring[0]);
     mmio_write32(mmio_base + 0xE8, 0); 
@@ -93,7 +93,7 @@ void rtl8111_recv() {
 
     rx_ring[current_rx].status = 0x80000000 | 1536;
     if (current_rx == 3) {
-        rx_ring[current_rx].status |= 0x40000000;
+        rx_ring[current_rx].status =  rx_ring[current_rx].status | 0x40000000;
     }
 
     current_rx = (current_rx + 1) % 4;
