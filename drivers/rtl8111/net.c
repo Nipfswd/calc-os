@@ -3,6 +3,7 @@
 #include <idt.h>
 #include <stdint.h>
 #include <pci.h>
+#include <mm.h>
 
 uint32_t mmio_base = 0;
 static uint32_t current_rx = 0;
@@ -17,11 +18,12 @@ void rtl8111_init() {
     pci_device_t* dev = NULL; 
 
     for (int i = 0; i < device_count; i++) {
-        if (devices[i].vendor_id == 0x10EC) {
-            if (devices[i].device_id == 0x8168 || devices[i].device_id == 0x8169) {
-                dev = &devices[i];
-                break;
-            }
+        uint32_t clean_vendor = devices[i].vendor_id & 0xFFFF;
+        uint32_t clean_class = devices[i].class_id & 0xFF; 
+
+        if (clean_vendor == 0x10EC && clean_class == 0x02) {
+            dev = &devices[i];
+            break;
         }
     }
 
@@ -36,34 +38,44 @@ void rtl8111_init() {
     uint32_t bar2 = pci_read_config_dword(dev->bus, dev->slot, dev->func, 0x18);
     mmio_base = bar2 & 0xFFFFFFF0;
 
-    mmio_write8(mmio_base + 0x37, 0x10); 
+    if (mmio_base == 0) {
+        return;
+    }
 
+    map_mmio_space(mmio_base);
+
+    mmio_write8(mmio_base + 0x37, 0x10); 
+    int timeout = 1000;
     while ((mmio_read8(mmio_base + 0x37) & 0x10) != 0) {
-        delay_ticks(25);
+        delay_ticks(5);
+        timeout--;
+        if (timeout <= 0) {
+            break; 
+        }
     }
 
     for (int i = 0; i < 4; i++) {
         rx_ring[i].vlan = 0;
-        rx_ring[i].buf_addr_low = (uint32_t)rx_buffer[i]; 
+        rx_ring[i].buf_addr_low = (uint32_t)rx_buffer[i];
         rx_ring[i].buf_addr_high = 0;                 
         rx_ring[i].status = 0x80000000 | 1536; 
     }
     rx_ring[3].status |= 0x40000000;
 
-    *(volatile uint32_t*)(mmio_base + 0xE4) = (uint32_t)&rx_ring[0];
-    *(volatile uint32_t*)(mmio_base + 0xE8) = 0; 
+    mmio_write32(mmio_base + 0xE4, (uint32_t)&rx_ring[0]);
+    mmio_write32(mmio_base + 0xE8, 0); 
 
-    *(volatile uint32_t*)(mmio_base + 0x44) = 0x0F | (1 << 7); 
+    mmio_write32(mmio_base + 0x44, 0x0F | (1 << 7)); 
 
     mmio_write8(mmio_base + 0x37, 0x08);
 
     tx_ring.buf_addr_low = (uint32_t)tx_buffer;
     tx_ring.buf_addr_high = 0;
     tx_ring.vlan = 0;
-    tx_ring.status = 0x40000000;
+    tx_ring.status = 0x40000000; 
 
-    *(volatile uint32_t*)(mmio_base + 0x20) = (uint32_t)&tx_ring;
-    *(volatile uint32_t*)(mmio_base + 0x24) = 0;
+    mmio_write32(mmio_base + 0x20, (uint32_t)&tx_ring);
+    mmio_write32(mmio_base + 0x24, 0);
 
     mmio_write8(mmio_base + 0x37, 0x08 | 0x04);
 }
@@ -111,11 +123,15 @@ void rtl8111_send(uint8_t byte_to_send, uint8_t* dest_mac) {
         tx_buffer[i] = 0;
     }
 
-    tx_ring.status = 0x80000000 | 0x30000000 | 0x40000000 | 60;
+    tx_ring.status = 0x80000000 | 0x20000000 | 0x10000000 | 60;
 
-    *(volatile uint8_t*)(mmio_base + 0x38) = 0x04;
+    *(volatile uint8_t*)(mmio_base + 0xD9) = 0x02;
 
+    int timeout = 500000;
     while ((tx_ring.status & 0x80000000) != 0) {
-        delay_ticks(25);
+        delay_ticks(1);
+        if (--timeout == 0) {
+            return;
+        }
     }
 }

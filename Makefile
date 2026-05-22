@@ -52,11 +52,7 @@ cleane:
 
 run: os-image.img
 	qemu-system-i386 -drive file=os-image.img,format=raw \
-	-audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
-	-netdev user,id=net0 \
-    -object filter-dump,id=f1,netdev=net0,file=traffic.pcap \
-    -device rtl8139,netdev=net0
-
+	-audiodev pa,id=snd0 -machine pcspk-audiodev=snd0
 boch:
 	bochs -f bochsrc.txt
 

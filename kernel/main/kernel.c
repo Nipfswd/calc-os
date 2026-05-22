@@ -319,6 +319,7 @@ refresh:
                 print("  cat - print file content\n", 1);
                 print("  devices - print PCI devices\n", 1);
                 print("  send - send a byte to the network\n", 1);
+                print("  recv - receive a byte from the network\n", 1);
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
@@ -409,8 +410,20 @@ refresh:
                 pci_print_devices();
             }
             else if (compare_strings(command, "send")) {
+                print("Byte to send (0-255): ", 1);
+                char byte_str[4];
+                input_wait_string(byte_str);
+                int byte = atoi(byte_str);
+                if (byte < 0 || byte > 255) {
+                    print("Invalid byte value\n", 1);
+                    continue;
+                }
+
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                rtl8111_send('A', dest_mac);
+                rtl8111_send(byte, dest_mac);
+            }
+            else if (compare_strings(command, "recv")) {
+                rtl8111_recv();
             }
             else {
                 if (command[0] != '\0') {
@@ -481,7 +494,7 @@ void boot() {
     screen_clear();
     print("Booting CalcOS...\n", 1);
 
-    print("Scanning devices...", 1);
+    print("Scanning devices...\n", 1);
     pci_scan();
 
     init_mouse();
@@ -493,7 +506,6 @@ void boot() {
 
     rtl8111_init();
     print("[OK]\n", 1);
-    delay_ticks(15);
 
     screen_clear();
     init_palette();

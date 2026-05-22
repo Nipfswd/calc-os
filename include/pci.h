@@ -6,6 +6,8 @@
 
 #define mmio_write8(addr, val)  (*(volatile uint8_t*)(addr) = (val))
 #define mmio_read8(addr)        (*(volatile uint8_t*)(addr))
+#define mmio_write32(addr, val) (*(volatile uint32_t*)(addr) = (val))
+#define mmio_read32(addr)       (*(volatile uint32_t*)(addr))
 
 typedef struct {
     uint8_t bus;
@@ -13,7 +15,7 @@ typedef struct {
     uint8_t func;
     uint16_t vendor_id;
     uint16_t device_id;
-    uint8_t class_code;   
+    uint8_t class_id;   
     uint8_t subclass;    
 } pci_device_t;
 

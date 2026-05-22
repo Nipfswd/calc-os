@@ -62,7 +62,7 @@ void pci_scan() {
                         devices[device_count].vendor_id = data0 & 0xFFFF;
                         devices[device_count].device_id = (data0 >> 16) & 0xFFFF;
 
-                        devices[device_count].class_code = (data2 >> 24) & 0xFF;
+                        devices[device_count].class_id = (data2 >> 24) & 0xFF;
                         devices[device_count].subclass   = (data2 >> 16) & 0xFF;
 
                         device_count++;
@@ -94,7 +94,7 @@ void pci_print_devices() {
         print(buf, 1);
         
         print(" | Class: ", 1);
-        htoa(devices[i].class_code, buf);
+        htoa(devices[i].class_id, buf);
         print(buf, 1);
         
         print("\n", 1);
