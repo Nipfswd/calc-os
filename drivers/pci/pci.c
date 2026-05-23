@@ -13,13 +13,13 @@ pci_device_t devices[32];
 int device_count = 0;
 
 uint32_t pci_read_config_dword(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
-    uint32_t address = (1 << 31) | (bus << 16) | (slot << 11) | (func << 8) | (offset << 2);
+    uint32_t address = (1 << 31) | (bus << 16) | (slot << 11) | (func << 8) | (offset & 0xFC);
     outl(0xCF8, address);
     return inl(0xCFC);
 }
 
 void pci_write_config_dword(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint32_t value) {
-    uint32_t address = (1 << 31) | (bus << 16) | (slot << 11) | (func << 8) | (offset << 2);
+    uint32_t address = (1 << 31) | (bus << 16) | (slot << 11) | (func << 8) | (offset & 0xFC);
     outl(0xCF8, address);
     outl(0xCFC, value);
 }

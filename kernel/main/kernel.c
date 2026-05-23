@@ -7,7 +7,6 @@
 #include <idt.h>
 #include <stdint.h>
 #include <ata.h>
-#include <mm.h>
 #include <sound.h>
 #include <pci.h>
 
@@ -420,10 +419,10 @@ refresh:
                 }
 
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                rtl8111_send(byte, dest_mac);
+                //rtl8111_send(byte, dest_mac);
             }
             else if (compare_strings(command, "recv")) {
-                rtl8111_recv();
+                //rtl8111_recv();
             }
             else {
                 if (command[0] != '\0') {
@@ -498,10 +497,6 @@ void boot() {
     pci_scan();
 
     init_mouse();
-    print("[OK]\n", 1);
-
-    init_identity_paging();
-    enable_paging();
     print("[OK]\n", 1);
 
     rtl8111_init();
