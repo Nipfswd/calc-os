@@ -318,7 +318,7 @@ refresh:
                 print("  cat - print file content\n", 1);
                 print("  devices - print PCI devices\n", 1);
                 print("  send - send a byte to the network\n", 1);
-                print("  recv - receive a byte from the network\n", 1);
+                print("  behave - receive a byte from the network\n", 1);
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
@@ -419,10 +419,11 @@ refresh:
                 }
 
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                //rtl8111_send(byte, dest_mac);
+                send_pack(byte, dest_mac);
+                print("\n", 1);
             }
-            else if (compare_strings(command, "recv")) {
-                //rtl8111_recv();
+            else if (compare_strings(command, "behave")) {
+                read_pack();
             }
             else {
                 if (command[0] != '\0') {
@@ -499,7 +500,7 @@ void boot() {
     init_mouse();
     print("[OK]\n", 1);
 
-    rtl8111_init();
+    rtl8139_init();
     print("[OK]\n", 1);
 
     screen_clear();

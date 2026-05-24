@@ -17,7 +17,7 @@ OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.
 
 vpath %.c kernel/main drivers/cmos drivers/video drivers/mouse utils drivers/keyboard \
           drivers/video/font cpu/idt cpu/idt/tasks drivers/ata drivers/fat drivers/sound drivers/pci \
-		  drivers/rtl8111
+		  drivers/rtl8139
 		  
 vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/asm cpu/mm/asm
 
