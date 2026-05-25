@@ -62,6 +62,8 @@ void input_wait_string(char *buffer) {
 
 		if (code == 0) continue;
 
+		if (code >= 0x80) continue;
+
 		handle_hotkeys(code);
 
 		if (code == 0x1C) {

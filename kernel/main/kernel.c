@@ -129,6 +129,22 @@ void play_startup_sound() {
     beep(690, 3);
 }
 
+int atoi_super(const char* str) {
+    int res = 0;
+    int i = 0;
+
+    while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\r') {
+        i++;
+    }
+
+    while (str[i] >= '0' && str[i] <= '9') {
+        res = res * 10 + (str[i] - '0');
+        i++;
+    }
+
+    return res;
+}
+
 void shell() {
 refresh:
     ncount = 0;
@@ -409,17 +425,43 @@ refresh:
                 pci_print_devices();
             }
             else if (compare_strings(command, "send")) {
-                print("Byte to send (0-255): ", 1);
-                char byte_str[4];
+                while (get_scancode() != 0);
+
+                print("Byte to send 0-255: ", 1);
+
+                char byte_str[16];
+                for (int i = 0; i < 16; i++) byte_str[i] = 0;
+
+                ncount = 0; 
+
                 input_wait_string(byte_str);
-                int byte = atoi(byte_str);
+
+                int byte = 0;
+                int idx = 0;
+                int found_digits = 0;
+
+                while (byte_str[idx] != '\0' && (byte_str[idx] < '0' || byte_str[idx] > '9')) {
+                    idx++;
+                }
+
+                while (byte_str[idx] >= '0' && byte_str[idx] <= '9') {
+                    byte = byte * 10 + (byte_str[idx] - '0');
+                    idx++;
+                    found_digits = 1;
+                }
+
+                if (found_digits == 0) {
+                    print("\nParser failed, sending default 'E'\n", 1);
+                    byte = 69; 
+                } 
+
                 if (byte < 0 || byte > 255) {
-                    print("Invalid byte value\n", 1);
+                    print("Invalid byte.\n", 1);
                     continue;
                 }
 
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                send_pack(byte, dest_mac);
+                send_pack((uint8_t)byte, dest_mac);
                 print("\n", 1);
             }
             else if (compare_strings(command, "behave")) {

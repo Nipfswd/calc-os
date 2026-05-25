@@ -14,14 +14,20 @@ get_scancode:
     jnz .no_data    
 
     in al, 0x60      
+
     test al, 0x80    
-    jnz .no_data
+    jnz .is_break    
 
     movzx eax, al    
     pop ebp
     ret
 
+.is_break:
+    movzx eax, al    
+    pop ebp
+    ret
+
 .no_data:
-    xor eax, eax
+    xor eax, eax     
     pop ebp
     ret
