@@ -5,7 +5,7 @@
 #include <pci.h>
 #include <mm.h>
 
-uint16_t rtl_port_base = 0;
+volatile uint8_t* rtl_mmio;
 
 #define RX_BUFFER_SIZE 0x8000 
 
@@ -25,13 +25,16 @@ int rtl8139_find() {
     return -1;
 }
 
-uint32_t rtl8139_get_port_base() {
+uint32_t rtl8139_get_mmio() {
+    uint32_t mmio_base;
+
     int index = rtl8139_find();
     if (index < 0) return 0;
 
-    uint32_t io_base = pci_read_config_dword(devices[index].bus, devices[index].slot, devices[index].func, 0x10);
-    io_base = io_base & ~0x3;
-    return io_base; 
+    mmio_base = pci_read_config_dword(devices[index].bus, devices[index].slot, devices[index].func, 0x14);
+    mmio_base = mmio_base & ~0xF;
+
+    return mmio_base;
 }
 
 void rtl8139_init() {
@@ -44,77 +47,52 @@ void rtl8139_init() {
     cmd = cmd | 0x0007; 
     pci_write_config_word(devices[index].bus, devices[index].slot, devices[index].func, 0x04, cmd);
 
-    rtl_port_base = rtl8139_get_port_base();
-    if (rtl_port_base == 0) return;
+    uint32_t mmio_base = rtl8139_get_mmio();
+    if (mmio_base == 0) return;
+    rtl_mmio = (volatile uint8_t*)mmio_base;
 
     for (int i = 0; i < 6; i++) {
-        mac_addr[i] = inb(rtl_port_base + i);
+        mac_addr[i] = rtl_mmio[i];
     }
 
-    outb(rtl_port_base + 0x37, 0x10);
+    rtl_mmio[0x37] = 0x10;
     uint32_t timeout = 500000;
-    while ((inb(rtl_port_base + 0x37) & 0x10) && timeout > 0) {
+    while ((rtl_mmio[0x37] & 0x10) && timeout > 0) {
         timeout--;
     }
     if (timeout == 0) return;
 
-    outl(rtl_port_base + 0x44, 0x0000E70F);
+    *(volatile uint32_t*)(rtl_mmio + 0x44) = 0x0000E70F;
 
-    outl(rtl_port_base + 0x30, rx_phys);
+    *(volatile uint32_t*)(rtl_mmio + 0x30) = rx_phys;
 
-    outw(rtl_port_base + 0x38, 0);
-    outw(rtl_port_base + 0x3A, 0); 
-    outw(rtl_port_base + 0x3C, 0x0005);
+    *(volatile uint16_t*)(rtl_mmio + 0x38) = 0;
+    *(volatile uint16_t*)(rtl_mmio + 0x3A) = 0; // Змінено на 0
 
-    outb(rtl_port_base + 0x37, 0x0C);
+    *(volatile uint16_t*)(rtl_mmio + 0x3C) = 0x0005;
+
+    rtl_mmio[0x37] = 0x0C;
 
     tx_counter = 0;
     rx_offset = 0; 
 }
 
-void send_pack(uint8_t data, uint8_t dest_mac[6]) {
-    if (rtl_port_base == 0) return;
-
-    uint32_t phys_tx_buf = (uint32_t)rtl_tx_buffer[tx_counter]; 
-
-    for (int i = 0; i < 6; i++) rtl_tx_buffer[tx_counter][i] = dest_mac[i];
-    for (int i = 0; i < 6; i++) rtl_tx_buffer[tx_counter][i + 6] = mac_addr[i];
-
-    rtl_tx_buffer[tx_counter][12] = 0x88;
-    rtl_tx_buffer[tx_counter][13] = 0xB5;
-    rtl_tx_buffer[tx_counter][14] = data;
-
-    for (int i = 15; i < 60; i++) rtl_tx_buffer[tx_counter][i] = 0;
-    
-    uint32_t length = 60; 
-    uint8_t tx_reg_offset = tx_counter * 4;
-
-    outl(rtl_port_base + 0x20 + tx_reg_offset, phys_tx_buf);
-    outl(rtl_port_base + 0x10 + tx_reg_offset, length);
-
-    uint32_t tx_timeout = 200000;
-    while (!(inl(rtl_port_base + 0x10 + tx_reg_offset) & (1 << 13)) && tx_timeout > 0) {
-        tx_timeout--;
-    }
-
-    tx_counter = (tx_counter + 1) % 4;
-}
-
 uint8_t read_pack() {
-    if (rtl_port_base == 0) return 0;
-
-    if (inb(rtl_port_base + 0x37) & 0x01) {
+    if (rtl_mmio[0x37] & 0x01) {
         return 0;
     }
     
     uint8_t* header = rtl_rx_buffer + rx_offset;
+
     uint16_t status = header[0] | (header[1] << 8);
     if (!(status & 0x01)) {
         return 0;
     }
 
     uint16_t length = header[2] | (header[3] << 8);
+
     uint8_t* payload = header + 4;
+    
     uint16_t ethertype = (payload[12] << 8) | payload[13];
     
     if (ethertype == 0x88B5) {
@@ -133,12 +111,45 @@ uint8_t read_pack() {
     rx_offset = (rx_offset + length + 4 + 3) & ~3;
     rx_offset = rx_offset % RX_BUFFER_SIZE;
 
-    int capr = (int)rx_offset - 16;
-    if (capr < 0) {
-        capr += RX_BUFFER_SIZE;
-    }
-
-    outw(rtl_port_base + 0x3A, (uint16_t)capr);
+    *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
 
     return 1;
+}
+
+void send_pack(uint8_t data, uint8_t dest_mac[6]) {
+    uint32_t phys_tx_buf = (uint32_t)rtl_tx_buffer[tx_counter]; 
+
+    for (int i = 0; i < 6; i++) {
+        rtl_tx_buffer[tx_counter][i] = dest_mac[i];
+    }
+    
+    for (int i = 0; i < 6; i++) {
+        rtl_tx_buffer[tx_counter][i + 6] = mac_addr[i];
+    }
+
+    rtl_tx_buffer[tx_counter][12] = 0x88;
+    rtl_tx_buffer[tx_counter][13] = 0xB5;
+    rtl_tx_buffer[tx_counter][14] = data;
+
+    for (int i = 15; i < 60; i++) {
+        rtl_tx_buffer[tx_counter][i] = 0;
+    }
+    
+    uint32_t length = 60; 
+    uint8_t tx_reg_offset = tx_counter * 4;
+
+    uint32_t tsad_addr = (uint32_t)rtl_mmio + 0x20 + tx_reg_offset;
+    *(volatile uint32_t*)tsad_addr = phys_tx_buf;
+
+    __asm__ __volatile__("" : : : "memory");
+
+    uint32_t tsd_addr = (uint32_t)rtl_mmio + 0x10 + tx_reg_offset;
+    *(volatile uint32_t*)tsd_addr = length;
+
+    uint32_t tx_timeout = 200000;
+    while (!((*(volatile uint32_t*)tsd_addr) & (1 << 13)) && tx_timeout > 0) {
+        tx_timeout--;
+    }
+
+    tx_counter = (tx_counter + 1) % 4;
 }
