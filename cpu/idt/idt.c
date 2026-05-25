@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <sound.h>
 
-struct idt_entry   idt_entry[256];
+struct idt_entry   idt[256];
 struct idt_pointer idtp;
 
 unsigned int timer_ticks = 0;
@@ -17,11 +17,11 @@ unsigned char *timer_str[16];
 volatile int ata_interrupt_received = 0;
 
 void set_idt_gate(uint8_t number, uint32_t base, uint16_t selector, uint8_t flags) {
-    idt_entry[number].base_low = (base & 0xFFFF);
-    idt_entry[number].base_high = (base >> 16) & 0xFFFF;
-    idt_entry[number].selector = selector;
-    idt_entry[number].always0 = 0;
-    idt_entry[number].flags = flags;
+    idt[number].base_low = (base & 0xFFFF);
+    idt[number].base_high = (base >> 16) & 0xFFFF;
+    idt[number].selector = selector;
+    idt[number].always0 = 0;
+    idt[number].flags = flags;
 }
 
 void pic_remap() {
@@ -36,8 +36,8 @@ void pic_remap() {
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     
-    outb(0x21, 0xF8);
-    outb(0xA1, 0x00);
+    outb(0x21, 0xF8); 
+    outb(0xA1, 0xFF); 
 }
 
 unsigned int task2_stack[1024]; 
@@ -49,7 +49,6 @@ void task2_main() {
     while(1) {
         if (current_mode != 0 && is_window_crt == 0) {
             get_time(&hours, &minutes);
-
             x = 600; y = 15;
             
             itoa(hours, h_str);
@@ -66,22 +65,21 @@ void task2_main() {
 }
 
 void prepare_task2() {
-    uint32_t* st = &task2_stack[1024];
+    struct registers* regs = (struct registers*)(&task2_stack[1024] - sizeof(struct registers) / sizeof(uint32_t));
 
-    *(--st) = 0x202;       
-    *(--st) = 0x08;    
-    *(--st) = (uint32_t)task2_main; 
+    regs->eflags   = 0x202; 
+    regs->cs       = 0x08;  
+    regs->eip      = (uint32_t)task2_main; 
 
-    *(--st) = 0;
-    *(--st) = 0;
+    regs->err_code = 0;
+    regs->int_no   = 0;
 
-    for (int i = 0; i < 8; i++) {
-        *(--st) = 0;
-    }
+    regs->eax = 0; regs->ecx = 0; regs->edx = 0; regs->ebx = 0;
+    regs->ebp = 0; regs->esp = 0; regs->esi = 0; regs->edi = 0;
 
-    *(--st) = 0x10;
+    regs->ds       = 0x10;  
 
-    task_list[1].esp = (uint32_t)st;
+    task_list[1].esp = (uint32_t)regs;
 }
 
 uint32_t timer_handler(struct registers *regs) {
@@ -182,20 +180,18 @@ void exception_handler(struct registers *regs) {
 
 void init_timer() {
     outb(0x43, 0x36); 
-
     outb(0x40, 0xFF); 
     outb(0x40, 0xFF); 
 }
 
 void ata_handler() {
     ata_interrupt_received = 1;
-
     outb(0xA0, 0x20);
     outb(0x20, 0x20);
 }
 
 void init_idt() {
-    idtp.idt_ptr = (uint32_t)&idt_entry;
+    idtp.idt_ptr = (uint32_t)idt;
     idtp.idt_size = (sizeof(struct idt_entry) * 256) - 1;
 
     for (int i = 0; i < 256; i++) {
