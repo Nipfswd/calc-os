@@ -122,7 +122,6 @@ void send_pack(uint8_t data, uint8_t dest_mac[6]) {
     for (int i = 0; i < 6; i++) {
         rtl_tx_buffer[tx_counter][i] = dest_mac[i];
     }
-    
     for (int i = 0; i < 6; i++) {
         rtl_tx_buffer[tx_counter][i + 6] = mac_addr[i];
     }
@@ -138,12 +137,15 @@ void send_pack(uint8_t data, uint8_t dest_mac[6]) {
     uint32_t length = 60; 
     uint8_t tx_reg_offset = tx_counter * 4;
 
-    uint32_t tsad_addr = (uint32_t)rtl_mmio + 0x20 + tx_reg_offset;
-    *(volatile uint32_t*)tsad_addr = phys_tx_buf;
-
     __asm__ __volatile__("" : : : "memory");
 
-    uint32_t tsd_addr = (uint32_t)rtl_mmio + 0x10 + tx_reg_offset;
+    uint32_t tsad_addr = (uint32_t)rtl_mmio + 0x20 + tx_reg_offset;
+    uint32_t tsd_addr  = (uint32_t)rtl_mmio + 0x10 + tx_reg_offset;
+
+    *(volatile uint32_t*)tsad_addr = phys_tx_buf;
+
+    __asm__ __volatile__("mfence" : : : "memory");
+
     *(volatile uint32_t*)tsd_addr = length;
 
     uint32_t tx_timeout = 200000;
