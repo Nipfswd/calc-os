@@ -52,17 +52,17 @@ void task2_main() {
         if (current_mode != 0 && is_window_crt == 0) {
             get_time(&hours, &minutes);
 
-            x = 600; y = 15;
+            x = 972; y = 15;
             
             itoa(hours, h_str);
-            print(h_str, 1);
-            print(":", 1);
+            print(h_str, 15);
+            print(":", 15);
             
             itoa(minutes, m_str);
-            if (minutes < 10) print("0", 1); 
-            print(m_str, 1);
+            if (minutes < 10) print("0", 15); 
+            print(m_str, 15);
 
-            draw_rect(602, 5, 38, 30, 0); 
+            draw_rect(970, 5, 46, 30, 0); 
         }
     }
 }
@@ -126,58 +126,58 @@ void exception_handler(struct registers *regs) {
     x = 10;
     y = 10;
     
-    print("KERNEL FATAL: ", 0);
+    print("KERNEL FATAL: ", 15);
     
-    if (regs->int_no == 0) print("DIVISION BY ZERO", 0);
-    else if (regs->int_no == 1) print("DEBUG", 0);
-    else if (regs->int_no == 2) print("NON MASKABLE INTERRUPT", 0);
-    else if (regs->int_no == 3) print("BREAKPOINT", 0);
-    else if (regs->int_no == 4) print("INTO DETECTED OVERFLOW", 0);
-    else if (regs->int_no == 5) print("OUT OF BOUNDS", 0);
-    else if (regs->int_no == 6) print("INVALID OPCODE", 0);
-    else if (regs->int_no == 7) print("NO COPROCESSOR", 0);
-    else if (regs->int_no == 8) print("DOUBLE FAULT", 0);
-    else if (regs->int_no == 9) print("COPROCESSOR SEGMENT OVERRUN", 0);
-    else if (regs->int_no == 10) print("BAD TSS", 0);
-    else if (regs->int_no == 11) print("SEGMENT NOT PRESENT", 0);
-    else if (regs->int_no == 12) print("STACK FAULT", 0);
-    else if (regs->int_no == 13) print("GENERAL PROTECTION FAULT", 0);
-    else if (regs->int_no == 14) print("PAGE FAULT", 0);
-    else if (regs->int_no == 15) print("UNKNOWN INTERRUPT (RESERVED)", 0);
-    else if (regs->int_no == 16) print("FLOATING POINT ERROR", 0);
-    else if (regs->int_no == 17) print("ALIGNMENT CHECK", 0);
-    else if (regs->int_no == 18) print("MACHINE CHECK", 0);
-    else if (regs->int_no == 19) print("SIMD FLOATING POINT EXCEPTION", 0);
-    else if (regs->int_no == 20) print("VIRTUALIZATION EXCEPTION", 0);
-    else if (regs->int_no == 21) print("CONTROL PROTECTION EXCEPTION", 0);
-    else if (regs->int_no >= 22 && regs->int_no <= 27) print("RESERVED EXCEPTION", 0);
-    else if (regs->int_no == 28) print("HYPERVISOR INJECTION EXCEPTION", 0);
-    else if (regs->int_no == 29) print("VMM COMMUNICATION EXCEPTION", 0);
-    else if (regs->int_no == 30) print("SECURITY EXCEPTION", 0);
-    else if (regs->int_no == 31) print("RESERVED EXCEPTION", 0);
-    else print("UNKNOWN EXCEPTION\n", 0);
+    if (regs->int_no == 0) print("DIVISION BY ZERO", 15);
+    else if (regs->int_no == 1) print("DEBUG", 15);
+    else if (regs->int_no == 2) print("NON MASKABLE INTERRUPT", 15);
+    else if (regs->int_no == 3) print("BREAKPOINT", 15);
+    else if (regs->int_no == 4) print("INTO DETECTED OVERFLOW", 15);
+    else if (regs->int_no == 5) print("OUT OF BOUNDS", 15);
+    else if (regs->int_no == 6) print("INVALID OPCODE", 15);
+    else if (regs->int_no == 7) print("NO COPROCESSOR", 15);
+    else if (regs->int_no == 8) print("DOUBLE FAULT", 15);
+    else if (regs->int_no == 9) print("COPROCESSOR SEGMENT OVERRUN", 15);
+    else if (regs->int_no == 10) print("BAD TSS", 15);
+    else if (regs->int_no == 11) print("SEGMENT NOT PRESENT", 15);
+    else if (regs->int_no == 12) print("STACK FAULT", 15);
+    else if (regs->int_no == 13) print("GENERAL PROTECTION FAULT", 15);
+    else if (regs->int_no == 14) print("PAGE FAULT", 15);
+    else if (regs->int_no == 15) print("UNKNOWN INTERRUPT (RESERVED)", 15);
+    else if (regs->int_no == 16) print("FLOATING POINT ERROR", 15);
+    else if (regs->int_no == 17) print("ALIGNMENT CHECK", 15);
+    else if (regs->int_no == 18) print("MACHINE CHECK", 15);
+    else if (regs->int_no == 19) print("SIMD FLOATING POINT EXCEPTION", 15);
+    else if (regs->int_no == 20) print("VIRTUALIZATION EXCEPTION", 15);
+    else if (regs->int_no == 21) print("CONTROL PROTECTION EXCEPTION", 15);
+    else if (regs->int_no >= 22 && regs->int_no <= 27) print("RESERVED EXCEPTION", 15);
+    else if (regs->int_no == 28) print("HYPERVISOR INJECTION EXCEPTION", 15);
+    else if (regs->int_no == 29) print("VMM COMMUNICATION EXCEPTION", 15);
+    else if (regs->int_no == 30) print("SECURITY EXCEPTION", 15);
+    else if (regs->int_no == 31) print("RESERVED EXCEPTION", 15);
+    else print("UNKNOWN EXCEPTION\n", 15);
 
     x = 10;
     y = 70;
-    print("TECHICAL INFORMATION: ", 0);
+    print("TECHICAL INFORMATION: ", 15);
     char buf[16];
     itoa(regs->int_no, buf);
-    print("\n  INTERRUPT NO: ", 0); 
-    print(buf, 0); 
+    print("\n  INTERRUPT NO: ", 15); 
+    print(buf, 15); 
 
 
-    print("\n  EIP: ", 0);
+    print("\n  EIP: ", 15);
     char eip_buf[32];
     htoa(regs->eip, eip_buf);
-    print(eip_buf, 0);
+    print(eip_buf, 15);
 
-    print("\n  CS: ", 0);
+    print("\n  CS: ", 15);
     htoa(regs->cs, buf); 
-    print(buf, 0);
+    print(buf, 15);
 
-    print("\n  ERR CODE: ", 0);
+    print("\n  ERR CODE: ", 15);
     itoa(regs->err_code, buf); 
-    print(buf, 0);
+    print(buf, 15);
     
     while(1); 
 }

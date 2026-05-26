@@ -97,14 +97,14 @@ uint8_t read_pack() {
     
     if (ethertype == 0x88B5) {
         char c = payload[14];
-        put_char(c, 1);
+        put_char(c, 15);
     } 
     else if (ethertype == 0x0800 && length >= 42 && length < 1600) {
         uint16_t offset = 14 + 20 + 8;
         uint8_t* icmp_data = payload + offset;
         for (int i = 0; i < length - offset - 4; i++) {
             char c = icmp_data[i];
-            put_char(c, 1);
+            put_char(c, 15);
         }
     }
 

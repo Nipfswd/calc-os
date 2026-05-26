@@ -78,8 +78,8 @@ static void draw_file_icons() {
             if ((uint8_t)entries[i].name[0] == 0xE5) continue;
             if (entries[i].attributes == 0x0F) continue;
 
-            int col = icon_index % 3;
-            int row = icon_index / 3;
+            int col = icon_index % 6;
+            int row = icon_index / 5;
             int icon_x = 20 + col * 180;
             int icon_y = 100 + row * 100;
 
@@ -150,13 +150,13 @@ void shell() {
 refresh:
     ncount = 0;
 
-    draw_rect(0, 0, 640, 400, 15);
+    draw_rect(0, 0, 1024, 40, 15);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 15);
 
     if (current_mode == 0) {
         if (draw_0 == 1) {
-            draw_rect(0, 40, 640, 480, 0);
+            draw_rect(0, 40, 1024, 728, 0);
 
             if (draw_0 == 1) {
                 draw_button(78, 5, 136, 26, "Terminal", 0, 15);
@@ -186,7 +186,7 @@ refresh:
         }
     }
     else if (current_mode == 2) {
-        draw_rect(0, 40, 640, 480, 0);
+        draw_rect(0, 40, 1024, 728, 0);
 
         if (draw_0 == 1) {
             draw_button(78, 5, 136, 26, "Terminal", 0, 15);
@@ -204,41 +204,42 @@ refresh:
             draw_button(10, 31, 70, 26, "Terminal", 0, 15);
             draw_button(10, 51, 70, 26, "Explorer", 15, 0);
 
-
             draw_button(10, 85, 15, 15, "x", 0, 15);
         }
 
-        draw_button(0, 440, 640, 40, "F2 - create a new file", 15, 0);
+        draw_button(0, 728, 1024, 40, "F2 - create a new file", 15, 0);
 
         draw_file_icons();
 
         if (show_crt_window == 1) {
             is_window_crt = 1;
-            draw_rect(104, 100, 432, 260, 0);
-            draw_rect(100, 96, 432, 260, 15);
-            draw_rect(104, 100, 424, 252, 7);
+            int wx = 296; 
+            int wy = 244;
 
-            draw_rect(104, 100, 424, 32, 0);
+            draw_rect(wx + 4, wy + 4, 432, 260, 0);
+            draw_rect(wx,     wy,     432, 260, 15);
+            draw_rect(wx + 4, wy + 4, 424, 252, 7);
+            draw_rect(wx + 4, wy + 4, 424, 32, 0);
 
-            x = 118;
-            y = 104;
+            x = wx + 18;
+            y = wy + 8;
             print("Create a new file", 15);
 
-            x = 118;
-            y = 140;
+            x = wx + 18;
+            y = wy + 44;
             print("Name:", 15);
-            draw_rect(118, 152, 404, 24, 15);
-            draw_rect(120, 154, 400, 20, 0);
+            draw_rect(wx + 18, wy + 56, 404, 24, 15);
+            draw_rect(wx + 20, wy + 58, 400, 20, 0);
 
-            x = 118;
-            y = 190;
+            x = wx + 18;
+            y = wy + 94;
             print("Content:", 15);
-            draw_rect(118, 242, 404, 24, 15);
-            draw_rect(120, 244, 400, 20, 0);
+            draw_rect(wx + 18, wy + 146, 404, 24, 15); 
+            draw_rect(wx + 20, wy + 148, 400, 20, 0);
         }
     }
     else if (current_mode == 3) {
-        draw_rect(0, 40, 640, 480, 0);
+        draw_rect(0, 40, 1024, 728, 0);
         
         if (draw_0 == 1) {
             draw_button(78, 5, 136, 26, "Terminal", 0, 15);
@@ -259,20 +260,20 @@ refresh:
             draw_button(10, 85, 15, 15, "x", 0, 15);
         }
 
-          x = 0;
-          y = 96;
-          print("System Information:\n", 15);
-          print("Battery Status: ", 15);
-          unsigned char battery_status = check_battery();
-          if (battery_status) {
-              print("OK\n", 15);
-          } else {
-              print("BAD. Please insert a new CMOS battery\n", 15);
-          }
+        x = 0;
+        y = 96;
+        print("System Information:\n", 15);
+        print("Battery Status: ", 15);
+        unsigned char battery_status = check_battery();
+        if (battery_status) {
+            print("OK\n", 15);
+        } else {
+            print("BAD. Please insert a new CMOS battery\n", 15);
+        }
     }
     else {
         if (draw_1 == 1) {
-           draw_rect(0, 40, 640, 480, 0);
+            draw_rect(0, 40, 1024, 728, 0);
 
             if (draw_0 == 1) {
                 draw_button(78, 5, 136, 26, "Terminal", 0, 15);
@@ -294,12 +295,12 @@ refresh:
             }
 
             if (is_button_files == 1) {
-                draw_button(156, 100, 320, 36, "Files", 15, 0);
-                draw_button(156, 200, 320, 36, "System", 7, 0);
+                draw_button(352, 250, 320, 36, "Files", 15, 0);
+                draw_button(352, 350, 320, 36, "System", 7, 0);
             }
             else if (is_button_apps == 1) {
-                draw_button(156, 100, 320, 36, "Files", 7, 0);
-                draw_button(156, 200, 320, 36, "System", 15, 0);
+                draw_button(352, 250, 320, 36, "Files", 7, 0);
+                draw_button(352, 350, 320, 36, "System", 15, 0);
             } 
         } else {
             current_mode = 0;
@@ -349,9 +350,6 @@ refresh:
 
                 char name_11[11];
                 format_fat_name(name, name_11);
-
-                uint8_t buffer[512] = {0};
-                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
 
                 read_file(name_11, content);
                 print(content, 15);
@@ -427,35 +425,27 @@ refresh:
             }
             else if (compare_strings(command, "send")) {
                 while (get_scancode() != 0); 
-
                 print("Enter a byte: ", 15);
-
                 for (int i = 0; i < 16; i++) byte_str[i] = 0;
-
                 for (volatile int j = 0; j < 200000; j++);
 
                 while (1) {
                     ncount = 0; 
-
                     input_wait_string(byte_str);
-
                     if (byte_str[0] == '\0') {
                         ncount = 0;
                         continue;
                     }
-
                     break;
                 }
 
                 int byte_val = atoi_super(byte_str);
-
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
                 if (byte_val < 0 || byte_val > 255) {
                     print("Invalid byte value. Must be between 0 and 255.\n", 15);
                 } else {
                     send_pack((uint8_t)byte_val, dest_mac);
                 }
-
                 print("\n", 15);
             }
             else if (compare_strings(command, "behave")) {
@@ -486,13 +476,17 @@ refresh:
 
                 if (ncount == 1) goto refresh;
 
+                // Масштабовано: Зміщено текстове введення під нові координати відцентрованого вікна
+                int wx = 296; 
+                int wy = 244;
+
                 asm volatile("cli");
-                x = 126;
-                y = 156;
+                x = wx + 26;
+                y = wy + 60;
                 input_wait_string(name);
 
-                x = 156;
-                y = 246;
+                x = wx + 26;
+                y = wy + 150;
                 input_wait_string(content);
                 asm volatile("sti");
 
@@ -546,7 +540,8 @@ void boot() {
     is_scaled = 1;
     delay_ticks(15);
 
-    draw_rect(0, 0, 640, 480, 15);
+    // Масштабовано: Стартове вікно завантаження на весь новий екран
+    draw_rect(0, 0, 1024, 768, 15);
 
     x = 0;
     y = 10;

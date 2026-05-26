@@ -139,17 +139,17 @@ void check_ui_clicks() {
             }
         }
 
-        if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 100 && mouse_y <= 118) {
+        if (current_mode == 1 && mouse_x >= 352 && mouse_x <= 672 && mouse_y >= 250 && mouse_y <= 286) {
             current_mode = 2;
             ncount = 1;
         }
 
-        if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 200 && mouse_y <= 218) {
+        if (current_mode == 1 && mouse_x >= 352 && mouse_x <= 672 && mouse_y >= 350 && mouse_y <= 386) {
             current_mode = 3;
             ncount = 1;
         }
 
-        if (current_mode == 2 && mouse_y >= 440 && mouse_y <= SCREEN_HEIGHT) { // Було 480
+        if (current_mode == 2 && mouse_y >= 728 && mouse_y <= SCREEN_HEIGHT) {
             show_crt_window = 1;
             ncount = 1;
         }
@@ -176,13 +176,13 @@ void check_ui_clicks() {
             ncount = 1;
         }
 
-        if (mouse_x >= 191 && mouse_x <= 206 && mouse_y >= 5 && mouse_y <= 20) {
+        if (mouse_x >= 104 && mouse_x <= 206 && mouse_y >= 5 && mouse_y <= 20) { 
             draw_0 = 0;
             ncount = 1;
         }
 
         if (mouse_x >= 351 && mouse_x <= 366 && mouse_y >= 5 && mouse_y <= 20) {
-            draw_1 = 4;
+            draw_1 = 4; 
             ncount = 1;
         }
     }
