@@ -67,7 +67,7 @@ void rtl8139_init() {
     *(volatile uint32_t*)(rtl_mmio + 0x30) = rx_phys;
 
     *(volatile uint16_t*)(rtl_mmio + 0x38) = 0;
-    *(volatile uint16_t*)(rtl_mmio + 0x3A) = 0; // Змінено на 0
+    *(volatile uint16_t*)(rtl_mmio + 0x3A) = 0;
 
     *(volatile uint16_t*)(rtl_mmio + 0x3C) = 0x0005;
 

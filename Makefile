@@ -49,6 +49,8 @@ clean:
 
 cleane:
 	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS
+	$(RM) traffic.pcap
+	touch traffic.pcap
 
 run: os-image.img
 	qemu-system-i386 -drive file=os-image.img,format=raw \

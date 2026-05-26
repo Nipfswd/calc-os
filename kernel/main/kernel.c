@@ -13,6 +13,7 @@
 char command[256];
 char name[128];
 char content[512];
+char byte_str[16];
 
 void name_clear() {
     for (int i = 0; i < 128; i++) {
@@ -327,7 +328,7 @@ refresh:
                 print("  help - show this message\n", 1);
                 print("  cln  - clear the screen\n", 1);
                 print("  ls  - list all files\n", 1);
-                print("  crt  - create a new file\n", 1);
+                print("  touch  - create a new file\n", 1);
                 print("  draw - draw a rectangle\n", 1);
                 print("  status - check system status\n", 1);
                 print("  livetime - print system livetime irq0 ticks\n", 1);
@@ -363,7 +364,7 @@ refresh:
             else if (compare_strings(command, "ls")) {
                 list_files();
             }
-            else if (compare_strings(command, "crt")) {
+            else if (compare_strings(command, "touch")) {
                 name_clear();
                 content_clear();
                 print("Name: ", 1);
@@ -425,43 +426,36 @@ refresh:
                 pci_print_devices();
             }
             else if (compare_strings(command, "send")) {
-                while (get_scancode() != 0);
+                while (get_scancode() != 0); 
 
-                print("Byte to send 0-255: ", 1);
+                print("Enter a byte: ", 1);
 
-                char byte_str[16];
                 for (int i = 0; i < 16; i++) byte_str[i] = 0;
 
-                ncount = 0; 
+                for (volatile int j = 0; j < 200000; j++);
 
-                input_wait_string(byte_str);
+                while (1) {
+                    ncount = 0; 
 
-                int byte = 0;
-                int idx = 0;
-                int found_digits = 0;
+                    input_wait_string(byte_str);
 
-                while (byte_str[idx] != '\0' && (byte_str[idx] < '0' || byte_str[idx] > '9')) {
-                    idx++;
+                    if (byte_str[0] == '\0') {
+                        ncount = 0;
+                        continue;
+                    }
+
+                    break;
                 }
 
-                while (byte_str[idx] >= '0' && byte_str[idx] <= '9') {
-                    byte = byte * 10 + (byte_str[idx] - '0');
-                    idx++;
-                    found_digits = 1;
-                }
-
-                if (found_digits == 0) {
-                    print("\nParser failed, sending default 'E'\n", 1);
-                    byte = 69; 
-                } 
-
-                if (byte < 0 || byte > 255) {
-                    print("Invalid byte.\n", 1);
-                    continue;
-                }
+                int byte_val = atoi_super(byte_str);
 
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                send_pack((uint8_t)byte, dest_mac);
+                if (byte_val < 0 || byte_val > 255) {
+                    print("Invalid byte value. Must be between 0 and 255.\n", 1);
+                } else {
+                    send_pack((uint8_t)byte_val, dest_mac);
+                }
+
                 print("\n", 1);
             }
             else if (compare_strings(command, "behave")) {
