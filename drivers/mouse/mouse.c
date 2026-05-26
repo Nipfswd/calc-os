@@ -24,7 +24,6 @@ unsigned char mouse_cursor[16][16] = {
         {1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0},
 };
 
-
 void draw_cursor(int mx, int my) {
     for (int row = 0; row < 16; row = row + 1) {
         for (int col = 0; col < 16; col = col + 1) {
@@ -34,14 +33,13 @@ void draw_cursor(int mx, int my) {
                 int curr_x = mx + col;
                 int curr_y = my + row;
 
-                if (curr_x >= 0 && curr_x < 640 && curr_y >= 0 && curr_y < 480) {
-                    uint8_t *ptr = &VIDEO_MEMORY[curr_y * 80 + (curr_x / 8)];
-                    uint8_t mask = 128 >> (curr_x % 8);
+                if (curr_x >= 0 && curr_x < SCREEN_WIDTH && curr_y >= 0 && curr_y < SCREEN_HEIGHT) {
+                    uint8_t *ptr = &VIDEO_MEMORY[curr_y * SCREEN_WIDTH + curr_x];
 
                     if (c == 1) {
-                        *ptr = *ptr | mask;
+                        *ptr = 15; 
                     } else {
-                        *ptr = *ptr & ~mask;
+                        *ptr = 0; 
                     }
                 }
             }
@@ -49,53 +47,54 @@ void draw_cursor(int mx, int my) {
     }
 }
 
-int mouse_x = 320;
-int mouse_y = 200;
+int mouse_x = 512;
+int mouse_y = 384;
 
-int old_mouse_x = 320;
-int old_mouse_y = 200;
+int old_mouse_x = 512;
+int old_mouse_y = 384;
 int mouse_left_button = 0;
+
 uint8_t cursor_back_buffer[256];
 
 void mouse_handler() {
-	if ((inb(0x64) & 1) == 0) {
-		return;
-	}
+    if ((inb(0x64) & 1) == 0) {
+        return;
+    }
 
-	uint8_t mouse_packet[3];
-	uint8_t status = inb(0x64);
+    uint8_t mouse_packet[3];
+    uint8_t status = inb(0x64);
 
-	if (!(status & 0x01) || !(status & 0x20)) {
-		return;
-	}
+    if (!(status & 0x01) || !(status & 0x20)) {
+        return;
+    }
 
-	uint8_t first_byte = inb(0x60);
+    uint8_t first_byte = inb(0x60);
 
-	if (!(first_byte & 0x08)) {
-		return;
-	}
+    if (!(first_byte & 0x08)) {
+        return;
+    }
 
-	mouse_packet[0] = first_byte;
+    mouse_packet[0] = first_byte;
 
-	mouse_wait_input();
-	mouse_packet[1] = inb(0x60);
+    mouse_wait_input();
+    mouse_packet[1] = inb(0x60);
 
-	mouse_wait_input();
-	mouse_packet[2] = inb(0x60);
+    mouse_wait_input();
+    mouse_packet[2] = inb(0x60);
 
-	int x_offset = (int)((signed char)mouse_packet[1]);
-	int y_offset = (int)((signed char)mouse_packet[2]);
+    int x_offset = (int)((signed char)mouse_packet[1]);
+    int y_offset = (int)((signed char)mouse_packet[2]);
 
-	mouse_x += x_offset;
-	mouse_y -= y_offset;
+    mouse_x += x_offset;
+    mouse_y -= y_offset;
 
     if (mouse_x < 0) mouse_x = 0;
     if (mouse_y < 0) mouse_y = 0;
 
-    if (mouse_x > 624) mouse_x = 624; 
-    if (mouse_y > 464) mouse_y = 464; 
+    if (mouse_x > (SCREEN_WIDTH - 16))  mouse_x = SCREEN_WIDTH - 16; 
+    if (mouse_y > (SCREEN_HEIGHT - 16)) mouse_y = SCREEN_HEIGHT - 16; 
 
-	mouse_left_button = first_byte & 0x01;
+    mouse_left_button = first_byte & 0x01;
 }
 
 void save_background() {
@@ -104,15 +103,8 @@ void save_background() {
             int cur_x = mouse_x + j;
             int cur_y = mouse_y + i;
 
-            if (cur_x >= 0 && cur_x < 640 && cur_y >= 0 && cur_y < 480) {
-                uint8_t p_byte = VIDEO_MEMORY[cur_y * 80 + (cur_x / 8)];
-                uint8_t mask = 128 >> (cur_x % 8);
-
-                if (p_byte & mask) {
-                    cursor_back_buffer[i * 16 + j] = 1;
-                } else {
-                    cursor_back_buffer[i * 16 + j] = 0;
-                }
+            if (cur_x >= 0 && cur_x < SCREEN_WIDTH && cur_y >= 0 && cur_y < SCREEN_HEIGHT) {
+                cursor_back_buffer[i * 16 + j] = VIDEO_MEMORY[cur_y * SCREEN_WIDTH + cur_x];
             }
         }
     }
@@ -124,50 +116,43 @@ void restore_background() {
             int old_x = old_mouse_x + j;
             int old_y = old_mouse_y + i;
 
-            if (old_x >= 0 && old_x < 640 && old_y >= 0 && old_y < 480) {
-                uint8_t *ptr = &VIDEO_MEMORY[old_y * 80 + (old_x / 8)];
-                uint8_t mask = 128 >> (old_x % 8);
-
-                if (cursor_back_buffer[i * 16 + j] == 1) {
-                    *ptr = *ptr | mask;    
-                } else {
-                    *ptr = *ptr & ~mask;   
-                }
+            if (old_x >= 0 && old_x < SCREEN_WIDTH && old_y >= 0 && old_y < SCREEN_HEIGHT) {
+                VIDEO_MEMORY[old_y * SCREEN_WIDTH + old_x] = cursor_back_buffer[i * 16 + j];
             }
         }
     }
 }
 
 void check_ui_clicks() {
-	if (mouse_left_button == 1) {
-		if (mouse_x >= 238 && mouse_x <= 374 && mouse_y >= 5 && mouse_y <= 31) {
-			if (current_mode != 1) {
-				current_mode = 1;
-				ncount = 1;
-			}
-		}
-		
-		if (mouse_x >= 78 && mouse_x <= 214 && mouse_y >= 5 && mouse_y <= 31) {
-			if (current_mode != 0) {
-				current_mode = 0;
-				ncount = 1;
-			}
-		}
-
-		if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 100 && mouse_y <= 118) {
-            current_mode = 2;
-			ncount = 1;
+    if (mouse_left_button == 1) {
+        if (mouse_x >= 238 && mouse_x <= 374 && mouse_y >= 5 && mouse_y <= 31) {
+            if (current_mode != 1) {
+                current_mode = 1;
+                ncount = 1;
+            }
+        }
+        
+        if (mouse_x >= 78 && mouse_x <= 214 && mouse_y >= 5 && mouse_y <= 31) {
+            if (current_mode != 0) {
+                current_mode = 0;
+                ncount = 1;
+            }
         }
 
-		if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 200 && mouse_y <= 218) {
-			current_mode = 3;
-			ncount = 1;
-		}
+        if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 100 && mouse_y <= 118) {
+            current_mode = 2;
+            ncount = 1;
+        }
 
-		if (current_mode == 2 && mouse_y >= 440 && mouse_y <= 480) {
-			show_crt_window = 1;
-			ncount = 1;
-		}
+        if (current_mode == 1 && mouse_x >= 156 && mouse_x <= 316 && mouse_y >= 200 && mouse_y <= 218) {
+            current_mode = 3;
+            ncount = 1;
+        }
+
+        if (current_mode == 2 && mouse_y >= 440 && mouse_y <= SCREEN_HEIGHT) { // Було 480
+            show_crt_window = 1;
+            ncount = 1;
+        }
 
         if (mouse_x >= 10 && mouse_x <= 66 && mouse_y >= 5 && mouse_y <= 31) {
             is_button_calc = 1;
@@ -200,17 +185,17 @@ void check_ui_clicks() {
             draw_1 = 4;
             ncount = 1;
         }
-	}
+    }
 }
 
 void update_system() {
-	mouse_handler();
-	if (mouse_x != old_mouse_x || mouse_y != old_mouse_y) {
-		restore_background();
-		save_background();
-		draw_cursor(mouse_x, mouse_y);
-		old_mouse_x = mouse_x;
-		old_mouse_y = mouse_y;
-	}
-	check_ui_clicks();
+    mouse_handler();
+    if (mouse_x != old_mouse_x || mouse_y != old_mouse_y) {
+        restore_background();
+        save_background();
+        draw_cursor(mouse_x, mouse_y);
+        old_mouse_x = mouse_x;
+        old_mouse_y = mouse_y;
+    }
+    check_ui_clicks();
 }

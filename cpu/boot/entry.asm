@@ -22,6 +22,7 @@ boot_signature db 0x29
 volume_id dd 0x12345678
 volume_label db "NO NAME    "
 file_system_type db "FAT12   "
+MODE_INFO_BUF equ 0x7E00
 
 start_code:
     xor ax, ax
@@ -35,9 +36,47 @@ start_code:
     or al, 2
     out 0x92, al
 
-    mov ax, 0x0011
-    int 0x10
+    mov cx, 0x0100          
 
+setup_vbe_loop:
+    cmp cx, 0x0200          
+    je error_handler
+
+    push cx                 
+
+    mov ax, 0x4F01
+    mov di, MODE_INFO_BUF   
+    int 0x10
+    
+    pop cx                  
+    
+    cmp ax, 0x004F          
+    jne next_mode
+
+    mov bx, MODE_INFO_BUF
+    cmp word [bx + 18], 1024   
+    jne next_mode
+    cmp word [bx + 20], 768    
+    jne next_mode
+    cmp byte [bx + 25], 8      
+    jne next_mode
+
+    mov eax, [bx + 40]
+    mov [0x0500], eax
+
+    mov bx, cx
+    or bx, 0x4000           
+    mov ax, 0x4F02
+    int 0x10
+    cmp ax, 0x004F
+    jne error_handler
+    jmp load_disk
+
+next_mode:
+    inc cx                  
+    jmp setup_vbe_loop
+
+load_disk:
     mov eax, 33
     mov [disk_packet + 8], eax 
 
@@ -49,7 +88,7 @@ start_code:
     mov dl, [boot_drive]
     mov si, disk_packet
     int 0x13
-    jc disk_error
+    jc error_handler
 
     cli
     lgdt [gdt_ptr]
@@ -58,10 +97,10 @@ start_code:
     mov cr0, eax
     jmp 0x08:init_32bit
 
-disk_error:
+error_handler:
     cli
     hlt
-    jmp disk_error
+    jmp error_handler
 
 [bits 32]
 init_32bit:

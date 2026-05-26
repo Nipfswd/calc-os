@@ -83,7 +83,7 @@ static void draw_file_icons() {
             int icon_x = 20 + col * 180;
             int icon_y = 100 + row * 100;
 
-            draw_rect(icon_x, icon_y, 130, 30, 1);
+            draw_rect(icon_x, icon_y, 130, 30, 15);
 
             char name_buf[9];
             char ext_buf[4];
@@ -150,31 +150,31 @@ void shell() {
 refresh:
     ncount = 0;
 
-    draw_rect(0, 0, 640, 400, 1);
+    draw_rect(0, 0, 640, 400, 15);
 
-    draw_button(10, 5, 56, 26, "CalcOS", 0, 1);
+    draw_button(10, 5, 56, 26, "CalcOS", 0, 15);
 
     if (current_mode == 0) {
         if (draw_0 == 1) {
             draw_rect(0, 40, 640, 480, 0);
 
             if (draw_0 == 1) {
-                draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-                draw_button(191, 11, 15, 15, "x", 1, 0);
+                draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+                draw_button(191, 11, 15, 15, "x", 15, 0);
             }
 
             if (draw_1 == 1) {
-                draw_button(238, 5, 136, 26, "Explorer", 2, 0);
-                draw_button(351, 11, 15, 15, "x", 1, 0);
+                draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+                draw_button(351, 11, 15, 15, "x", 15, 0);
             }
 
             if (is_button_calc == 1) {
-                draw_rect(10, 31, 72, 70, 2);
+                draw_rect(10, 31, 72, 70, 7);
 
-                draw_button(10, 31, 70, 26, "Terminal", 0, 1);
-                draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+                draw_button(10, 31, 70, 26, "Terminal", 0, 15);
+                draw_button(10, 51, 70, 26, "Explorer", 15, 0);
 
-                draw_button(10, 85, 15, 15, "x", 0, 1);
+                draw_button(10, 85, 15, 15, "x", 0, 15);
             }
 
             x = 0;
@@ -189,51 +189,51 @@ refresh:
         draw_rect(0, 40, 640, 480, 0);
 
         if (draw_0 == 1) {
-            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-            draw_button(191, 11, 15, 15, "x", 1, 0);
+            draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+            draw_button(191, 11, 15, 15, "x", 15, 0);
         }
 
         if (draw_1 == 1) {
-            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
-            draw_button(351, 11, 15, 15, "x", 1, 0);
+            draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+            draw_button(351, 11, 15, 15, "x", 15, 0);
         }
 
         if (is_button_calc == 1) {
-            draw_rect(10, 31, 72, 70, 2);
+            draw_rect(10, 31, 72, 70, 7);
 
-            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
-            draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+            draw_button(10, 31, 70, 26, "Terminal", 0, 15);
+            draw_button(10, 51, 70, 26, "Explorer", 15, 0);
 
 
-            draw_button(10, 85, 15, 15, "x", 0, 1);
+            draw_button(10, 85, 15, 15, "x", 0, 15);
         }
 
-        draw_button(0, 440, 640, 40, "F2 - create a new file", 1, 0);
+        draw_button(0, 440, 640, 40, "F2 - create a new file", 15, 0);
 
         draw_file_icons();
 
         if (show_crt_window == 1) {
             is_window_crt = 1;
             draw_rect(104, 100, 432, 260, 0);
-            draw_rect(100, 96, 432, 260, 1);
-            draw_rect(104, 100, 424, 252, 2);
+            draw_rect(100, 96, 432, 260, 15);
+            draw_rect(104, 100, 424, 252, 7);
 
             draw_rect(104, 100, 424, 32, 0);
 
             x = 118;
             y = 104;
-            print("Create a new file", 1);
+            print("Create a new file", 15);
 
             x = 118;
             y = 140;
-            print("Name:", 1);
-            draw_rect(118, 152, 404, 24, 1);
+            print("Name:", 15);
+            draw_rect(118, 152, 404, 24, 15);
             draw_rect(120, 154, 400, 20, 0);
 
             x = 118;
             y = 190;
-            print("Content:", 1);
-            draw_rect(118, 242, 404, 24, 1);
+            print("Content:", 15);
+            draw_rect(118, 242, 404, 24, 15);
             draw_rect(120, 244, 400, 20, 0);
         }
     }
@@ -241,33 +241,33 @@ refresh:
         draw_rect(0, 40, 640, 480, 0);
         
         if (draw_0 == 1) {
-            draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-            draw_button(191, 11, 15, 15, "x", 1, 0);
+            draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+            draw_button(191, 11, 15, 15, "x", 15, 0);
         }
 
         if (draw_1 == 1) {
-            draw_button(238, 5, 136, 26, "Explorer", 2, 0);
-            draw_button(351, 11, 15, 15, "x", 1, 0);
+            draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+            draw_button(351, 11, 15, 15, "x", 15, 0);
         }
 
         if (is_button_calc == 1) {
-            draw_rect(10, 31, 72, 70, 2);
+            draw_rect(10, 31, 72, 70, 7);
 
-            draw_button(10, 31, 70, 26, "Terminal", 0, 1);
-            draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+            draw_button(10, 31, 70, 26, "Terminal", 0, 15);
+            draw_button(10, 51, 70, 26, "Explorer", 15, 0);
 
-            draw_button(10, 85, 15, 15, "x", 0, 1);
+            draw_button(10, 85, 15, 15, "x", 0, 15);
         }
 
           x = 0;
           y = 96;
-          print("System Information:\n", 1);
-          print("Battery Status: ", 1);
+          print("System Information:\n", 15);
+          print("Battery Status: ", 15);
           unsigned char battery_status = check_battery();
           if (battery_status) {
-              print("OK\n", 1);
+              print("OK\n", 15);
           } else {
-              print("BAD. Please insert a new CMOS battery\n", 1);
+              print("BAD. Please insert a new CMOS battery\n", 15);
           }
     }
     else {
@@ -275,31 +275,31 @@ refresh:
            draw_rect(0, 40, 640, 480, 0);
 
             if (draw_0 == 1) {
-                draw_button(78, 5, 136, 26, "Terminal", 0, 1);
-                draw_button(191, 11, 15, 15, "x", 1, 0);
+                draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+                draw_button(191, 11, 15, 15, "x", 15, 0);
             }
 
             if (draw_1 == 1) {
-                draw_button(238, 5, 136, 26, "Explorer", 2, 0);
-                draw_button(351, 11, 15, 15, "x", 1, 0);
+                draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+                draw_button(351, 11, 15, 15, "x", 15, 0);
             }
 
             if (is_button_calc == 1) {
-                draw_rect(10, 31, 72, 70, 2);
+                draw_rect(10, 31, 72, 70, 7);
 
-                draw_button(10, 31, 70, 26, "Terminal", 0, 1);
-                draw_button(10, 51, 70, 26, "Explorer", 1, 0);
+                draw_button(10, 31, 70, 26, "Terminal", 0, 15);
+                draw_button(10, 51, 70, 26, "Explorer", 15, 0);
 
-                draw_button(10, 85, 15, 15, "x", 0, 1);
+                draw_button(10, 85, 15, 15, "x", 0, 15);
             }
 
             if (is_button_files == 1) {
-                draw_button(156, 100, 320, 36, "Files", 1, 0);
-                draw_button(156, 200, 320, 36, "System", 2, 0);
+                draw_button(156, 100, 320, 36, "Files", 15, 0);
+                draw_button(156, 200, 320, 36, "System", 7, 0);
             }
             else if (is_button_apps == 1) {
-                draw_button(156, 100, 320, 36, "Files", 2, 0);
-                draw_button(156, 200, 320, 36, "System", 1, 0);
+                draw_button(156, 100, 320, 36, "Files", 7, 0);
+                draw_button(156, 200, 320, 36, "System", 15, 0);
             } 
         } else {
             current_mode = 0;
@@ -316,32 +316,32 @@ refresh:
         if (ncount == 1) goto refresh;
 
         if (current_mode == 0) {
-            print("> ", 1);
+            print("> ", 15);
             input_wait_string(command);
 
             if (ncount == 1) goto refresh;
 
-            print("\n", 1);
+            print("\n", 15);
 
             if (compare_strings(command, "help")) {
-                print("Available commands:\n", 1);
-                print("  help - show this message\n", 1);
-                print("  cln  - clear the screen\n", 1);
-                print("  ls  - list all files\n", 1);
-                print("  touch  - create a new file\n", 1);
-                print("  draw - draw a rectangle\n", 1);
-                print("  status - check system status\n", 1);
-                print("  livetime - print system livetime irq0 ticks\n", 1);
-                print("  cat - print file content\n", 1);
-                print("  devices - print PCI devices\n", 1);
-                print("  send - send a byte to the network\n", 1);
-                print("  behave - receive a byte from the network\n", 1);
+                print("Available commands:\n", 15);
+                print("  help - show this message\n", 15);
+                print("  cln  - clear the screen\n", 15);
+                print("  ls  - list all files\n", 15);
+                print("  touch  - create a new file\n", 15);
+                print("  draw - draw a rectangle\n", 15);
+                print("  status - check system status\n", 15);
+                print("  livetime - print system livetime irq0 ticks\n", 15);
+                print("  cat - print file content\n", 15);
+                print("  devices - print PCI devices\n", 15);
+                print("  send - send a byte to the network\n", 15);
+                print("  behave - receive a byte from the network\n", 15);
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
-                print("Name: ", 1);
+                print("Name: ", 15);
                 input_wait_string(name);
-                print("\n", 1);
+                print("\n", 15);
 
                 int len = 0;
                 while (content[len] != '\0') len++;
@@ -354,8 +354,8 @@ refresh:
                 for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
 
                 read_file(name_11, content);
-                print(content, 1);
-                print("\n", 1);
+                print(content, 15);
+                print("\n", 15);
             }
             else if (compare_strings(command, "cln")) {
                 screen_clear();
@@ -367,12 +367,12 @@ refresh:
             else if (compare_strings(command, "touch")) {
                 name_clear();
                 content_clear();
-                print("Name: ", 1);
+                print("Name: ", 15);
                 input_wait_string(name);
-                print("\n", 1);
-                print("Content: ", 1);
+                print("\n", 15);
+                print("Content: ", 15);
                 input_wait_string(content);
-                print("\n", 1);
+                print("\n", 15);
 
                 int len = 0;
                 while (content[len] != '\0') len++;
@@ -390,36 +390,36 @@ refresh:
                 char val[16];
                 int r_w, r_h, r_x, r_y;
 
-                print("Enter width: ", 1);
+                print("Enter width: ", 15);
                 input_wait_string(val);
                 r_w = atoi(val);
 
-                print("\nEnter height: ", 1);
+                print("\nEnter height: ", 15);
                 input_wait_string(val);
                 r_h = atoi(val);
 
-                print("\nEnter x: ", 1);
+                print("\nEnter x: ", 15);
                 input_wait_string(val);
                 r_x = atoi(val);
 
-                print("\nEnter y: ", 1);
+                print("\nEnter y: ", 15);
                 input_wait_string(val);
                 r_y = atoi(val);
 
-                print("\n", 1);
-                draw_rect(r_x, r_y, r_w, r_h, 1);
+                print("\n", 15);
+                draw_rect(r_x, r_y, r_w, r_h, 15);
             }
             else if (compare_strings(command, "livetime")) {
                 itoa(timer_ticks / 18, timer_str);
-                print(timer_str, 1);
-                print("\n", 1);
+                print(timer_str, 15);
+                print("\n", 15);
             }
             else if (compare_strings(command, "status")) {
                 unsigned char battery_status = check_battery();
                 if (battery_status) {
-                    print("Battery: OK\n", 1);
+                    print("Battery: OK\n", 15);
                 } else {
-                    print("Battery: BAD Please insert a new CMOS battery\n", 1);
+                    print("Battery: BAD Please insert a new CMOS battery\n", 15);
                 }
             }
             else if (compare_strings(command, "devices")) {
@@ -428,7 +428,7 @@ refresh:
             else if (compare_strings(command, "send")) {
                 while (get_scancode() != 0); 
 
-                print("Enter a byte: ", 1);
+                print("Enter a byte: ", 15);
 
                 for (int i = 0; i < 16; i++) byte_str[i] = 0;
 
@@ -451,19 +451,19 @@ refresh:
 
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
                 if (byte_val < 0 || byte_val > 255) {
-                    print("Invalid byte value. Must be between 0 and 255.\n", 1);
+                    print("Invalid byte value. Must be between 0 and 255.\n", 15);
                 } else {
                     send_pack((uint8_t)byte_val, dest_mac);
                 }
 
-                print("\n", 1);
+                print("\n", 15);
             }
             else if (compare_strings(command, "behave")) {
                 read_pack();
             }
             else {
                 if (command[0] != '\0') {
-                    print("Unknown command. Type 'help'\n", 1);
+                    print("Unknown command. Type 'help'\n", 15);
                 }
             }
         }
@@ -498,7 +498,7 @@ refresh:
 
                 if (ncount == 1) goto refresh;
 
-                print("\n", 1);
+                print("\n", 15);
 
                 int len = 0;
                 while (content[len] != '\0') len++;
@@ -528,25 +528,25 @@ refresh:
 void boot() {
     is_scaled = 1;
     screen_clear();
-    print("Booting CalcOS...\n", 1);
+    print("Booting CalcOS...\n", 15);
 
-    print("Scanning devices...\n", 1);
+    print("Scanning devices...\n", 15);
     pci_scan();
 
     init_mouse();
-    print("[OK]\n", 1);
+    print("[OK]\n", 15);
 
     rtl8139_init();
-    print("[OK]\n", 1);
+    print("[OK]\n", 15);
 
     screen_clear();
     init_palette();
     is_scaled = 0;
-    print("Success!", 1);
+    print("Success!", 15);
     is_scaled = 1;
     delay_ticks(15);
 
-    draw_rect(0, 0, 640, 480, 1);
+    draw_rect(0, 0, 640, 480, 15);
 
     x = 0;
     y = 10;

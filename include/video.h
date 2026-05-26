@@ -2,7 +2,11 @@
 #define STDIO_H
 #include <stdint.h>
 
-#define VIDEO_MEMORY ((uint8_t*)0xA0000)
+#define fb_address (*(volatile uint32_t*)0x0500)
+#define VIDEO_MEMORY ((uint8_t*)(uint32_t)fb_address)
+
+#define SCREEN_WIDTH  1024
+#define SCREEN_HEIGHT 768
 
 extern int x;
 extern int y;
@@ -27,9 +31,7 @@ void draw_rect(int x, int y, int width, int height, uint8_t color);
 
 void update_system();
 void handle_hotkeys(int code);
-
-void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b);
-void init_palette(); 
+void init_palette();
 
 extern int get_scancode();
 extern void outb( uint16_t port, uint8_t val);

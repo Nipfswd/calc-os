@@ -147,7 +147,7 @@ void input_wait_string(char *buffer) {
 		}
 
 		if (letter != 0 && i < 255) {
-			put_char(letter, 1);
+			put_char(letter, 15);
 			buffer[i] = letter;
 			i++;
 		}
