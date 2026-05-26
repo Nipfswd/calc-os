@@ -150,7 +150,7 @@ void shell() {
 refresh:
     ncount = 0;
 
-    draw_rect(0, 0, 1024, 40, 15);
+    draw_rect(0, 0, 1024, 40, COLOR_CYAN);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 15);
 
@@ -159,20 +159,20 @@ refresh:
             draw_rect(0, 40, 1024, 728, 0);
 
             if (draw_0 == 1) {
-                draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+                draw_button(78, 5, 136, 26, "Terminal", COLOR_RED, 15);
                 draw_button(191, 11, 15, 15, "x", 15, 0);
             }
 
             if (draw_1 == 1) {
-                draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+                draw_button(238, 5, 136, 26, "Explorer", COLOR_GREEN, 0);
                 draw_button(351, 11, 15, 15, "x", 15, 0);
             }
 
             if (is_button_calc == 1) {
                 draw_rect(10, 31, 72, 70, 7);
 
-                draw_button(10, 31, 70, 26, "Terminal", 0, 15);
-                draw_button(10, 51, 70, 26, "Explorer", 15, 0);
+                draw_button(10, 31, 70, 26, "Terminal", COLOR_RED, 15);
+                draw_button(10, 51, 70, 26, "Explorer", COLOR_GREEN, 0);
 
                 draw_button(10, 85, 15, 15, "x", 0, 15);
             }
@@ -189,25 +189,25 @@ refresh:
         draw_rect(0, 40, 1024, 728, 0);
 
         if (draw_0 == 1) {
-            draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+            draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
             draw_button(191, 11, 15, 15, "x", 15, 0);
         }
 
         if (draw_1 == 1) {
-            draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+            draw_button(238, 5, 136, 26, "Explorer", COLOR_RED, 0);
             draw_button(351, 11, 15, 15, "x", 15, 0);
         }
 
         if (is_button_calc == 1) {
             draw_rect(10, 31, 72, 70, 7);
 
-            draw_button(10, 31, 70, 26, "Terminal", 0, 15);
-            draw_button(10, 51, 70, 26, "Explorer", 15, 0);
+            draw_button(10, 31, 70, 26, "Terminal", COLOR_GREEN, 15);
+            draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
             draw_button(10, 85, 15, 15, "x", 0, 15);
         }
 
-        draw_button(0, 728, 1024, 40, "F2 - create a new file", 15, 0);
+        draw_button(0, 728, 1024, 40, "F2 - create a new file", COLOR_BLUE, 0);
 
         draw_file_icons();
 
@@ -242,20 +242,20 @@ refresh:
         draw_rect(0, 40, 1024, 728, 0);
         
         if (draw_0 == 1) {
-            draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+            draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
             draw_button(191, 11, 15, 15, "x", 15, 0);
         }
 
         if (draw_1 == 1) {
-            draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+            draw_button(238, 5, 136, 26, "Explorer", COLOR_RED, 0);
             draw_button(351, 11, 15, 15, "x", 15, 0);
         }
 
         if (is_button_calc == 1) {
             draw_rect(10, 31, 72, 70, 7);
 
-            draw_button(10, 31, 70, 26, "Terminal", 0, 15);
-            draw_button(10, 51, 70, 26, "Explorer", 15, 0);
+            draw_button(10, 31, 70, 26, "Terminal", COLOR_GREEN, 15);
+            draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
             draw_button(10, 85, 15, 15, "x", 0, 15);
         }
@@ -276,31 +276,31 @@ refresh:
             draw_rect(0, 40, 1024, 728, 0);
 
             if (draw_0 == 1) {
-                draw_button(78, 5, 136, 26, "Terminal", 0, 15);
+                draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
                 draw_button(191, 11, 15, 15, "x", 15, 0);
             }
 
             if (draw_1 == 1) {
-                draw_button(238, 5, 136, 26, "Explorer", 7, 0);
+                draw_button(238, 5, 136, 26, "Explorer", COLOR_RED, 0);
                 draw_button(351, 11, 15, 15, "x", 15, 0);
             }
 
             if (is_button_calc == 1) {
                 draw_rect(10, 31, 72, 70, 7);
 
-                draw_button(10, 31, 70, 26, "Terminal", 0, 15);
-                draw_button(10, 51, 70, 26, "Explorer", 15, 0);
+                draw_button(10, 31, 70, 26, "Terminal", COLOR_GREEN, 15);
+                draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
                 draw_button(10, 85, 15, 15, "x", 0, 15);
             }
 
             if (is_button_files == 1) {
-                draw_button(352, 250, 320, 36, "Files", 15, 0);
-                draw_button(352, 350, 320, 36, "System", 7, 0);
+                draw_button(352, 250, 320, 36, "Files", COLOR_RED, 0);
+                draw_button(352, 350, 320, 36, "System", COLOR_GREEN, 0);
             }
             else if (is_button_apps == 1) {
-                draw_button(352, 250, 320, 36, "Files", 7, 0);
-                draw_button(352, 350, 320, 36, "System", 15, 0);
+                draw_button(352, 250, 320, 36, "Files", COLOR_GREEN, 0);
+                draw_button(352, 350, 320, 36, "System", COLOR_RED, 0);
             } 
         } else {
             current_mode = 0;
