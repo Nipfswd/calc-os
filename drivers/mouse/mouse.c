@@ -182,7 +182,7 @@ void check_ui_clicks() {
             ncount = 1;
         }
 
-        if (mouse_x >= 104 && mouse_x <= 206 && mouse_y >= 5 && mouse_y <= 20) { 
+        if (mouse_x >= 191 && mouse_x <= 206 && mouse_y >= 11 && mouse_y <= 26) { 
             draw_0 = 0;
             ncount = 1;
         }
