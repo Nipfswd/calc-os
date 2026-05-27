@@ -530,8 +530,13 @@ void boot() {
     init_mouse();
     print("[OK]\n", 15);
 
-    rtl8139_init();
-    print("[OK]\n", 15);
+    int is_rtl8139_found = rtl8139_find();
+    if (is_rtl8139_found) {
+        rtl8139_init();
+        print("[OK]\n", 15);
+    } else {
+        print("[Failed to find RTL8139]\n", 15);
+    }
 
     screen_clear();
     init_palette();
@@ -540,7 +545,6 @@ void boot() {
     is_scaled = 1;
     delay_ticks(15);
 
-    // Масштабовано: Стартове вікно завантаження на весь новий екран
     draw_rect(0, 0, 1024, 768, 15);
 
     x = 0;
