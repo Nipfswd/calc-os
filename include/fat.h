@@ -37,6 +37,7 @@ struct fat12_entry {
 
 void read_file(const char* filename_11, uint8_t* buffer);
 void create_file(const char* name_11, uint8_t* data, int size);
+void delete_file(const char* filename_11);
 void list_files();
 
 extern int disk_initialized;

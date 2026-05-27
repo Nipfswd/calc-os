@@ -345,6 +345,7 @@ refresh:
                 print("  send - send a byte to the network\n", 15);
                 print("  behave - receive a byte from the network\n", 15);
                 print("  reboot - reboot the system\n", 15);
+                print("  rm - delete a file\n", 15);
             }
             else if (compare_strings(command, "reboot")) {
                 reboot();
@@ -461,6 +462,17 @@ refresh:
             }
             else if (compare_strings(command, "behave")) {
                 read_pack();
+            }
+            else if (compare_strings(command, "rm")) {
+                name_clear();
+                print("Name: ", 15);
+                input_wait_string(name);
+                print("\n", 15);
+
+                char name_11[11];
+                format_fat_name(name, name_11);
+
+                delete_file(name_11);
             }
             else {
                 if (command[0] != '\0') {
