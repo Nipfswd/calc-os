@@ -27,6 +27,7 @@ void screen_clear() {
     y = 0;
 
     ncount = 1;
+    is_scaled = 0;
 }
 
 void set_palette_color(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {

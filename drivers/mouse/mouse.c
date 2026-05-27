@@ -191,6 +191,10 @@ void check_ui_clicks() {
             draw_1 = 4; 
             ncount = 1;
         }
+
+        if (mouse_x >= 65 && mouse_x <= 80 && mouse_y >= 85 && mouse_y <= 100) {
+            reboot();
+        }
     }
 }
 

@@ -175,6 +175,7 @@ refresh:
                 draw_button(10, 51, 70, 26, "Explorer", COLOR_GREEN, 0);
 
                 draw_button(10, 85, 15, 15, "x", 0, 15);
+                draw_button(65, 85, 15, 15, "r", 0, 15);
             }
 
             x = 0;
@@ -205,6 +206,7 @@ refresh:
             draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
             draw_button(10, 85, 15, 15, "x", 0, 15);
+            draw_button(65, 85, 15, 15, "r", 0, 15);
         }
 
         draw_button(0, 728, 1024, 40, "F2 - create a new file", COLOR_BLUE, 0);
@@ -258,6 +260,7 @@ refresh:
             draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
             draw_button(10, 85, 15, 15, "x", 0, 15);
+            draw_button(65, 85, 15, 15, "r", 0, 15);
         }
 
         x = 0;
@@ -294,6 +297,7 @@ refresh:
                 draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
 
                 draw_button(10, 85, 15, 15, "x", 0, 15);
+                draw_button(65, 85, 15, 15, "r", 0, 15);
             }
 
             if (is_button_files == 1) {
