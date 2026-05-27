@@ -126,6 +126,8 @@ void restore_background() {
 void check_ui_clicks() {
     if (mouse_left_button == 1) {
         if (mouse_x >= 238 && mouse_x <= 374 && mouse_y >= 5 && mouse_y <= 31) {
+            is_scaled = 0;
+
             if (current_mode != 1) {
                 current_mode = 1;
                 ncount = 1;
@@ -133,6 +135,8 @@ void check_ui_clicks() {
         }
         
         if (mouse_x >= 78 && mouse_x <= 214 && mouse_y >= 5 && mouse_y <= 31) {
+            is_scaled = 0;
+
             if (current_mode != 0) {
                 current_mode = 0;
                 ncount = 1;
@@ -155,6 +159,7 @@ void check_ui_clicks() {
         }
 
         if (mouse_x >= 10 && mouse_x <= 66 && mouse_y >= 5 && mouse_y <= 31) {
+            is_scaled = 0;
             is_button_calc = 1;
             ncount = 1;
         }
@@ -172,6 +177,7 @@ void check_ui_clicks() {
         }
 
         if (mouse_x >= 10 && mouse_x <= 25 && mouse_y >= 85 && mouse_y <= 100) {
+            is_scaled = 0;
             is_button_calc = 0;
             ncount = 1;
         }

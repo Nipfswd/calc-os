@@ -9,12 +9,14 @@ int shift_pressed = 0;
 
 void handle_hotkeys(int code) {
 	if (code == 0x4B) {
+		is_scaled = 0;
 		current_mode = 0;
 		is_window_crt = 0;
 		show_crt_window = 0;
 		ncount = 1;
 	}
 	if (code == 0x4D) {
+		is_scaled = 0;
 		current_mode = 1;
 		ncount = 1;
 	}
@@ -122,11 +124,13 @@ void input_wait_string(char *buffer) {
 		case 0x27: letter = ';'; break;
 		case 0x0E:
 			if (is_window_crt == 0) {
-				if (i > 0) {
-					i = i - 1;
-					if (x > 16) {
-						x = x - 8;
-						draw_rect(x, y, 8, 8, 0);
+				if (current_mode == 0) {
+					if (i > 0) {
+						i = i - 1;
+						if (x > 32) {
+							x = x - 16;
+							draw_rect(x, y, 16, 16, 0);
+						}
 					}
 				}
 			}

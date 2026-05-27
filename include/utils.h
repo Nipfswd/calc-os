@@ -17,5 +17,6 @@ uint8_t bcd_to_bin(uint8_t val);
 void get_time(int *h, int *m);
 int memcmp(const char *s1, const char *s2, int n);
 void* memcpy(void* dest, const void* src, uint32_t n);
+void reboot();
 
 #endif

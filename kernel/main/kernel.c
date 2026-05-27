@@ -272,6 +272,8 @@ refresh:
         }
     }
     else {
+        is_scaled = 0;
+
         if (draw_1 == 1) {
             draw_rect(0, 40, 1024, 728, 0);
 
@@ -317,6 +319,7 @@ refresh:
         if (ncount == 1) goto refresh;
 
         if (current_mode == 0) {
+            is_scaled = 2;
             print("> ", 15);
             input_wait_string(command);
 
@@ -337,6 +340,10 @@ refresh:
                 print("  devices - print PCI devices\n", 15);
                 print("  send - send a byte to the network\n", 15);
                 print("  behave - receive a byte from the network\n", 15);
+                print("  reboot - reboot the system\n", 15);
+            }
+            else if (compare_strings(command, "reboot")) {
+                reboot();
             }
             else if (compare_strings(command, "cat")) {
                 content_clear();
@@ -476,7 +483,6 @@ refresh:
 
                 if (ncount == 1) goto refresh;
 
-                // Масштабовано: Зміщено текстове введення під нові координати відцентрованого вікна
                 int wx = 296; 
                 int wy = 244;
 

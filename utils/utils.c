@@ -112,3 +112,9 @@ void* memcpy(void* dest, const void* src, uint32_t n) {
 
     return dest;
 }
+
+void reboot() {
+    while (inb(0x64) & 0x02) { }
+    outb(0x64, 0xFE);
+    for (;;) { }
+}
