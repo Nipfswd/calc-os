@@ -119,7 +119,7 @@ void play_error_sound() {
 }
 
 void exception_handler(struct registers *regs) {
-    draw_rect(0, 0, 640, 480, 1); 
+    draw_rect(0, 0, 1024, 768, 1); 
 
     play_error_sound();
 

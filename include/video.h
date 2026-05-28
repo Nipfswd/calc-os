@@ -48,6 +48,7 @@ extern int is_button_calc;
 extern int draw_0;
 extern int draw_1;
 extern int is_scaled;
+extern int is_del;
 
 void screen_clear();
 void put_char(char s, uint8_t color);

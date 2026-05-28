@@ -225,7 +225,7 @@ refresh:
 
             x = wx + 18;
             y = wy + 8;
-            print("Create a new file", 15);
+            print("Create a new file. Del - delete a file", 15);
 
             x = wx + 18;
             y = wy + 44;
@@ -238,6 +238,23 @@ refresh:
             print("Content:", 15);
             draw_rect(wx + 18, wy + 146, 404, 24, 15); 
             draw_rect(wx + 20, wy + 148, 400, 20, 0);
+
+            if (is_del == 1) {
+                draw_rect(wx + 4, wy + 4, 432, 260, 0);
+                draw_rect(wx,     wy,     432, 260, 15);
+                draw_rect(wx + 4, wy + 4, 424, 252, 7);
+                draw_rect(wx + 4, wy + 4, 424, 32, 0);
+
+                x = wx + 18;
+                y = wy + 8;
+                print("Delete a file", 15);
+
+                x = wx + 18;
+                y = wy + 44;
+                print("Name:", 15);
+                draw_rect(wx + 18, wy + 56, 404, 24, 15);
+                draw_rect(wx + 20, wy + 58, 400, 20, 0);
+            }
         }
     }
     else if (current_mode == 3) {
@@ -526,11 +543,16 @@ refresh:
                 uint8_t buffer[512] = {0};
                 for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
 
-                create_file(name_11, buffer, len);
+                if (is_del == 0) {
+                    create_file(name_11, buffer, len);
+                } else {
+                    delete_file(name_11);
+                }
 
                 show_crt_window = 0;
                 is_window_crt = 0;
                 ncount = 1;
+                is_del = 0;
             }
         }
         else {

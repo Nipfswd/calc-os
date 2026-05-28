@@ -47,11 +47,19 @@ void handle_hotkeys(int code) {
 
 		ncount = 1;
 	}
+	if (code == 0x5B) {
+		is_scaled = 0;
+		is_button_calc = 1;
+		ncount = 1;
+	}
+	if (is_window_crt == 1 && code == 0x53) {
+		is_del = 1;
+		ncount = 1;
+	}
 }
 
 void input_wait_string(char *buffer) {
 	int i = 0;
-	asm volatile("cli");
 	while (1) {
 		update_system();
 
@@ -156,5 +164,4 @@ void input_wait_string(char *buffer) {
 			i++;
 		}
 	}
-	asm volatile("sti");
 }
