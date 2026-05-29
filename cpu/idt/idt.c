@@ -52,18 +52,26 @@ void task2_main() {
         if (current_mode != 0 && is_window_crt == 0) {
             get_time(&hours, &minutes);
 
-            x = 972; y = 15;
-            
-            itoa(hours, h_str);
-            print(h_str, 15);
-            print(":", 15);
-            
-            itoa(minutes, m_str);
-            if (minutes < 10) print("0", 15); 
-            print(m_str, 15);
+            if (hours != old_hours || minutes != old_minutes) {
+                draw_rect(970, 5, 46, 30, 0); 
 
-            draw_rect(970, 5, 46, 30, 0); 
+                x = 972; y = 15;
+                
+                itoa(hours, h_str);
+                if (hours < 10) print("0", 15); 
+                print(h_str, 15);
+                
+                print(":", 15);
+                
+                itoa(minutes, m_str);
+                if (minutes < 10) print("0", 15); 
+                print(m_str, 15);
+
+                old_hours = hours;
+                old_minutes = minutes;
+            }
         }
+        __asm__ __volatile__("hlt");
     }
 }
 
@@ -185,8 +193,8 @@ void exception_handler(struct registers *regs) {
 void init_timer() {
     outb(0x43, 0x36); 
 
-    outb(0x40, 0xFF); 
-    outb(0x40, 0xFF); 
+    outb(0x40, 0x52); 
+    outb(0x40, 0x09);
 }
 
 void ata_handler() {

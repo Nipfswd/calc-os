@@ -50,6 +50,8 @@ extern int draw_1;
 extern int is_scaled;
 extern int is_del;
 
+void draw_desktop();
+
 void screen_clear();
 void put_char(char s, uint8_t color);
 void print(char *msg, uint8_t color);

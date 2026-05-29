@@ -119,15 +119,15 @@ static void draw_file_icons() {
 }
 
 void play_startup_sound() {
-    beep(233, 4); 
-    beep(349, 4); 
-    beep(311, 4);
-    beep(466, 4); 
-    beep(523, 4);
+    beep(233, 40); 
+    beep(349, 40); 
+    beep(311, 40);
+    beep(466, 40); 
+    beep(523, 40);
     
-    beep(698, 6); 
-    beep(695, 3); 
-    beep(690, 3);
+    beep(698, 60); 
+    beep(695, 30); 
+    beep(690, 30);
 }
 
 int atoi_super(const char* str) {
@@ -153,6 +153,8 @@ refresh:
     draw_rect(0, 0, 1024, 40, COLOR_CYAN);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 15);
+
+    asm volatile("sti");
 
     if (current_mode == 0) {
         if (draw_0 == 1) {
@@ -187,7 +189,7 @@ refresh:
         }
     }
     else if (current_mode == 2) {
-        draw_rect(0, 40, 1024, 728, 0);
+        draw_desktop();
 
         if (draw_0 == 1) {
             draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
@@ -258,7 +260,7 @@ refresh:
         }
     }
     else if (current_mode == 3) {
-        draw_rect(0, 40, 1024, 728, 0);
+        draw_desktop();
         
         if (draw_0 == 1) {
             draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
@@ -295,7 +297,7 @@ refresh:
         is_scaled = 0;
 
         if (draw_1 == 1) {
-            draw_rect(0, 40, 1024, 728, 0);
+                draw_desktop();
 
             if (draw_0 == 1) {
                 draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
@@ -519,7 +521,6 @@ refresh:
                 int wx = 296; 
                 int wy = 244;
 
-                asm volatile("cli");
                 x = wx + 26;
                 y = wy + 60;
                 input_wait_string(name);
@@ -527,7 +528,6 @@ refresh:
                 x = wx + 26;
                 y = wy + 150;
                 input_wait_string(content);
-                asm volatile("sti");
 
                 if (ncount == 1) goto refresh;
 
@@ -598,6 +598,7 @@ void boot() {
     play_startup_sound();
 
     is_scaled = 0;
+    __asm__ __volatile__("sti");
 }
 
 void __attribute__((section(".text.entry"))) kernel_main() {
