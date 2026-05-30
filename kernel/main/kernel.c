@@ -607,6 +607,46 @@ refresh:
                 is_del = 0;
             }
         }
+        else if (current_mode == 5) {
+            int code = get_scancode();
+            if (code != 0) {
+                handle_hotkeys(code);
+                if (code == 0x3C) {
+                    is_window_send = 1;
+                    ncount = 1;
+                }
+            }
+
+            if (ncount == 1) goto refresh;
+
+            if (is_window_send == 1) {
+                while (get_scancode() != 0); 
+                for (int i = 0; i < 16; i++) byte_str[i] = 0;
+                for (volatile int j = 0; j < 200000; j++);
+
+                while (1) {
+                    ncount = 0; 
+
+                    int wx = 296; 
+                    int wy = 244;
+
+                    x = wx + 26;
+                    y = wy + 60;
+                    input_wait_string(byte_str);
+                    if (byte_str[0] == '\0') {
+                        ncount = 0;
+                        continue;
+                    }
+                    break;
+                }
+
+                int byte_val = atoi_super(byte_str);
+                uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+                send_pack((uint8_t)byte_val, dest_mac);
+                is_window_send = 0;
+                ncount = 1;
+            }
+        }
         else {
             int code = get_scancode();
             if (code != 0) handle_hotkeys(code);
