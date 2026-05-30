@@ -119,15 +119,15 @@ static void draw_file_icons() {
 }
 
 void play_startup_sound() {
-    beep(233, 40); 
-    beep(349, 40); 
-    beep(311, 40);
-    beep(466, 40); 
-    beep(523, 40);
+    beep(233, 80); 
+    beep(349, 80); 
+    beep(311, 80);
+    beep(466, 80); 
+    beep(523, 80);
     
-    beep(698, 60); 
-    beep(695, 30); 
-    beep(690, 30);
+    beep(698, 100); 
+    beep(695, 70); 
+    beep(690, 70);
 }
 
 int atoi_super(const char* str) {
@@ -211,7 +211,7 @@ refresh:
             draw_button(65, 85, 15, 15, "r", 0, 15);
         }
 
-        draw_button(0, 728, 1024, 40, "F2 - create a new file", COLOR_BLUE, 0);
+        draw_button(0, 728, 1024, 40, "F2 - create a new file", COLOR_BLUE, 15);
 
         draw_file_icons();
 
@@ -293,6 +293,51 @@ refresh:
             print("BAD. Please insert a new CMOS battery\n", 15);
         }
     }
+    else if (current_mode == 5) {
+        draw_desktop();
+
+        if (draw_0 == 1) {
+            draw_button(78, 5, 136, 26, "Terminal", COLOR_GREEN, 15);
+            draw_button(191, 11, 15, 15, "x", 15, 0);
+        }
+
+        if (draw_1 == 1) {
+            draw_button(238, 5, 136, 26, "Explorer", COLOR_RED, 0);
+            draw_button(351, 11, 15, 15, "x", 15, 0);
+        }
+
+        if (is_button_calc == 1) {
+            draw_rect(10, 31, 72, 70, 7);
+
+            draw_button(10, 31, 70, 26, "Terminal", COLOR_GREEN, 15);
+            draw_button(10, 51, 70, 26, "Explorer", COLOR_RED, 0);
+
+            draw_button(10, 85, 15, 15, "x", 0, 15);
+            draw_button(65, 85, 15, 15, "r", 0, 15);
+        }
+
+        draw_button(0, 728, 1024, 40, "F2 - Send a pack", COLOR_BLUE, 15);
+
+        if (is_window_send == 1) {
+            int wx = 296; 
+            int wy = 244;
+
+            draw_rect(wx + 4, wy + 4, 432, 260, 0);
+            draw_rect(wx,     wy,     432, 260, 15);
+            draw_rect(wx + 4, wy + 4, 424, 252, 7);
+            draw_rect(wx + 4, wy + 4, 424, 32, 0);
+
+            x = wx + 18;
+            y = wy + 8;
+            print("Send a pack", 15);
+
+            x = wx + 18;
+            y = wy + 44;
+            print("Byte:", 15);
+            draw_rect(wx + 18, wy + 56, 404, 24, 15);
+            draw_rect(wx + 20, wy + 58, 400, 20, 0);
+        }
+    }
     else {
         is_scaled = 0;
 
@@ -322,11 +367,18 @@ refresh:
             if (is_button_files == 1) {
                 draw_button(352, 250, 320, 36, "Files", COLOR_RED, 0);
                 draw_button(352, 350, 320, 36, "System", COLOR_GREEN, 0);
+                draw_button(352, 450, 320, 36, "Ethernet", COLOR_GREEN, 0);
             }
             else if (is_button_apps == 1) {
                 draw_button(352, 250, 320, 36, "Files", COLOR_GREEN, 0);
                 draw_button(352, 350, 320, 36, "System", COLOR_RED, 0);
+                draw_button(352, 450, 320, 36, "Ethernet", COLOR_GREEN, 0);
             } 
+            else if (is_button_ethernet == 1) {
+                draw_button(352, 250, 320, 36, "Files", COLOR_GREEN, 0);
+                draw_button(352, 350, 320, 36, "System", COLOR_GREEN, 0);
+                draw_button(352, 450, 320, 36, "Ethernet", COLOR_RED, 0);
+            }
         } else {
             current_mode = 0;
             ncount = 1;

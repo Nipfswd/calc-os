@@ -33,6 +33,7 @@ void handle_hotkeys(int code) {
 	}
 	if (code == 0x50 && current_mode == 1 && is_button_files == 1) {
 		is_button_apps = 1;
+		is_button_ethernet = 0;
 		is_button_files = 0;
 		ncount = 1;
 	}
@@ -43,8 +44,8 @@ void handle_hotkeys(int code) {
 	if (code == 0x48 && current_mode == 1 && is_button_apps == 1) {
 		is_button_apps = 0;
 		is_button_files = 1;
+		is_button_ethernet = 0;
 		current_mode = 1;
-
 		ncount = 1;
 	}
 	if (code == 0x5B) {
@@ -55,6 +56,27 @@ void handle_hotkeys(int code) {
 	if (is_window_crt == 1 && code == 0x53) {
 		is_del = 1;
 		ncount = 1;
+	}
+	if (code == 0x50 && current_mode == 1 && is_button_apps == 1 && is_button_files == 0) {
+		is_button_apps = 0;
+		is_button_files = 0;
+		is_button_ethernet = 1;
+		current_mode = 1;
+		ncount = 1;
+	}
+	if (code == 0x48 && current_mode == 1 && is_button_ethernet == 1) {
+		is_button_apps = 1;
+		is_button_files = 0;
+		is_button_ethernet = 0;
+		current_mode = 1;
+		ncount = 1;
+	}
+	if (code == 0x1C && current_mode == 1 && is_button_ethernet == 1) {
+		current_mode = 5;
+		ncount = 1;
+	}
+	if (code == 0x3C && current_mode == 5) {
+		is_window_send = 1;
 	}
 }
 

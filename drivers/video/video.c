@@ -19,6 +19,8 @@ int draw_0 = 1;
 int draw_1 = 1;
 int is_scaled = 0;
 int is_del = 0;
+int is_button_ethernet = 0;
+int is_window_send = 0;
 
 void screen_clear() {
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
@@ -68,123 +70,49 @@ void init_palette() {
 }
 
 void put_char(char s, uint8_t color) {
-    if (is_scaled == 1) {
-    
-        int scale = 3; 
-        if (s == '\n') {
-            x = 0;
-            y = y + (8 * scale);
-            asm volatile("sti");
-            return;
-        }
+    int scale = 1;
+    if (is_scaled == 1) scale = 3;
+    else if (is_scaled == 2) scale = 2;
 
-        if (x + (8 * scale) > SCREEN_WIDTH) {
-            x = 0;
-            y = y + (8 * scale);
-        }
-
-        if (y + (8 * scale) > SCREEN_HEIGHT) {
-            screen_clear();
-            y = 0;
-        }
-
-        for (int i = 0; i < 8; i++) {
-            for (int v_scale = 0; v_scale < scale; v_scale++) {
-                unsigned char bits = font[(int)s][i];
-                
-                int current_y = y + (i * scale) + v_scale;
-                uint8_t *row = &VIDEO_MEMORY[current_y * SCREEN_WIDTH];
-
-                for (int j = 0; j < 8; j++) {
-                    if (bits > 127) { 
-                        for (int h_scale = 0; h_scale < scale; h_scale++) {
-                            int current_x = x + (j * scale) + h_scale;
-                            if (current_x < SCREEN_WIDTH) {
-                                row[current_x] = color; 
-                            }
-                        }
-                    }
-                    bits = bits << 1; 
-                }
-            }
-        }
-        
-        x = x + (8 * scale);
-    } else if (is_scaled == 2) {
-        int scale = 2; 
-
-        if (s == '\n') {
-            x = 0;
-            y = y + (8 * scale);
-            asm volatile("sti");
-            return;
-        }
-
-        if (x + (8 * scale) > SCREEN_WIDTH) {
-            x = 0;
-            y = y + (8 * scale);
-        }
-
-        if (y + (8 * scale) > SCREEN_HEIGHT) {
-            screen_clear();
-            y = 0;
-        }
-
-        for (int i = 0; i < 8; i++) {
-            for (int v_scale = 0; v_scale < scale; v_scale++) {
-                unsigned char bits = font[(int)s][i];
-                
-                int current_y = y + (i * scale) + v_scale;
-                uint8_t *row = &VIDEO_MEMORY[current_y * SCREEN_WIDTH];
-
-                for (int j = 0; j < 8; j++) {
-                    if (bits > 127) { 
-                        for (int h_scale = 0; h_scale < scale; h_scale++) {
-                            int current_x = x + (j * scale) + h_scale;
-                            if (current_x < SCREEN_WIDTH) {
-                                row[current_x] = color; 
-                            }
-                        }
-                    }
-                    bits = bits << 1; 
-                }
-            }
-        }
-        
-        x = x + (8 * scale);
+    if (s == '\n') {
+        x = 0;
+        y = y + (8 * scale);
+        asm volatile("sti");
+        return;
     }
-    else {
-        if (s == '\n') {
-            x = 0;
-            y = y + 8;
-            asm volatile("sti"); 
-            return;
-        }
 
-        if (x + 8 > SCREEN_WIDTH) {
-            x = 0;
-            y = y + 8;
-        }
+    if (x + (8 * scale) > SCREEN_WIDTH) {
+        x = 0;
+        y = y + (8 * scale);
+    }
 
-        if (y + 8 > SCREEN_HEIGHT) {
-            screen_clear();
-            y = 0;
-        }
+    if (y + (8 * scale) > SCREEN_HEIGHT) {
+        screen_clear();
+        y = 0;
+    }
 
-        for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
+        for (int v_scale = 0; v_scale < scale; v_scale++) {
             unsigned char bits = font[(int)s][i];
             
-            uint8_t *row = &VIDEO_MEMORY[(y + i) * SCREEN_WIDTH];
+            int current_y = y + (i * scale) + v_scale;
+            uint8_t *row = &VIDEO_MEMORY[current_y * SCREEN_WIDTH];
 
             for (int j = 0; j < 8; j++) {
-                if (bits > 127) {
-                    row[x + j] = color; 
+                if (bits > 127) { 
+                    for (int h_scale = 0; h_scale < scale; h_scale++) {
+                        int current_x = x + (j * scale) + h_scale;
+                        if (current_x < SCREEN_WIDTH) {
+                            row[current_x] = color; 
+                        }
+                    }
                 }
-                bits = bits << 1;
+                bits = bits << 1; 
             }
         }
-        x = x + 8;
     }
+    
+    x = x + (8 * scale);
 }
 
 void print(char *msg, uint8_t color) {
@@ -194,6 +122,7 @@ void print(char *msg, uint8_t color) {
 }
 
 void draw_rect(int x, int y, int width, int height, uint8_t color) {
+    asm volatile("cli");
     for (int i = 0; i < height; i = i + 1) {
         for (int j = 0; j < width; j = j + 1) {
             int curr_x = x + j;
@@ -204,6 +133,7 @@ void draw_rect(int x, int y, int width, int height, uint8_t color) {
             }
         }
     }
+    asm volatile("sti");
 }
 
 static const uint8_t fade_palette[24] = {
