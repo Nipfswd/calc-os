@@ -173,6 +173,15 @@ void input_wait_string(char *buffer) {
 					}
 				}
 			}
+			else if (is_window_send != 0) {
+				if (i > 0) {
+					i = i - 1;
+					if (x > 48) {
+						x = x - 8;
+						draw_rect(x, y, 8, 8, 0);
+					}
+				}
+			}
 			break;
 
 		default:

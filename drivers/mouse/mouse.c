@@ -196,6 +196,18 @@ void check_ui_clicks() {
         if (mouse_x >= 65 && mouse_x <= 80 && mouse_y >= 85 && mouse_y <= 100) {
             reboot();
         }
+
+        if (mouse_x >= 352 && mouse_x <= 672 && mouse_y >= 450 && mouse_y <= 486) {
+            if (current_mode == 1) {
+                current_mode = 5;
+                ncount = 1;
+            }
+        }
+
+        if (current_mode == 5 && mouse_y >= 728 && mouse_y <= SCREEN_HEIGHT) {
+            is_window_send = 1;
+            ncount = 1;
+        }
     }
 }
 

@@ -25,6 +25,7 @@ void rtl8139_init();
 void send_pack(uint8_t data, uint8_t dest_mac[6]);
 uint8_t read_pack();
 int rtl8139_find();
+int draw_pack_icons();
 
 extern pci_device_t devices[32];
 extern int device_count;

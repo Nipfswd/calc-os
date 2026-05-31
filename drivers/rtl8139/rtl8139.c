@@ -155,3 +155,72 @@ void send_pack(uint8_t data, uint8_t dest_mac[6]) {
 
     tx_counter = (tx_counter + 1) % 4;
 }
+
+int draw_pack_icons() {
+    if (rtl_mmio[0x37] & 0x01) {
+        return 0;
+    }
+    
+    uint8_t* header = rtl_rx_buffer + rx_offset;
+
+    uint16_t status = header[0] | (header[1] << 8);
+    if (!(status & 0x01)) {
+        return 0;
+    }
+
+    uint16_t length = header[2] | (header[3] << 8);
+
+    uint8_t* payload = header + 4;
+    
+    uint16_t ethertype = (payload[12] << 8) | payload[13];
+    
+    static int pack_index = 0;
+    int col = pack_index % 6;
+    int row = pack_index / 5;
+    int icon_x = 20 + col * 180;
+    int icon_y = 100 + row * 100;
+    
+    if (ethertype == 0x88B5) {
+        draw_rect(icon_x, icon_y, 130, 30, 15);
+        x = icon_x + 8;
+        y = icon_y + 8;
+        
+        char packet_buf[2] = { (char)payload[14], '\0' };
+        print(packet_buf, 0);
+        
+        pack_index++;
+    } 
+    else if (ethertype == 0x0800 && length >= 42 && length < 1600) {
+        uint16_t offset = 14 + 20 + 8;
+        uint8_t* icmp_data = payload + offset;
+        int data_len = length - offset - 4;
+        
+        if (data_len > 0) {
+            draw_rect(icon_x, icon_y, 130, 30, 15);
+            x = icon_x + 8;
+            y = icon_y + 8;
+            
+            char packet_buf[16];
+            int i = 0;
+            for (i = 0; i < data_len && i < 15; i++) {
+                packet_buf[i] = (char)icmp_data[i];
+            }
+            packet_buf[i] = '\0';
+            
+            print(packet_buf, 0);
+            
+            pack_index++;
+        }
+    }
+
+    if (pack_index >= 6) {
+        pack_index = 0;
+    }
+
+    rx_offset = (rx_offset + length + 4 + 3) & ~3;
+    rx_offset = rx_offset % RX_BUFFER_SIZE;
+
+    *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
+
+    return 1;
+}

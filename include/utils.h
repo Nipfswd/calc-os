@@ -18,5 +18,11 @@ void get_time(int *h, int *m);
 int memcmp(const char *s1, const char *s2, int n);
 void* memcpy(void* dest, const void* src, uint32_t n);
 void reboot();
+void name_clear();
+void content_clear();
+void format_fat_name(const char* src, char dest[11]);
+void draw_file_icons();
+void play_startup_sound();
+int atoi_super(const char* str);
 
 #endif
