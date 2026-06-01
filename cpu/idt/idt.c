@@ -44,7 +44,7 @@ void pic_remap() {
 uint32_t timer_handler(struct registers *regs) {
     task_list[current_task].esp = (uint32_t)regs; 
 
-    current_task = (current_task + 1) % 2;
+    current_task = (current_task + 1) % 3;
     timer_ticks++;
     outb(0x20, 0x20); 
 
@@ -204,6 +204,33 @@ void prepare_task2() {
     task_list[1].esp = (uint32_t)st;
 }
 
+unsigned int task3_stack[1024]; 
+
+void task3_main() {
+    while(1) {
+        __asm__ __volatile__("hlt"); 
+    }
+}
+
+void prepare_task3() {
+    uint32_t* st = &task3_stack[1024];
+
+    *(--st) = 0x202;    
+    *(--st) = 0x08;     
+    *(--st) = (uint32_t)task3_main; 
+
+    *(--st) = 0;          
+    *(--st) = 0;           
+
+    for (int i = 0; i < 8; i++) {
+        *(--st) = 0;
+    }
+
+    *(--st) = 0x10;   
+
+    task_list[2].esp = (uint32_t)st;
+}
+
 void init_idt() {
     idtp.idt_ptr = (uint32_t)&idt_entry;
     idtp.idt_size = (sizeof(struct idt_entry) * 256) - 1;
@@ -226,6 +253,7 @@ void init_idt() {
     set_idt_gate(46, (uint32_t)ata_wrapper, 0x08, 0x8E);
 
     prepare_task2();
+    prepare_task3();
 
     current_task = 0; 
     task_list[0].id = 0;

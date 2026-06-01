@@ -8,7 +8,7 @@ typedef struct {
     uint8_t state;
 } Task;
 
-extern Task task_list[2];
+extern Task task_list[3];
 extern int current_task;
 
 #endif 
