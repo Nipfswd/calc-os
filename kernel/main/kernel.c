@@ -19,7 +19,7 @@ void system() {
 refresh:
     ncount = 0;
 
-    draw_rect(0, 0, 1024, 40, COLOR_CYAN);
+    draw_rect(0, 0, 1024, 40, 7);
 
     draw_button(10, 5, 56, 26, "CalcOS", 0, 15);
 
@@ -184,6 +184,8 @@ refresh:
             draw_button(10, 85, 15, 15, "x", 0, 15);
             draw_button(65, 85, 15, 15, "r", 0, 15);
         }
+
+        draw_pack_icons();
 
         draw_button(0, 728, 1024, 40, "F2 - Send a pack", COLOR_BLUE, 15);
 

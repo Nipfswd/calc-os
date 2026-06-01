@@ -42,5 +42,7 @@ extern unsigned int timer_ticks;
 extern uint8_t *timer_str[16];
 
 extern volatile int ata_interrupt_received;
+void task2_main();
+void prepare_task2();
 
 #endif
