@@ -9,6 +9,7 @@
 #include <ata.h>
 #include <sound.h>
 #include <pci.h>
+#include <mm.h>
 
 char command[256];
 char name[128];
@@ -536,6 +537,11 @@ void boot() {
 
     init_mouse();
     print("[OK]\n", 15);
+    delay_ticks(10);
+
+    init_memory_manager();
+    print("[OK]\n", 15);
+    delay_ticks(10);
 
     int is_rtl8139_found = rtl8139_find();
     if (is_rtl8139_found) {

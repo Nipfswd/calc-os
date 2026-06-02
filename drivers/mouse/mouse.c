@@ -189,6 +189,7 @@ void check_ui_clicks() {
         }
 
         if (mouse_x >= 351 && mouse_x <= 366 && mouse_y >= 5 && mouse_y <= 20) {
+            is_scaled = 0;
             draw_1 = 4; 
             ncount = 1;
         }

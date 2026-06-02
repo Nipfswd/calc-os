@@ -2,11 +2,23 @@
 #define MM_H
 #include <stdint.h>
 
-void init_identity_paging();
-extern void enable_paging();
-extern unsigned int page_directory[1024] __attribute__((aligned(4096)));
-extern unsigned int page_table[1024] __attribute__((aligned(4096)));
+#define HEAP_START 0x200000          
+#define HEAP_SIZE  (4 * 1024 * 1024)  
 
-void map_mmio_space(uint32_t physical_base);
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+typedef uint32_t size_t;
+
+typedef struct Block {
+    size_t size;
+    int free;
+    struct Block* next;
+} Block;
+
+void init_memory_manager();
+void* kmalloc(size_t size);
+void kfree(void* ptr);
 
 #endif 

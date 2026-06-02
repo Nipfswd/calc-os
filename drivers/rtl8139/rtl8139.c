@@ -3,7 +3,7 @@
 #include <idt.h>
 #include <stdint.h>
 #include <pci.h>
-#include <mm.h>
+#include <video.h>Z
 
 volatile uint8_t* rtl_mmio;
 
@@ -78,6 +78,9 @@ void rtl8139_init() {
 }
 
 uint8_t read_pack() {
+    int is_rtl8139_found = rtl8139_find();
+    if (!is_rtl8139_found) return 0;
+
     if (rtl_mmio[0x37] & 0x01) {
         return 0;
     }
@@ -117,6 +120,8 @@ uint8_t read_pack() {
 }
 
 void send_pack(uint8_t data, uint8_t dest_mac[6]) {
+    int is_rtl8139_found = rtl8139_find();
+    if (!is_rtl8139_found) return;
     uint32_t phys_tx_buf = (uint32_t)rtl_tx_buffer[tx_counter]; 
 
     for (int i = 0; i < 6; i++) {
@@ -157,6 +162,8 @@ void send_pack(uint8_t data, uint8_t dest_mac[6]) {
 }
 
 int draw_pack_icons() {
+    int is_rtl8139_found = rtl8139_find();
+    if (!is_rtl8139_found) return 0;
     if (rtl_mmio[0x37] & 0x01) {
         return 0;
     }
