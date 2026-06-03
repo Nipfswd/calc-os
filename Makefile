@@ -13,11 +13,11 @@ LDFLAGS     := -m elf_i386 -T linker.ld --nostdlib --static
 
 OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.o \
        mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o \
-       sound.o pci.o rtl8139.o mm.o
+       sound.o pci.o rtl8139.o mm.o forth.o
 
 vpath %.c kernel/main drivers/cmos drivers/video drivers/mouse utils drivers/keyboard \
           drivers/video/font cpu/idt cpu/idt/tasks cpu/mm drivers/ata drivers/fat drivers/sound drivers/pci \
-		  drivers/rtl8139
+		  drivers/rtl8139 forth
 		  
 vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/asm
 

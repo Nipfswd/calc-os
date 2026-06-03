@@ -208,13 +208,7 @@ unsigned int task3_stack[1024];
 
 void task3_main() {
     while(1) {
-        uint8_t is_behave = read_pack();
-        if (is_behave == 0) {
-            __asm__ __volatile__("hlt");
-            continue;
-        } else {
-            draw_rect(956, 668, 76, 90, 15);
-        }
+        __asm__ __volatile__("hlt");
     }
 }
 
