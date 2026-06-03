@@ -10,6 +10,7 @@
 #include <sound.h>
 #include <pci.h>
 #include <mm.h>
+#include <forth.h>
 
 char command[256];
 char name[128];
@@ -289,6 +290,7 @@ refresh:
                 print("  behave - receive a byte from the network\n", 15);
                 print("  reboot - reboot the system\n", 15);
                 print("  rm - delete a file\n", 15);
+                print("  forth - Forth interpreter\n", 15);
             }
             else if (compare_strings(command, "reboot")) {
                 reboot();
@@ -416,6 +418,26 @@ refresh:
                 format_fat_name(name, name_11);
 
                 delete_file(name_11);
+            }
+           else if (compare_strings(command, "forth")) {
+                name_clear();
+                print("Enter Forth file: ", 15);
+                input_wait_string(name);
+                print("\n", 15);
+
+                int len = 0;
+                while (content[len] != '\0') len++;
+                if (len > 512) len = 512;
+
+                char name_11[11];
+                format_fat_name(name, name_11);
+
+                uint8_t buffer[512] = {0};
+                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
+
+                read_file(name_11, content);
+                interpret(stack_init(1024), content);
+                print("\n", 15);
             }
             else {
                 if (command[0] != '\0') {

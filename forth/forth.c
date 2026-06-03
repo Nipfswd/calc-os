@@ -1,10 +1,16 @@
 #include <stdint.h>
 #include <mm.h>
+#include <utils.h>
 
 struct Stack {
     int *data;
     int size;
     int sp;
+};
+
+struct Word {
+    const char* name;
+    void (*fn)(struct Stack*);
 };
 
 struct Stack* stack_init(int size) {
@@ -42,4 +48,138 @@ void stack_push(struct Stack* st, int value) {
     }
 
     st->data[++st->sp] = value;
+}
+
+int stack_pop(struct Stack* st) {
+    if (st->sp == -1) {
+        print("Forth: pop from empty stack", 15);
+        return 0;
+    }
+
+    return st->data[st->sp--];
+}
+
+void word_add(struct Stack* st) {
+    int b = stack_pop(st);
+    int a = stack_pop(st);
+    stack_push(st, a + b);
+}
+
+void word_sub(struct Stack* st) {
+    int b = stack_pop(st);
+    int a = stack_pop(st);
+    stack_push(st, a - b);
+}
+
+void word_mul(struct Stack* st) {
+    int b = stack_pop(st);
+    int a = stack_pop(st);
+    stack_push(st, a * b);
+}
+
+void word_div(struct Stack* st) {
+    int b = stack_pop(st);
+    int a = stack_pop(st);
+    if (b == 0) {
+        print("Forth: division by zero", 15);
+        stack_push(st, 0);
+    } else {
+        stack_push(st, a / b);
+    }
+}
+
+void word_dot(struct Stack* st) {
+    int a = stack_pop(st);
+
+    char buf[32];
+    itoa(a, buf);  
+
+    print(buf, 15);
+    print(" ", 15);
+}
+
+struct Word dictionary[] = {
+    { "+", word_add },
+    { "-", word_sub },
+    { "*", word_mul },
+    { "/", word_div },
+    { ".", word_dot }
+};
+
+struct Word* find_word(const char* token) {
+    int count = sizeof(dictionary) / sizeof(dictionary[0]);
+
+    for (int i = 0; i < count; i++) {
+        if (compare_strings(token, dictionary[i].name)) {
+            return &dictionary[i];
+        }
+    }
+
+    return NULL;
+}
+
+char* next_token(char** input) {
+    char* s = *input;
+
+    while (*s == ' ' || *s == '\t') {
+        s++;
+    }
+
+    if (*s == '\0') {
+        *input = s;
+        return NULL;
+    }
+
+    char* start = s;
+
+    while (*s && *s != ' ' && *s != '\t') {
+        s++;
+    }
+    
+    if (*s) {
+        *s = '\0';
+        s++;
+    }
+
+    *input = s;
+    return start;
+}
+
+int is_number(const char* s) {
+    if (*s == '\0') return 0;
+
+    if (*s == '-') s++;
+
+    if (*s == '\0') return 0;
+
+    while (*s) {
+        if (*s < '0' || *s > '9')
+            return 0;
+        s++;
+    }
+
+    return 1;
+}
+
+void interpret(struct Stack* st, char* input) {
+    char* ptr = input;
+    char* token;
+
+    while ((token = next_token(&ptr)) != NULL) {
+
+        struct Word* w = find_word(token);
+        if (w) {
+            w->fn(st);
+            continue;
+        }
+
+        if (is_number(token)) {
+            int value = atoi(token);
+            stack_push(st, value);
+            continue;
+        }
+
+        print("Forth: unknown word: ", 15);
+        print(token, 15);
+    }
 }

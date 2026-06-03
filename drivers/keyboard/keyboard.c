@@ -144,7 +144,7 @@ void input_wait_string(char *buffer) {
 		case 0x0A: letter = '9'; break;
 		case 0x0B: letter = '0'; break;
 		case 0x0C: letter = '-'; break;
-		case 0x0D: letter = '='; break;
+		case 0x0D: letter = '+'; break;
 		case 0x34: letter = '.'; break;
 		case 0x35: letter = '/'; break;
 		case 0x1A: letter = '['; break;
