@@ -7,6 +7,7 @@
 #include <task.h>
 #include <stdint.h>
 #include <sound.h>
+#include <forth.h>
 
 struct idt_entry   idt_entry[256];
 struct idt_pointer idtp;
@@ -44,7 +45,16 @@ void pic_remap() {
 uint32_t timer_handler(struct registers *regs) {
     task_list[current_task].esp = (uint32_t)regs; 
 
-    current_task = (current_task + 1) % 3;
+    int next_task = current_task;
+    while (1) {
+        next_task = (next_task + 1) % 3;
+        
+        if (next_task == 0 || task_list[next_task].is_active == 1) {
+            break;
+        }
+    }
+
+    current_task = next_task;
     timer_ticks++;
     outb(0x20, 0x20); 
 
@@ -117,7 +127,7 @@ void exception_handler(struct registers *regs) {
     print("TECHICAL INFORMATION: ", 15);
     char buf[16];
     itoa(regs->int_no, buf);
-    print("\n  INTERRUPT NO: ", 15); 
+    print("\n  INTERRUPT NO: ", 15);
     print(buf, 15); 
 
 
@@ -231,6 +241,40 @@ void prepare_task3() {
     task_list[2].esp = (uint32_t)st;
 }
 
+void create_task(int task_id) {
+    if (task_id < 1 || task_id > 2) return; 
+
+    __asm__ __volatile__("cli"); 
+
+    if (task_id == 1) {
+        prepare_task2();
+    } else if (task_id == 2) {
+        prepare_task3();
+    }
+
+    task_list[task_id].id = task_id;
+    task_list[task_id].is_active = 1; 
+
+    __asm__ __volatile__("sti");
+}
+
+void delete_task(int task_id) {
+    if (task_id < 1 || task_id > 2) return;
+
+    __asm__ __volatile__("cli");
+
+    task_list[task_id].is_active = 0;
+
+    if (current_task == task_id) {
+        __asm__ __volatile__("sti");
+        while(1) {
+            __asm__ __volatile__("hlt"); 
+        }
+    }
+
+    __asm__ __volatile__("sti");
+}
+
 void init_idt() {
     idtp.idt_ptr = (uint32_t)&idt_entry;
     idtp.idt_size = (sizeof(struct idt_entry) * 256) - 1;
@@ -257,6 +301,11 @@ void init_idt() {
 
     current_task = 0; 
     task_list[0].id = 0;
+
+    task_list[0].is_active = 1; 
+
+    task_list[1].is_active = 1;
+    task_list[2].is_active = 0;
 
     __asm__ __volatile__("lidt (%0)" : : "r" (&idtp));
     __asm__ __volatile__("sti");

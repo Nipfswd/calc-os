@@ -61,43 +61,37 @@ void create_file(const char* name_11, uint8_t* data, int size) {
     }
 }
 
-void delete_file(const char* filename_11) {
-    if (!disk_initialized) {
-        uint16_t bpb_buf[256];
-        ata_read_sector(0, bpb_buf);
-        cached_bpb = *(struct fat12_bpb*)bpb_buf;
+void delete_file(const char* name_11) {
+    uint16_t bpb_buf[256];
+    uint8_t fat_table[512 * 9];
+    uint16_t root_buf[256];
 
-        for (uint32_t i = 0; i < cached_bpb.fat_size_sectors; i++) {
-            ata_read_sector(cached_bpb.reserved_sectors + i, 
-                            (uint16_t*)(cached_fat + (i * 512)));
-        }
-        disk_initialized = 1;
+    ata_read_sector(0, bpb_buf);
+    struct fat12_bpb* bpb = (struct fat12_bpb*)bpb_buf;
+    for (int i = 0; i < bpb->fat_size_sectors; i++) {
+        ata_read_sector(bpb->reserved_sectors + i, (uint16_t*)(fat_table + (i * 512)));
     }
 
-    uint32_t root_lba = cached_bpb.reserved_sectors + (cached_bpb.num_fats * cached_bpb.fat_size_sectors);
-    uint32_t root_sectors = ((cached_bpb.root_entries * 32) + (cached_bpb.bytes_per_sector - 1)) / cached_bpb.bytes_per_sector;
-
-    uint16_t buffer[256];
+    uint32_t root_lba = bpb->reserved_sectors + (bpb->num_fats * bpb->fat_size_sectors);
+    uint32_t root_sectors = ((bpb->root_entries * 32) + 511) / 512;
+    
+    uint16_t cluster_to_free = 0;
     int file_found = 0;
-    uint16_t current_cluster = 0;
 
     for (uint32_t s = 0; s < root_sectors; s++) {
-        ata_read_sector(root_lba + s, buffer);
-        struct fat12_entry* entries = (struct fat12_entry*)buffer;
+        ata_read_sector(root_lba + s, root_buf);
+        struct fat12_entry* entries = (struct fat12_entry*)root_buf;
 
         for (int i = 0; i < 16; i++) {
-            if (entries[i].name[0] == 0x00) break;
-            
-            if ((uint8_t)entries[i].name[0] == 0xE5) continue;
+            if (entries[i].name[0] != 0x00 && (uint8_t)entries[i].name[0] != 0xE5) {
+                if (memcmp(entries[i].name, name_11, 11) == 1) {
+                    cluster_to_free = entries[i].first_cluster;
+                    entries[i].name[0] = 0xE5; 
 
-            if (memcmp(entries[i].name, filename_11, 11) == 1) {
-                current_cluster = entries[i].first_cluster;
-
-                entries[i].name[0] = 0xE5;
-
-                ata_write_sector(root_lba + s, buffer);
-                file_found = 1;
-                break;
+                    ata_write_sector(root_lba + s, root_buf);
+                    file_found = 1;
+                    break;
+                }
             }
         }
         if (file_found) break;
@@ -105,19 +99,18 @@ void delete_file(const char* filename_11) {
 
     if (!file_found) return;
 
-    while (current_cluster >= 2 && current_cluster < 0xFF8) {
-        uint16_t next_cluster = get_fat_entry(current_cluster, cached_fat);
-
-        set_fat_entry(current_cluster, 0x000, cached_fat);
-
+    uint16_t current_cluster = cluster_to_free;
+    while (current_cluster != 0 && current_cluster < 0xFF8) {
+        uint16_t next_cluster = get_fat_entry(current_cluster, fat_table);
+        set_fat_entry(current_cluster, 0x000, fat_table);
         current_cluster = next_cluster;
-        if (current_cluster == 0) break;
     }
 
-    for (uint32_t i = 0; i < cached_bpb.fat_size_sectors; i++) {
-        ata_write_sector(cached_bpb.reserved_sectors + i, 
-                         (uint16_t*)(cached_fat + (i * 512)));
+    for (int i = 0; i < bpb->fat_size_sectors; i++) {
+        ata_write_sector(bpb->reserved_sectors + i, (uint16_t*)(fat_table + (i * 512)));
     }
 
-    disk_initialized = 0;
+    if (disk_initialized) {
+        disk_initialized = 0;
+    }
 }

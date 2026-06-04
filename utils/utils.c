@@ -189,7 +189,7 @@ void draw_file_icons() {
             if (entries[i].attributes == 0x0F) continue;
 
             int col = icon_index % 6;
-            int row = icon_index / 5;
+            int row = icon_index / 6;
             int icon_x = 20 + col * 180;
             int icon_y = 100 + row * 100;
 

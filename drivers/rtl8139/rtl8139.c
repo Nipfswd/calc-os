@@ -183,7 +183,7 @@ int draw_pack_icons() {
     
     static int pack_index = 0;
     int col = pack_index % 6;
-    int row = pack_index / 5;
+    int row = pack_index / 6;
     int icon_x = 20 + col * 180;
     int icon_y = 100 + row * 100;
     

@@ -98,12 +98,26 @@ void word_dot(struct Stack* st) {
     print(" ", 15);
 }
 
+void word_fetch(struct Stack* st) {
+    int addr = stack_pop(st);
+    int value = *(int*)addr;
+    stack_push(st, value);
+}
+
+void word_store(struct Stack* st) {
+    int addr = stack_pop(st);
+    int value = stack_pop(st);
+    *(int*)addr = value;
+}
+
 struct Word dictionary[] = {
     { "+", word_add },
     { "-", word_sub },
     { "*", word_mul },
     { "/", word_div },
-    { ".", word_dot }
+    { ".", word_dot },
+    { "@", word_fetch },
+    { "!", word_store }
 };
 
 struct Word* find_word(const char* token) {
