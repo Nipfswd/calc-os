@@ -53,10 +53,6 @@ void handle_hotkeys(int code) {
 		is_button_calc = 1;
 		ncount = 1;
 	}
-	if (is_window_crt == 1 && code == 0x53) {
-		is_del = 1;
-		ncount = 1;
-	}
 	if (code == 0x50 && current_mode == 1 && is_button_apps == 1 && is_button_files == 0) {
 		is_button_apps = 0;
 		is_button_files = 0;
@@ -93,8 +89,6 @@ void input_wait_string(char *buffer) {
 		}
 
 		if (code == 0) continue;
-
-		if (code >= 0x80) continue;
 
 		handle_hotkeys(code);
 

@@ -27,6 +27,9 @@ void set_idt_gate(uint8_t number, uint32_t base, uint16_t selector, uint8_t flag
 void pic_remap();
 void exception_handler(struct registers *regs);
 
+void create_task(int task_id);
+void delete_task(int task_id);
+
 extern void timer_wrapper();
 extern void keyboard_wrapper();
 extern void mouse_wrapper();

@@ -18,7 +18,6 @@ int is_button_calc = 0;
 int draw_0 = 1;
 int draw_1 = 1;
 int is_scaled = 0;
-int is_del = 0;
 int is_button_ethernet = 0;
 int is_window_send = 0;
 

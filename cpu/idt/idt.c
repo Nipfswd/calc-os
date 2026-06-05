@@ -218,7 +218,7 @@ unsigned int task3_stack[1024];
 
 void task3_main() {
     while(1) {
-        __asm__ __volatile__("hlt");
+        interpret(stack_init(1024), content);
     }
 }
 

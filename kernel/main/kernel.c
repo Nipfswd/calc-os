@@ -98,7 +98,7 @@ refresh:
 
             x = wx + 18;
             y = wy + 8;
-            print("Create a new file. Del - delete a file", 15);
+            print("Create a new file", 15);
 
             x = wx + 18;
             y = wy + 44;
@@ -111,23 +111,6 @@ refresh:
             print("Content:", 15);
             draw_rect(wx + 18, wy + 146, 404, 24, 15); 
             draw_rect(wx + 20, wy + 148, 400, 20, 0);
-
-            if (is_del == 1) {
-                draw_rect(wx + 4, wy + 4, 432, 260, 0);
-                draw_rect(wx,     wy,     432, 260, 15);
-                draw_rect(wx + 4, wy + 4, 424, 252, 7);
-                draw_rect(wx + 4, wy + 4, 424, 32, 0);
-
-                x = wx + 18;
-                y = wy + 8;
-                print("Delete a file", 15);
-
-                x = wx + 18;
-                y = wy + 44;
-                print("Name:", 15);
-                draw_rect(wx + 18, wy + 56, 404, 24, 15);
-                draw_rect(wx + 20, wy + 58, 400, 20, 0);
-            }
         }
     }
     else if (current_mode == 3) {
@@ -289,7 +272,6 @@ refresh:
                 print("  send - send a byte to the network\n", 15);
                 print("  behave - receive a byte from the network\n", 15);
                 print("  reboot - reboot the system\n", 15);
-                print("  rm - delete a file\n", 15);
                 print("  forth - Forth interpreter\n", 15);
             }
             else if (compare_strings(command, "reboot")) {
@@ -320,27 +302,130 @@ refresh:
                 list_files();
             }
             else if (compare_strings(command, "touch")) {
+                is_scaled = 2;
                 name_clear();
                 content_clear();
-                print("Name: ", 15);
+                
+                print("Enter file name: ", 15);
                 input_wait_string(name);
                 print("\n", 15);
-                print("Content: ", 15);
-                input_wait_string(content);
-                print("\n", 15);
-
-                int len = 0;
-                while (content[len] != '\0') len++;
-                if (len > 512) len = 512;
 
                 char name_11[11];
                 format_fat_name(name, name_11);
 
-                uint8_t buffer[512] = {0};
-                for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
+                screen_clear();
 
-                create_file(name_11, buffer, len);
-            }    
+                draw_rect(0, 0, 1024, 30, 7); 
+                x = 10; y = 8;
+                print("Editing: ", 0);
+                print(name, 0);
+
+                draw_rect(0, 738, 1024, 30, 7); 
+                x = 10; y = 746;
+                print("F2: Save and Exit", 0);
+
+                x = 10;
+                y = 40;
+
+                uint8_t file_buffer[512];
+                for (int i = 0; i < 512; i++) file_buffer[i] = 0;
+                int buffer_ptr = 0;
+
+                while (1) {
+                    update_system(); 
+
+                    int code = get_scancode();
+                    if (code == 0) continue;
+
+                    handle_hotkeys(code);
+
+                    if (code == 0x3C) {
+                        create_file(name_11, file_buffer, buffer_ptr);
+                        
+                        screen_clear();
+                        current_mode = 0;
+                        ncount = 1; 
+                        break; 
+                    }
+
+                    if (code == 0x1C) {
+                        if (buffer_ptr < 511) {
+                            file_buffer[buffer_ptr++] = '\n';
+                            put_char('\n', 15); 
+                        }
+                        continue;
+                    }
+
+                    if (code == 0x0E) {
+                        if (buffer_ptr > 0) {
+                            buffer_ptr--;
+                            if (file_buffer[buffer_ptr] != '\n') {
+                                x = x - 8; 
+                                draw_rect(x, y, 8, 8, 0); 
+                            }
+                            file_buffer[buffer_ptr] = 0;
+                        }
+                        continue;
+                    }
+
+                    char letter = 0;
+                    switch (code) {
+                        case 0x18: letter = 'o'; break; 
+                        case 0x23: letter = 'h'; break;
+                        case 0x2E: letter = 'c'; break; 
+                        case 0x1E: letter = 'a'; break;
+                        case 0x26: letter = 'l'; break; 
+                        case 0x12: letter = 'e'; break;
+                        case 0x13: letter = 'r'; break; 
+                        case 0x2D: letter = 'x'; break;
+                        case 0x17: letter = 'i'; break; 
+                        case 0x14: letter = 't'; break;
+                        case 0x19: letter = 'p'; break; 
+                        case 0x10: letter = 'q'; break;
+                        case 0x11: letter = 'w'; break; 
+                        case 0x15: letter = 'y'; break;
+                        case 0x16: letter = 'u'; break; 
+                        case 0x1F: letter = 's'; break;
+                        case 0x20: letter = 'd'; break; 
+                        case 0x21: letter = 'f'; break;
+                        case 0x22: letter = 'g'; break; 
+                        case 0x24: letter = 'j'; break;
+                        case 0x25: letter = 'k'; break; 
+                        case 0x2C: letter = 'z'; break;
+                        case 0x2F: letter = 'v'; break; 
+                        case 0x30: letter = 'b'; break;
+                        case 0x31: letter = 'n'; break; 
+                        case 0x32: letter = 'm'; break;
+                        case 0x39: letter = ' '; break;
+                        case 0x02: letter = '1'; break; 
+                        case 0x03: letter = '2'; break;
+                        case 0x04: letter = '3'; break; 
+                        case 0x05: letter = '4'; break;
+                        case 0x06: letter = '5'; break; 
+                        case 0x07: letter = '6'; break;
+                        case 0x08: letter = '7'; break; 
+                        case 0x09: letter = '8'; break;
+                        case 0x0A: letter = '9'; break; 
+                        case 0x0B: letter = '0'; break;
+                        case 0x0C: letter = '-'; break; 
+                        case 0x0D: letter = '+'; break;
+                        case 0x34: letter = '.'; break; 
+                        case 0x35: letter = '/'; break;
+                        case 0x1A: letter = '['; break; 
+                        case 0x1B: letter = ']'; break;
+                        case 0x33: letter = ','; break; 
+                        case 0x28: letter = '\''; break;
+                        case 0x27: letter = ';'; break;
+                        default:   letter = 0;   break;
+                    }
+
+                    if (letter != 0 && buffer_ptr < 511) {
+                        put_char(letter, 15); 
+                        file_buffer[buffer_ptr] = letter;
+                        buffer_ptr++;
+                    }
+                }
+            }   
             else if (compare_strings(command, "draw")) {
                 char val[16];
                 int r_w, r_h, r_x, r_y;
@@ -408,22 +493,10 @@ refresh:
             else if (compare_strings(command, "behave")) {
                 read_pack();
             }
-            else if (compare_strings(command, "rm")) {
-                name_clear();
-                print("Name: ", 15);
-                input_wait_string(name);
-                print("\n", 15);
-
-                char name_11[11];
-                format_fat_name(name, name_11);
-
-                delete_file(name_11);
-            }
            else if (compare_strings(command, "forth")) {
                 name_clear();
                 print("Enter Forth file: ", 15);
                 input_wait_string(name);
-                print("\n", 15);
 
                 int len = 0;
                 while (content[len] != '\0') len++;
@@ -436,7 +509,7 @@ refresh:
                 for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
 
                 read_file(name_11, content);
-                interpret(stack_init(1024), content);
+                create_task(2);
                 print("\n", 15);
             }
             else {
@@ -489,16 +562,11 @@ refresh:
                 uint8_t buffer[512] = {0};
                 for (int j = 0; j < len; j++) buffer[j] = (uint8_t)content[j];
 
-                if (is_del == 0) {
-                    create_file(name_11, buffer, len);
-                } else {
-                    delete_file(name_11);
-                }
+                create_file(name_11, buffer, len);
 
                 show_crt_window = 0;
                 is_window_crt = 0;
                 ncount = 1;
-                is_del = 0;
             }
         }
         else if (current_mode == 5) {

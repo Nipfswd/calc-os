@@ -1,6 +1,14 @@
-#include <stdint.h>
-#include <mm.h>
+#include <cmos.h>
+#include <video.h>
+#include <mouse.h>
 #include <utils.h>
+#include <keyboard.h>
+#include <idt.h>
+#include <task.h>
+#include <stdint.h>
+#include <sound.h>
+#include <forth.h>
+#include <mm.h>
 
 struct Stack {
     int *data;
@@ -16,7 +24,7 @@ struct Word {
 struct Stack* stack_init(int size) {
     struct Stack* st = kmalloc(sizeof(struct Stack));
     if (!st) {
-        print("Forth: cannot allocate Stack", 15);
+        print("\nForth: cannot allocate Stack\n", 15);
     }
 
     st->size = size;
@@ -24,7 +32,7 @@ struct Stack* stack_init(int size) {
 
     st->data = kmalloc(size * sizeof(int));
     if (!st->data) {
-        print("Forth: cannot allocate stack data", 15);
+        print("\nForth: cannot allocate stack data\n", 15);
     }
         
     return st;
@@ -35,7 +43,7 @@ void stack_push(struct Stack* st, int value) {
         int new_size = st->size + 32;
         int* new_data = kmalloc(new_size * sizeof(int));
         if (!new_data) {
-            print("Forth: cannot expand stack", 15);
+            print("\nForth: cannot expand stack\n", 15);
         }
 
         for (int i = 0; i <= st->sp; i++) {
@@ -52,7 +60,7 @@ void stack_push(struct Stack* st, int value) {
 
 int stack_pop(struct Stack* st) {
     if (st->sp == -1) {
-        print("Forth: pop from empty stack", 15);
+        print("\nForth: pop from empty stack\n", 15);
         return 0;
     }
 
@@ -81,7 +89,7 @@ void word_div(struct Stack* st) {
     int b = stack_pop(st);
     int a = stack_pop(st);
     if (b == 0) {
-        print("Forth: division by zero", 15);
+        print("\nForth: division by zero\n", 15);
         stack_push(st, 0);
     } else {
         stack_push(st, a / b);
@@ -94,8 +102,8 @@ void word_dot(struct Stack* st) {
     char buf[32];
     itoa(a, buf);  
 
+    print("\n", 15);
     print(buf, 15);
-    print(" ", 15);
 }
 
 void word_fetch(struct Stack* st) {
@@ -193,7 +201,10 @@ void interpret(struct Stack* st, char* input) {
             continue;
         }
 
-        print("Forth: unknown word: ", 15);
+        print("\nForth: unknown word: ", 15);
         print(token, 15);
+        print("\n", 15);
     }
+
+    delete_task(2);
 }

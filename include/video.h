@@ -48,7 +48,6 @@ extern int is_button_calc;
 extern int draw_0;
 extern int draw_1;
 extern int is_scaled;
-extern int is_del;
 extern int is_button_ethernet;
 extern int is_window_send;
 extern char content[512];
