@@ -40,10 +40,32 @@ extern void isr8();
 extern void isr13();
 extern void isr14();
 void delay_ticks(uint32_t ticks);
+extern void syscall_wrapper();
 
 extern unsigned int timer_ticks;
 extern uint8_t *timer_str[16];
 
 extern volatile int ata_interrupt_received;
+
+#define SYS_EXIT  1
+#define SYS_READ  3
+#define SYS_WRITE 4
+#define SYS_OPEN  5
+#define SYS_EXEC  11
+
+uint32_t syscall_handler(struct registers *regs);
+
+extern unsigned int task2_stack[1024];
+
+static inline uint32_t _syscall3(uint32_t num, uint32_t a1, uint32_t a2, uint32_t a3) {
+    uint32_t ret;
+    __asm__ __volatile__(
+        "int $0x80"
+        : "=a"(ret)
+        : "a"(num), "b"(a1), "c"(a2), "d"(a3)
+        : "memory"
+    );
+    return ret;
+}
 
 #endif

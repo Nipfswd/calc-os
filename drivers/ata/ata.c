@@ -9,11 +9,15 @@
 #include <fat.h>
 
 void ata_wait_bsy() {
-    while (inb(0x1F7) & 0x80);
+    while (inb(0x1F7) & 0x80) {
+        __asm__ __volatile__("pause");
+    }
 }
 
 void ata_wait_drq() {
-    while (!(inb(0x1F7) & 0x08));
+    while (!(inb(0x1F7) & 0x08)) {
+        __asm__ __volatile__("pause");
+    }
 }
 
 void ata_read_sector(uint32_t lba, uint16_t* buffer) {

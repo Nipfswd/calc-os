@@ -13,7 +13,8 @@ LDFLAGS     := -m elf_i386 -T linker.ld --nostdlib --static
 
 OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.o \
        mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o \
-       sound.o pci.o rtl8139.o mm.o forth.o
+       sound.o pci.o rtl8139.o mm.o forth.o syscalls.o sys_write.o sys_read.o sys_exec.o sys_exit.o \
+	   sys_open.o
 
 vpath %.c kernel/main drivers/cmos drivers/video drivers/mouse utils drivers/keyboard \
           drivers/video/font cpu/idt cpu/idt/tasks cpu/mm drivers/ata drivers/fat drivers/sound drivers/pci \
@@ -25,11 +26,22 @@ vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/as
 
 all: os-image.img
 
-os-image.img: boot.bin KERNEL.SYS
+CFLAGS_TEST := -m32 -ffreestanding -fPIE -I./include -c
+LDFLAGS_TEST := -m elf_i386 -pie --nostdlib
+
+TEST.BIN: test.o
+	$(LD) $(LDFLAGS_TEST) -o test.elf test.o
+	$(OBJCOPY) -O binary test.elf $@
+
+test.o: test.c
+	$(CC) $(CFLAGS_TEST) $< -o $@
+
+os-image.img: boot.bin KERNEL.SYS TEST.BIN
 	dd if=/dev/zero of=$@ bs=512 count=2880
 	mformat -i $@ -f 1440 ::
 	dd if=$< of=$@ conv=notrunc bs=512 count=1
 	mcopy -i $@ KERNEL.SYS ::KERNEL.SYS
+	mcopy -i $@ TEST.BIN ::TEST.BIN
 
 boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@
@@ -45,10 +57,10 @@ KERNEL.SYS: $(OBJ)
 	$(AS) $(ASFLAGS_ELF) $< -o $@
 
 clean:
-	$(RM) *.o *.bin *.elf KERNEL.SYS
+	$(RM) *.o *.bin *.elf KERNEL.SYS TEST.BIN
 
 cleane:
-	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS
+	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS TEST.BIN
 	$(RM) traffic.pcap
 	touch traffic.pcap
 
@@ -57,7 +69,7 @@ run: os-image.img
 	-audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
 	-netdev user,id=net0 \
     -object filter-dump,id=f1,netdev=net0,file=traffic.pcap \
-    -device rtl8139,netdev=net0
+    -device rtl8139,netdev=net0 
 
 boch:
 	bochs -f bochsrc.txt

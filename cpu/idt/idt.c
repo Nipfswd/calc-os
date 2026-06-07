@@ -296,6 +296,8 @@ void init_idt() {
     set_idt_gate(44, (uint32_t)mouse_wrapper, 0x08, 0x8E);
     set_idt_gate(46, (uint32_t)ata_wrapper, 0x08, 0x8E);
 
+    set_idt_gate(128, (uint32_t)syscall_wrapper, 0x08, 0x8E); 
+
     prepare_task2();
     prepare_task3();
 
