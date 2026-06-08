@@ -8,5 +8,5 @@
 #include <stdint.h>
 #include <sound.h>
 
-Task task_list[3];
+Task task_list[4];
 int current_task = 0;

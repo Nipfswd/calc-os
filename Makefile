@@ -26,8 +26,8 @@ vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/as
 
 all: os-image.img
 
-CFLAGS_TEST := -m32 -ffreestanding -fPIE -I./include -c
-LDFLAGS_TEST := -m elf_i386 -pie --nostdlib
+CFLAGS_TEST := -m32 -ffreestanding -fno-pic -fno-pie -I./include -c
+LDFLAGS_TEST := -m elf_i386 -static -Ttext 0x0 --nostdlib
 
 TEST.BIN: test.o
 	$(LD) $(LDFLAGS_TEST) -o test.elf test.o

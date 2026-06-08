@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-static inline int sys_exec(const char* filename_11) {
-    return (int)_syscall3(SYS_EXEC, (uint32_t)filename_11, 0, 0);
+int sys_exec(const char* filename_11) {
+    return (int)_syscall(SYS_EXEC, (uint32_t)filename_11, 0, 0);
 }

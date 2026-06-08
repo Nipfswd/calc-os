@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-static inline uint8_t sys_read(void) {
-    return (uint8_t)_syscall3(SYS_READ, 0, 0, 0);
+uint8_t sys_read(void) {
+    return (uint8_t)_syscall(SYS_READ, 0, 0, 0);
 }

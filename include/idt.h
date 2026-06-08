@@ -56,8 +56,10 @@ extern volatile int ata_interrupt_received;
 uint32_t syscall_handler(struct registers *regs);
 
 extern unsigned int task2_stack[1024];
+extern unsigned int task3_stack[1024];
+extern unsigned int task4_stack[1024];
 
-static inline uint32_t _syscall3(uint32_t num, uint32_t a1, uint32_t a2, uint32_t a3) {
+static inline uint32_t _syscall(uint32_t num, uint32_t a1, uint32_t a2, uint32_t a3) {
     uint32_t ret;
     __asm__ __volatile__(
         "int $0x80"
@@ -67,5 +69,12 @@ static inline uint32_t _syscall3(uint32_t num, uint32_t a1, uint32_t a2, uint32_
     );
     return ret;
 }
+
+int sys_exec(const char* filename_11);
+void sys_exit(void);
+uint8_t sys_read(void);
+uint16_t sys_open(const char* filename_11);
+int sys_write(int fd, const char* str, uint8_t color);
+
 
 #endif

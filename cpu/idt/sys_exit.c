@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-static inline void sys_exit(void) {
-    _syscall3(SYS_EXIT, 0, 0, 0);
+void sys_exit(void) {
+    _syscall(SYS_EXIT, 0, 0, 0);
 }

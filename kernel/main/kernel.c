@@ -11,6 +11,7 @@
 #include <pci.h>
 #include <mm.h>
 #include <forth.h>
+#include <task.h>
 
 char command[256];
 char name[128];
@@ -273,6 +274,15 @@ refresh:
                 print("  behave - receive a byte from the network\n", 15);
                 print("  reboot - reboot the system\n", 15);
                 print("  forth - Forth interpreter\n", 15);
+            }
+            else if (compare_strings(command, "test")) {
+                int result = sys_exec("TEST    BIN");
+                if (result) {
+                    print("Executed TEST.BIN successfully\n", 15);
+                } else {
+                    print("Failed to execute TEST.BIN\n", 15);
+                }
+                
             }
             else if (compare_strings(command, "reboot")) {
                 reboot();
@@ -661,10 +671,12 @@ void boot() {
 }
 
 void __attribute__((section(".text.entry"))) kernel_main() {
+    task_list[3].is_active = 0;
     asm volatile("cli");
 	screen_clear();
     init_idt();
     asm volatile("sti");
     boot();
+    task_list[3].is_active = 1;
     system();
 }

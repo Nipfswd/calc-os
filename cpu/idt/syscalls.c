@@ -54,14 +54,12 @@ uint32_t syscall_handler(struct registers *regs) {
 
         case SYS_EXEC: {  
             uint16_t exec_cluster = find_file_in_root((const char*)arg1);
-            
             if (exec_cluster == 0) {
                 return_value = 0;
                 break;
             }
 
             uint8_t* prog_buffer = (uint8_t*)kmalloc(65536);
-            
             if (!prog_buffer) {
                 return_value = 0;
                 break;
@@ -70,20 +68,22 @@ uint32_t syscall_handler(struct registers *regs) {
             read_file((const char*)arg1, prog_buffer);
 
             __asm__ __volatile__("cli");
-            uint32_t* st = &task2_stack[1024];
-            *(--st) = 0x202;
-            *(--st) = 0x08;
-            *(--st) = (uint32_t)prog_buffer;
-            *(--st) = 0;
-            *(--st) = 0;
+            
+            uint32_t* st = &task4_stack[1024];
+            *(--st) = 0x202; 
+            *(--st) = 0x08;  
+            *(--st) = (uint32_t)prog_buffer; 
+            *(--st) = 0;     
+            *(--st) = 0;      
             for (int i = 0; i < 8; i++) {
                 *(--st) = 0;
             }
-            *(--st) = 0x10;
+            *(--st) = 0x10; 
 
-            task_list[1].esp = (uint32_t)st;
-            task_list[1].id = 1;
-            task_list[1].is_active = 1;
+            task_list[3].esp = (uint32_t)st; 
+            task_list[3].id = 3;
+            task_list[3].is_active = 1;     
+            
             __asm__ __volatile__("sti");
 
             return_value = 1;

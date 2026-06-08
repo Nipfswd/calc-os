@@ -3,7 +3,7 @@
 #include <idt.h>
 #include <stdint.h>
 #include <pci.h>
-#include <video.h>Z
+#include <video.h>
 
 volatile uint8_t* rtl_mmio;
 
