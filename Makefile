@@ -13,12 +13,13 @@ LDFLAGS     := -m elf_i386 -T linker.ld --nostdlib --static
 
 OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.o \
        mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o \
-       sound.o pci.o rtl8139.o mm.o forth.o syscalls.o sys_write.o sys_read.o sys_exec.o sys_exit.o \
-	   sys_open.o
+       sound.o pci.o rtl8139.o mm.o forth.o syscalls.o sys_exit.o \
+	   sys_getpid.o sys_open.o sys_read.o sys_time.o sys_uname.o \
+	   sys_write.o ehci.o
 
 vpath %.c kernel/main drivers/cmos drivers/video drivers/mouse utils drivers/keyboard \
           drivers/video/font cpu/idt cpu/idt/tasks cpu/mm drivers/ata drivers/fat drivers/sound drivers/pci \
-		  drivers/rtl8139 forth
+		  drivers/rtl8139 forth drivers/ehci
 		  
 vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/asm
 
@@ -26,22 +27,11 @@ vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/as
 
 all: os-image.img
 
-CFLAGS_TEST := -m32 -ffreestanding -fno-pic -fno-pie -I./include -c
-LDFLAGS_TEST := -m elf_i386 -static -Ttext 0x0 --nostdlib
-
-TEST.BIN: test.o
-	$(LD) $(LDFLAGS_TEST) -o test.elf test.o
-	$(OBJCOPY) -O binary test.elf $@
-
-test.o: test.c
-	$(CC) $(CFLAGS_TEST) $< -o $@
-
-os-image.img: boot.bin KERNEL.SYS TEST.BIN
+os-image.img: boot.bin KERNEL.SYS 
 	dd if=/dev/zero of=$@ bs=512 count=2880
 	mformat -i $@ -f 1440 ::
 	dd if=$< of=$@ conv=notrunc bs=512 count=1
 	mcopy -i $@ KERNEL.SYS ::KERNEL.SYS
-	mcopy -i $@ TEST.BIN ::TEST.BIN
 
 boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@

@@ -7,6 +7,8 @@
 #include <task.h>
 #include <stdint.h>
 #include <sound.h>
+#include <forth.h>
 
-Task task_list[3];
-int current_task = 0;
+uint32_t sys_time(void) {
+    return _syscall(SYS_TIME, 0, 0, 0);
+}

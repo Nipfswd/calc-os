@@ -47,11 +47,13 @@ extern uint8_t *timer_str[16];
 
 extern volatile int ata_interrupt_received;
 
-#define SYS_EXIT  1
-#define SYS_READ  3
-#define SYS_WRITE 4
-#define SYS_OPEN  5
-#define SYS_EXEC  11
+#define SYS_EXIT    1
+#define SYS_READ    3
+#define SYS_WRITE   4
+#define SYS_OPEN    5
+#define SYS_TIME    13
+#define SYS_GETPID  20
+#define SYS_UNAME   122
 
 uint32_t syscall_handler(struct registers *regs);
 

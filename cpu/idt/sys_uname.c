@@ -7,6 +7,8 @@
 #include <task.h>
 #include <stdint.h>
 #include <sound.h>
+#include <forth.h>
 
-Task task_list[3];
-int current_task = 0;
+void sys_uname(char *buffer) {
+    _syscall(SYS_UNAME, (uint32_t)buffer, 0, 0);
+}

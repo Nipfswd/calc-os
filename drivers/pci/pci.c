@@ -44,6 +44,19 @@ void pci_write_config_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offs
     outl(0xCFC, tmp);
 }
 
+uint8_t pci_read_config_byte(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
+    uint32_t address = (1 << 31)
+                     | (bus << 16)
+                     | (slot << 11)
+                     | (func << 8)
+                     | (offset & 0xFC);
+
+    outl(0xCF8, address);
+    uint32_t data = inl(0xCFC);
+
+    return (data >> ((offset & 3) * 8)) & 0xFF;
+}
+
 int check_device(uint8_t bus, uint8_t slot, uint8_t func) {
     uint32_t vendor_id = pci_read_config_dword(bus, slot, func, 0) & 0xFFFF;
     if (vendor_id == 0xFFFF) {

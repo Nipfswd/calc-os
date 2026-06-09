@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-int sys_exec(const char* filename_11) {
-    return (int)_syscall(SYS_EXEC, (uint32_t)filename_11, 0, 0);
+int sys_getpid(void) {
+    return _syscall(SYS_GETPID, 0, 0, 0);
 }

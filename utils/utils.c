@@ -45,7 +45,7 @@ void draw_button(int _x, int _y, int _width, int _height, char *_msg, uint8_t co
     x = _x + 4;
     y = _y + 4;
 
-    print(_msg, text_color);
+    printk(_msg, text_color);
 }
 
 void itoa(uint32_t n, char* s) {
@@ -216,10 +216,10 @@ void draw_file_icons() {
 
             x = icon_x + 8;
             y = icon_y + 8;
-            print(name_buf, 0);
+            printk(name_buf, 0);
             if (ext_len > 0) {
-                print(".", 0);
-                print(ext_buf, 0);
+                printk(".", 0);
+                printk(ext_buf, 0);
             }
 
             icon_index++;

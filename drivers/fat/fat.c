@@ -60,12 +60,12 @@ void load_root_directory() {
         }
         ext_buf[ext_len] = '\0';
 
-        print(name_buf, 1);
+        printk(name_buf, 1);
         if (ext_len > 0) {
-            print(".", 1);
-            print(ext_buf, 1);
+            printk(".", 1);
+            printk(ext_buf, 1);
         }
-        print("\n", 0); 
+        printk("\n", 0); 
     }
 }
 

@@ -59,6 +59,7 @@ void draw_desktop();
 
 void screen_clear();
 void put_char(char s, uint8_t color);
+void printk(char *msg, uint8_t color);
 void print(char *msg, uint8_t color);
 void draw_rect(int x, int y, int width, int height, uint8_t color);
 

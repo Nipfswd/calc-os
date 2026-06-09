@@ -5,6 +5,7 @@
 #include <keyboard.h>
 #include <font.h>
 #include <stdint.h>
+#include <idt.h>
 
 int x = 0;
 int y = 0;
@@ -114,10 +115,14 @@ void put_char(char s, uint8_t color) {
     x = x + (8 * scale);
 }
 
-void print(char *msg, uint8_t color) {
+void printk(char *msg, uint8_t color) {
 	for (int i = 0; msg[i] != 0; i++) {
 		put_char(msg[i], color);
 	}
+}
+
+void print(char *msg, uint8_t color) {
+    sys_write(1, msg, color);
 }
 
 void draw_rect(int x, int y, int width, int height, uint8_t color) {

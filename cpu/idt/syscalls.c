@@ -17,10 +17,11 @@ uint32_t syscall_handler(struct registers *regs) {
     uint32_t return_value = 0;
 
     switch (syscall_num) {
-        case SYS_EXIT:
+        case SYS_EXIT: {
             delete_task(current_task);
             ncount = 1;
             break;
+        }
 
         case SYS_READ:
             if (arg1 == 0) {
@@ -37,7 +38,7 @@ uint32_t syscall_handler(struct registers *regs) {
 
         case SYS_WRITE:
             if (arg1 == 1 || arg1 == 2) {
-                print((char*)arg2, (uint8_t)arg3);
+                printk((char*)arg2, (uint8_t)arg3);
                 return_value = 1;
             }
             break;
@@ -52,48 +53,31 @@ uint32_t syscall_handler(struct registers *regs) {
             break;
         }
 
-        case SYS_EXEC: {  
-            uint16_t exec_cluster = find_file_in_root((const char*)arg1);
-            if (exec_cluster == 0) {
-                return_value = 0;
-                break;
-            }
+        case SYS_TIME: {
+            int hours = 0;
+            int minutes = 0;
+            get_time(&hours, &minutes); 
 
-            uint8_t* prog_buffer = (uint8_t*)kmalloc(65536);
-            if (!prog_buffer) {
-                return_value = 0;
-                break;
-            }
-
-            read_file((const char*)arg1, prog_buffer);
-
-            __asm__ __volatile__("cli");
-            
-            uint32_t* st = &task4_stack[1024];
-            *(--st) = 0x202; 
-            *(--st) = 0x08;  
-            *(--st) = (uint32_t)prog_buffer; 
-            *(--st) = 0;     
-            *(--st) = 0;      
-            for (int i = 0; i < 8; i++) {
-                *(--st) = 0;
-            }
-            *(--st) = 0x10; 
-
-            task_list[3].esp = (uint32_t)st; 
-            task_list[3].id = 3;
-            task_list[3].is_active = 1;     
-            
-            __asm__ __volatile__("sti");
-
-            return_value = 1;
+            return_value = (hours << 16) | minutes;
+            break;
+        }
+        case SYS_GETPID: {
+            return_value = (uint32_t)current_task;
             break;
         }
 
+        case SYS_UNAME: {
+            char* user_buffer = (char*)arg1;
+            
+            copy_string(user_buffer, "CalcOS 9.2");
+            
+            return_value = 1; 
+            break;
+        }
+        
         default:
             return_value = 0;
             break;
     }
-
     return return_value;
 }

@@ -47,7 +47,7 @@ uint32_t timer_handler(struct registers *regs) {
 
     int next_task = current_task;
     while (1) {
-        next_task = (next_task + 1) % 4;
+        next_task = (next_task + 1) % 3;
         
         if (next_task == 0 || task_list[next_task].is_active == 1) {
             break;
@@ -91,58 +91,58 @@ void exception_handler(struct registers *regs) {
     x = 10;
     y = 10;
     
-    print("KERNEL FATAL: ", 15);
+    printk("KERNEL FATAL: ", 15);
     
-    if (regs->int_no == 0) print("DIVISION BY ZERO", 15);
-    else if (regs->int_no == 1) print("DEBUG", 15);
-    else if (regs->int_no == 2) print("NON MASKABLE INTERRUPT", 15);
-    else if (regs->int_no == 3) print("BREAKPOINT", 15);
-    else if (regs->int_no == 4) print("INTO DETECTED OVERFLOW", 15);
-    else if (regs->int_no == 5) print("OUT OF BOUNDS", 15);
-    else if (regs->int_no == 6) print("INVALID OPCODE", 15);
-    else if (regs->int_no == 7) print("NO COPROCESSOR", 15);
-    else if (regs->int_no == 8) print("DOUBLE FAULT", 15);
-    else if (regs->int_no == 9) print("COPROCESSOR SEGMENT OVERRUN", 15);
-    else if (regs->int_no == 10) print("BAD TSS", 15);
-    else if (regs->int_no == 11) print("SEGMENT NOT PRESENT", 15);
-    else if (regs->int_no == 12) print("STACK FAULT", 15);
-    else if (regs->int_no == 13) print("GENERAL PROTECTION FAULT", 15);
-    else if (regs->int_no == 14) print("PAGE FAULT", 15);
-    else if (regs->int_no == 15) print("UNKNOWN INTERRUPT (RESERVED)", 15);
-    else if (regs->int_no == 16) print("FLOATING POINT ERROR", 15);
-    else if (regs->int_no == 17) print("ALIGNMENT CHECK", 15);
-    else if (regs->int_no == 18) print("MACHINE CHECK", 15);
-    else if (regs->int_no == 19) print("SIMD FLOATING POINT EXCEPTION", 15);
-    else if (regs->int_no == 20) print("VIRTUALIZATION EXCEPTION", 15);
-    else if (regs->int_no == 21) print("CONTROL PROTECTION EXCEPTION", 15);
-    else if (regs->int_no >= 22 && regs->int_no <= 27) print("RESERVED EXCEPTION", 15);
-    else if (regs->int_no == 28) print("HYPERVISOR INJECTION EXCEPTION", 15);
-    else if (regs->int_no == 29) print("VMM COMMUNICATION EXCEPTION", 15);
-    else if (regs->int_no == 30) print("SECURITY EXCEPTION", 15);
-    else if (regs->int_no == 31) print("RESERVED EXCEPTION", 15);
-    else print("UNKNOWN EXCEPTION\n", 15);
+    if (regs->int_no == 0) printk("DIVISION BY ZERO", 15);
+    else if (regs->int_no == 1) printk("DEBUG", 15);
+    else if (regs->int_no == 2) printk("NON MASKABLE INTERRUPT", 15);
+    else if (regs->int_no == 3) printk("BREAKPOINT", 15);
+    else if (regs->int_no == 4) printk("INTO DETECTED OVERFLOW", 15);
+    else if (regs->int_no == 5) printk("OUT OF BOUNDS", 15);
+    else if (regs->int_no == 6) printk("INVALID OPCODE", 15);
+    else if (regs->int_no == 7) printk("NO COPROCESSOR", 15);
+    else if (regs->int_no == 8) printk("DOUBLE FAULT", 15);
+    else if (regs->int_no == 9) printk("COPROCESSOR SEGMENT OVERRUN", 15);
+    else if (regs->int_no == 10) printk("BAD TSS", 15);
+    else if (regs->int_no == 11) printk("SEGMENT NOT PRESENT", 15);
+    else if (regs->int_no == 12) printk("STACK FAULT", 15);
+    else if (regs->int_no == 13) printk("GENERAL PROTECTION FAULT", 15);
+    else if (regs->int_no == 14) printk("PAGE FAULT", 15);
+    else if (regs->int_no == 15) printk("UNKNOWN INTERRUPT (RESERVED)", 15);
+    else if (regs->int_no == 16) printk("FLOATING POINT ERROR", 15);
+    else if (regs->int_no == 17) printk("ALIGNMENT CHECK", 15);
+    else if (regs->int_no == 18) printk("MACHINE CHECK", 15);
+    else if (regs->int_no == 19) printk("SIMD FLOATING POINT EXCEPTION", 15);
+    else if (regs->int_no == 20) printk("VIRTUALIZATION EXCEPTION", 15);
+    else if (regs->int_no == 21) printk("CONTROL PROTECTION EXCEPTION", 15);
+    else if (regs->int_no >= 22 && regs->int_no <= 27) printk("RESERVED EXCEPTION", 15);
+    else if (regs->int_no == 28) printk("HYPERVISOR INJECTION EXCEPTION", 15);
+    else if (regs->int_no == 29) printk("VMM COMMUNICATION EXCEPTION", 15);
+    else if (regs->int_no == 30) printk("SECURITY EXCEPTION", 15);
+    else if (regs->int_no == 31) printk("RESERVED EXCEPTION", 15);
+    else printk("UNKNOWN EXCEPTION\n", 15);
 
     x = 10;
     y = 70;
-    print("TECHICAL INFORMATION: ", 15);
+    printk("TECHICAL INFORMATION: ", 15);
     char buf[16];
     itoa(regs->int_no, buf);
-    print("\n  INTERRUPT NO: ", 15);
-    print(buf, 15); 
+    printk("\n  INTERRUPT NO: ", 15);
+    printk(buf, 15); 
 
 
-    print("\n  EIP: ", 15);
+    printk("\n  EIP: ", 15);
     char eip_buf[32];
     htoa(regs->eip, eip_buf);
-    print(eip_buf, 15);
+    printk(eip_buf, 15);
 
-    print("\n  CS: ", 15);
+    printk("\n  CS: ", 15);
     htoa(regs->cs, buf); 
-    print(buf, 15);
+    printk(buf, 15);
 
-    print("\n  ERR CODE: ", 15);
+    printk("\n  ERR CODE: ", 15);
     itoa(regs->err_code, buf); 
-    print(buf, 15);
+    printk(buf, 15);
     
     while(1); 
 }
@@ -241,33 +241,6 @@ void prepare_task3() {
     task_list[2].esp = (uint32_t)st;
 }
 
-unsigned int task4_stack[1024]; 
-
-void task4_main() {
-    while(1) {
-        __asm__ __volatile__("hlt");
-    }
-}
-
-void prepare_task4() {
-    uint32_t* st = &task4_stack[1024];
-
-    *(--st) = 0x202;    
-    *(--st) = 0x08;     
-    *(--st) = (uint32_t)task4_main; 
-
-    *(--st) = 0;          
-    *(--st) = 0;           
-
-    for (int i = 0; i < 8; i++) {
-        *(--st) = 0;
-    }
-
-    *(--st) = 0x10;   
-
-    task_list[3].esp = (uint32_t)st;
-}
-
 void create_task(int task_id) {
     if (task_id < 1 || task_id > 3) return; 
 
@@ -277,8 +250,6 @@ void create_task(int task_id) {
         prepare_task2();
     } else if (task_id == 2) {
         prepare_task3();
-    } else if (task_id == 3) {
-        prepare_task4();
     }
 
     task_list[task_id].id = task_id;
@@ -329,7 +300,6 @@ void init_idt() {
 
     prepare_task2();
     prepare_task3();
-    prepare_task4();
     current_task = 0; 
     task_list[0].id = 0;
 
@@ -337,7 +307,6 @@ void init_idt() {
 
     task_list[1].is_active = 1;
     task_list[2].is_active = 0;
-    task_list[3].is_active = 1;
 
     __asm__ __volatile__("lidt (%0)" : : "r" (&idtp));
     __asm__ __volatile__("sti");

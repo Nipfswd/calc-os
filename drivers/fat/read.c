@@ -84,14 +84,14 @@ void list_files() {
 
             ext_buf[ext_len] = '\0';
 
-            print(name_buf, 15);
+            printk(name_buf, 15);
 
             if(ext_len > 0) {
-                print(".", 15);
-                print(ext_buf, 15);
+                printk(".", 15);
+                printk(ext_buf, 15);
             }
 
-            print("\n", 15);
+            printk("\n", 15);
         }
     }
 }

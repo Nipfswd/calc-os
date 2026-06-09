@@ -275,15 +275,6 @@ refresh:
                 print("  reboot - reboot the system\n", 15);
                 print("  forth - Forth interpreter\n", 15);
             }
-            else if (compare_strings(command, "test")) {
-                int result = sys_exec("TEST    BIN");
-                if (result) {
-                    print("Executed TEST.BIN successfully\n", 15);
-                } else {
-                    print("Failed to execute TEST.BIN\n", 15);
-                }
-                
-            }
             else if (compare_strings(command, "reboot")) {
                 reboot();
             }
