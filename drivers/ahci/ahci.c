@@ -3,9 +3,9 @@
 
 typedef struct {
     volatile uint32_t* port_base;
-    uint32_t clb[256];
-    uint32_t fis[64];
-    uint8_t ct[256];
+    __attribute__((aligned(1024))) uint32_t clb[256];
+    __attribute__((aligned(256))) uint32_t fis[64];
+    __attribute__((aligned(128))) uint8_t ct[256];
 } ahci_port_t;
 
 ahci_port_t ports[32];
