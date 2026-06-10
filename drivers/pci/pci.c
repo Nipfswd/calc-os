@@ -97,6 +97,7 @@ void pci_scan() {
 
                         devices[device_count].class_id = (data2 >> 24) & 0xFF;
                         devices[device_count].subclass   = (data2 >> 16) & 0xFF;
+                        devices[device_count].prog_if = pci_read_config_byte(bus, slot, func, 0x09);
 
                         device_count++;
                     }

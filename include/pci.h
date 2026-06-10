@@ -11,7 +11,8 @@ typedef struct {
     uint16_t vendor_id;
     uint16_t device_id;
     uint8_t class_id;   
-    uint8_t subclass;    
+    uint8_t subclass; 
+    uint8_t prog_if;   
 } pci_device_t;
 
 void pci_print_devices();
@@ -27,6 +28,8 @@ void send_pack(uint8_t data, uint8_t dest_mac[6]);
 uint8_t read_pack();
 int rtl8139_find();
 int draw_pack_icons();
+void ahci_init();
+void ahci_identify(int port, uint8_t* ident_buf);
 
 extern pci_device_t devices[32];
 extern int device_count;

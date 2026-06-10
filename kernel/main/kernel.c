@@ -632,6 +632,9 @@ void boot() {
 
     init_memory_manager();
     print("[OK]\n", 15);
+
+    ahci_init();
+    print("[OK]\n", 15);
     delay_ticks(10);
 
     int is_rtl8139_found = rtl8139_find();
