@@ -632,9 +632,6 @@ void boot() {
 
     init_memory_manager();
     print("[OK]\n", 15);
-
-    ahci_init();
-    print("[OK]\n", 15);
     delay_ticks(10);
 
     int is_rtl8139_found = rtl8139_find();
@@ -671,6 +668,5 @@ void __attribute__((section(".text.entry"))) kernel_main() {
     init_idt();
     asm volatile("sti");
     boot();
-    task_list[3].is_active = 1;
     system();
 }

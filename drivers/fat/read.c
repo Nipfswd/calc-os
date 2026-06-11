@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <ata.h>
 #include <fat.h>
+#include <pci.h>
 
 void read_file_basic(uint16_t cluster, uint8_t* destination, uint8_t* fat_table, struct fat12_bpb* bpb) {
     uint32_t root_dir_sectors = ((bpb->root_entries * 32) + (bpb->bytes_per_sector - 1)) / bpb->bytes_per_sector;
@@ -31,12 +32,12 @@ void read_file_basic(uint16_t cluster, uint8_t* destination, uint8_t* fat_table,
 void read_file(const char* filename_11, uint8_t* buffer) {
     if (!disk_initialized) {
         uint16_t bpb_buf[256];
-        ata_read_sector(0, bpb_buf);
+        ata_read_sector(0, (uint8_t*)bpb_buf);
         cached_bpb = *(struct fat12_bpb*)bpb_buf;
 
         for (uint32_t i = 0; i < cached_bpb.fat_size_sectors; i++) {
             ata_read_sector(cached_bpb.reserved_sectors + i, 
-                            (uint16_t*)(cached_fat + (i * 512)));
+                            (uint8_t*)(cached_fat + (i * 512)));
         }
         disk_initialized = 1;
     }
@@ -52,7 +53,7 @@ void list_files() {
     static uint8_t sector_buffer[512];
     struct fat12_bpb bpb;
 
-    ata_read_sector(0, sector_buffer);
+    ata_read_sector(0, (uint8_t*)sector_buffer);
     memcpy(&bpb, sector_buffer, sizeof(struct fat12_bpb));
 
     uint32_t root_lba = bpb.reserved_sectors + (bpb.num_fats * bpb.fat_size_sectors);

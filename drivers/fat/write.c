@@ -12,10 +12,10 @@ void create_file(const char* name_11, uint8_t* data, int size) {
     uint8_t fat_table[512 * 9];
     uint16_t root_buf[256];
 
-    ata_read_sector(0, bpb_buf);
+    ata_read_sector(0, (uint8_t*)bpb_buf);
     struct fat12_bpb* bpb = (struct fat12_bpb*)bpb_buf;
     for (int i = 0; i < bpb->fat_size_sectors; i++)
-        ata_read_sector(bpb->reserved_sectors + i, (uint16_t*)(fat_table + (i * 512)));
+        ata_read_sector(bpb->reserved_sectors + i, (uint8_t*)(fat_table + (i * 512)));
 
     uint16_t free_cluster = 0;
     for (uint16_t i = 2; i < 4084; i++) {
@@ -31,7 +31,7 @@ void create_file(const char* name_11, uint8_t* data, int size) {
     
     int found_entry = 0;
     for (uint32_t s = 0; s < root_sectors; s++) {
-        ata_read_sector(root_lba + s, root_buf);
+        ata_read_sector(root_lba + s, (uint8_t*)root_buf);
         struct fat12_entry* entries = (struct fat12_entry*)root_buf;
 
         for (int i = 0; i < 16; i++) {
@@ -41,7 +41,7 @@ void create_file(const char* name_11, uint8_t* data, int size) {
                 entries[i].first_cluster = free_cluster;
                 entries[i].file_size = size; 
 
-                ata_write_sector(root_lba + s, root_buf);
+                ata_write_sector(root_lba + s, (uint8_t*)root_buf);
                 found_entry = 1;
                 break;
             }
@@ -51,10 +51,10 @@ void create_file(const char* name_11, uint8_t* data, int size) {
 
     set_fat_entry(free_cluster, 0xFFF, fat_table);
     for (int i = 0; i < bpb->fat_size_sectors; i++)
-        ata_write_sector(bpb->reserved_sectors + i, (uint16_t*)(fat_table + (i * 512)));
+        ata_write_sector(bpb->reserved_sectors + i, (uint8_t*)(fat_table + (i * 512)));
 
     uint32_t data_lba = root_lba + root_sectors;
-    ata_write_sector(data_lba + (free_cluster - 2), (uint16_t*)data);
+    ata_write_sector(data_lba + (free_cluster - 2), (uint8_t*)data);
 
     if (disk_initialized) {
         disk_initialized = 0;
