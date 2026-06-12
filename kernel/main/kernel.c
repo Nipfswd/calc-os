@@ -331,6 +331,8 @@ refresh:
                 uint8_t file_buffer[512];
                 for (int i = 0; i < 512; i++) file_buffer[i] = 0;
                 int buffer_ptr = 0;
+                
+                int shift_pressed = 0; 
 
                 while (1) {
                     update_system(); 
@@ -338,18 +340,28 @@ refresh:
                     int code = get_scancode();
                     if (code == 0) continue;
 
-                    handle_hotkeys(code);
+                    if (code == 0x2A || code == 0x36) {
+                        shift_pressed = 1;
+                        continue;
+                    }
+                    if (code == 0xAA || code == 0xB6) {
+                        shift_pressed = 0;
+                        continue;
+                    }
 
-                    if (code == 0x3C) {
+                    if (code & 0x80) {
+                        continue;
+                    }
+
+                    if (code == 0x3C) { 
                         create_file(name_11, file_buffer, buffer_ptr);
                         
                         screen_clear();
-                        current_mode = 0;
-                        ncount = 1; 
+                        goto refresh;
                         break; 
                     }
 
-                    if (code == 0x1C) {
+                    if (code == 0x1C) { 
                         if (buffer_ptr < 511) {
                             file_buffer[buffer_ptr++] = '\n';
                             put_char('\n', 15); 
@@ -357,7 +369,7 @@ refresh:
                         continue;
                     }
 
-                    if (code == 0x0E) {
+                    if (code == 0x0E) { 
                         if (buffer_ptr > 0) {
                             buffer_ptr--;
                             if (file_buffer[buffer_ptr] != '\n') {
@@ -371,53 +383,58 @@ refresh:
 
                     char letter = 0;
                     switch (code) {
-                        case 0x18: letter = 'o'; break; 
-                        case 0x23: letter = 'h'; break;
-                        case 0x2E: letter = 'c'; break; 
                         case 0x1E: letter = 'a'; break;
-                        case 0x26: letter = 'l'; break; 
-                        case 0x12: letter = 'e'; break;
-                        case 0x13: letter = 'r'; break; 
-                        case 0x2D: letter = 'x'; break;
-                        case 0x17: letter = 'i'; break; 
-                        case 0x14: letter = 't'; break;
-                        case 0x19: letter = 'p'; break; 
-                        case 0x10: letter = 'q'; break;
-                        case 0x11: letter = 'w'; break; 
-                        case 0x15: letter = 'y'; break;
-                        case 0x16: letter = 'u'; break; 
-                        case 0x1F: letter = 's'; break;
+                        case 0x30: letter = 'b'; break;
+                        case 0x2E: letter = 'c'; break; 
                         case 0x20: letter = 'd'; break; 
+                        case 0x12: letter = 'e'; break;
                         case 0x21: letter = 'f'; break;
                         case 0x22: letter = 'g'; break; 
+                        case 0x23: letter = 'h'; break;
+                        case 0x17: letter = 'i'; break; 
                         case 0x24: letter = 'j'; break;
                         case 0x25: letter = 'k'; break; 
-                        case 0x2C: letter = 'z'; break;
-                        case 0x2F: letter = 'v'; break; 
-                        case 0x30: letter = 'b'; break;
-                        case 0x31: letter = 'n'; break; 
+                        case 0x26: letter = 'l'; break; 
                         case 0x32: letter = 'm'; break;
+                        case 0x31: letter = 'n'; break; 
+                        case 0x18: letter = 'o'; break; 
+                        case 0x19: letter = 'p'; break; 
+                        case 0x10: letter = 'q'; break;
+                        case 0x13: letter = 'r'; break; 
+                        case 0x1F: letter = 's'; break;
+                        case 0x14: letter = 't'; break;
+                        case 0x16: letter = 'u'; break; 
+                        case 0x2F: letter = 'v'; break; 
+                        case 0x11: letter = 'w'; break; 
+                        case 0x2D: letter = 'x'; break;
+                        case 0x15: letter = 'y'; break; 
+                        case 0x2C: letter = 'z'; break;
                         case 0x39: letter = ' '; break;
-                        case 0x02: letter = '1'; break; 
-                        case 0x03: letter = '2'; break;
-                        case 0x04: letter = '3'; break; 
-                        case 0x05: letter = '4'; break;
-                        case 0x06: letter = '5'; break; 
-                        case 0x07: letter = '6'; break;
-                        case 0x08: letter = '7'; break; 
-                        case 0x09: letter = '8'; break;
-                        case 0x0A: letter = '9'; break; 
-                        case 0x0B: letter = '0'; break;
-                        case 0x0C: letter = '-'; break; 
-                        case 0x0D: letter = '+'; break;
-                        case 0x34: letter = '.'; break; 
-                        case 0x35: letter = '/'; break;
-                        case 0x1A: letter = '['; break; 
-                        case 0x1B: letter = ']'; break;
-                        case 0x33: letter = ','; break; 
-                        case 0x28: letter = '\''; break;
-                        case 0x27: letter = ';'; break;
+
+                        case 0x02: letter = shift_pressed ? '!' : '1'; break; 
+                        case 0x03: letter = shift_pressed ? '@' : '2'; break;
+                        case 0x04: letter = shift_pressed ? '#' : '3'; break; 
+                        case 0x05: letter = shift_pressed ? '$' : '4'; break;
+                        case 0x06: letter = shift_pressed ? '%' : '5'; break; 
+                        case 0x07: letter = shift_pressed ? '^' : '6'; break;
+                        case 0x08: letter = shift_pressed ? '&' : '7'; break; 
+                        case 0x09: letter = shift_pressed ? '*' : '8'; break;
+                        case 0x0A: letter = shift_pressed ? '(' : '9'; break; 
+                        case 0x0B: letter = shift_pressed ? ')' : '0'; break;
+                        case 0x0C: letter = shift_pressed ? '_' : '-'; break; 
+                        case 0x0D: letter = shift_pressed ? '+' : '='; break;
+                        case 0x34: letter = shift_pressed ? '>' : '.'; break; 
+                        case 0x35: letter = shift_pressed ? '?' : '/'; break;
+                        case 0x1A: letter = shift_pressed ? '{' : '['; break; 
+                        case 0x1B: letter = shift_pressed ? '}' : ']'; break;
+                        case 0x33: letter = shift_pressed ? '<' : ','; break; 
+                        case 0x28: letter = shift_pressed ? '"' : '\''; break;
+                        case 0x27: letter = shift_pressed ? ':' : ';'; break;
                         default:   letter = 0;   break;
+                    }
+
+                    if (shift_pressed && letter >= 'a' && letter <= 'z') {
+                        letter = letter - 'a' + 'A';
                     }
 
                     if (letter != 0 && buffer_ptr < 511) {
@@ -426,7 +443,7 @@ refresh:
                         buffer_ptr++;
                     }
                 }
-            }   
+            }
             else if (compare_strings(command, "draw")) {
                 char val[16];
                 int r_w, r_h, r_x, r_y;
@@ -632,23 +649,19 @@ void boot() {
 
     init_memory_manager();
     print("[OK]\n", 15);
-    delay_ticks(10);
 
     int is_rtl8139_found = rtl8139_find();
     if (is_rtl8139_found) {
         rtl8139_init();
         print("[OK]\n", 15);
     } else {
-        print("[Failed to find RTL8139]\n", 15);
+        print("[ERR]\n", 15);
     }
+
+    delay_ticks(50);
 
     screen_clear();
     init_palette();
-    is_scaled = 0;
-    print("Success!", 15);
-    is_scaled = 1;
-    delay_ticks(15);
-
     draw_rect(0, 0, 1024, 768, 15);
 
     x = 0;
@@ -662,7 +675,9 @@ void boot() {
 }
 
 void __attribute__((section(".text.entry"))) kernel_main() {
-    task_list[3].is_active = 0;
+    init_paging();
+    enable_paging();
+    
     asm volatile("cli");
 	screen_clear();
     init_idt();

@@ -214,8 +214,6 @@ void prepare_task2() {
     task_list[1].esp = (uint32_t)st;
 }
 
-unsigned int task3_stack[1024]; 
-
 void task3_main() {
     while(1) {
         interpret(stack_init(1024), content);
@@ -223,20 +221,20 @@ void task3_main() {
 }
 
 void prepare_task3() {
-    uint32_t* st = &task3_stack[1024];
+    uint32_t* st = (uint32_t*)0x1000000; 
 
     *(--st) = 0x202;    
-    *(--st) = 0x08;     
+    *(--st) = 0x08; 
     *(--st) = (uint32_t)task3_main; 
 
     *(--st) = 0;          
-    *(--st) = 0;           
+    *(--st) = 32;           
 
     for (int i = 0; i < 8; i++) {
         *(--st) = 0;
     }
 
-    *(--st) = 0x10;   
+    *(--st) = 0x10;
 
     task_list[2].esp = (uint32_t)st;
 }

@@ -21,4 +21,7 @@ void init_memory_manager();
 void* kmalloc(size_t size);
 void kfree(void* ptr);
 
+void init_paging();
+void enable_paging();
+
 #endif 

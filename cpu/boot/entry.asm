@@ -110,7 +110,7 @@ init_32bit:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov esp, 0x90000 
+    mov esp, 0x90000
     mov ebp, esp
 
     jmp 0x10000
@@ -121,7 +121,7 @@ align 4
 disk_packet:
     db 0x10      
     db 0             
-    dw 80              
+    dw 100             
     dw 0x0000        
     dw 0x1000       
     dq 0            

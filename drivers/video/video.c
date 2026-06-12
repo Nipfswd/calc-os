@@ -99,7 +99,7 @@ void put_char(char s, uint8_t color) {
             uint8_t *row = &VIDEO_MEMORY[current_y * SCREEN_WIDTH];
 
             for (int j = 0; j < 8; j++) {
-                if (bits > 127) { 
+                if (bits & 0x80) { 
                     for (int h_scale = 0; h_scale < scale; h_scale++) {
                         int current_x = x + (j * scale) + h_scale;
                         if (current_x < SCREEN_WIDTH) {
