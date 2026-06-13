@@ -71,9 +71,6 @@ void handle_hotkeys(int code) {
 		current_mode = 5;
 		ncount = 1;
 	}
-	if (code == 0x3C && current_mode == 5) {
-		is_window_send = 1;
-	}
 }
 
 void input_wait_string(char *buffer) {

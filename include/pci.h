@@ -24,10 +24,10 @@ void pci_write_config_word(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offs
 uint8_t pci_read_config_byte(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 
 void rtl8139_init();
-void send_pack(uint8_t data, uint8_t dest_mac[6]);
+void send_pack(uint8_t* payload, uint16_t payload_size, uint8_t dest_mac[6]);
 uint8_t read_pack();
 int rtl8139_find();
-int draw_pack_icons();
+int recv_cwl(uint8_t *out, int max_len);
 
 extern pci_device_t devices[32];
 extern int device_count;

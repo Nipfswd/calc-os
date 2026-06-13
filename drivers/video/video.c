@@ -20,7 +20,6 @@ int draw_0 = 1;
 int draw_1 = 1;
 int is_scaled = 0;
 int is_button_ethernet = 0;
-int is_window_send = 0;
 
 void screen_clear() {
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {

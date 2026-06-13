@@ -204,11 +204,6 @@ void check_ui_clicks() {
                 ncount = 1;
             }
         }
-
-        if (current_mode == 5 && mouse_y >= 728 && mouse_y <= SCREEN_HEIGHT) {
-            is_window_send = 1;
-            ncount = 1;
-        }
     }
 }
 

@@ -255,3 +255,57 @@ int atoi_super(const char* str) {
 
     return res;
 }
+
+void clear_string(char *s, int size) {
+    for (int i = 0; i < size; i++) s[i] = 0;
+}
+
+int starts_with(const char *line, const char *prefix) {
+    int i = 0;
+    while (prefix[i] != 0) {
+        if (line[i] != prefix[i]) return 0;
+        i++;
+    }
+    return 1;
+}
+
+void trim_left(char *s) {
+    int i = 0;
+    while (s[i] == ' ' || s[i] == '\t') i++;
+
+    if (i == 0) return;
+
+    int k = 0;
+    while (s[i]) {
+        s[k++] = s[i++];
+    }
+    s[k] = 0;
+}
+
+void trim_right(char *s) {
+    int len = 0;
+    while (s[len]) len++;
+
+    while (len > 0 && 
+          (s[len - 1] == ' ' || s[len - 1] == '\n' || s[len - 1] == '\r'))
+    {
+        s[len - 1] = 0;
+        len--;
+    }
+}
+
+void trim(char *s) {
+    trim_left(s);
+    trim_right(s);
+}
+
+void append(char *dst, const char *src, int max) {
+    int i = 0;
+    while (dst[i] && i < max - 1) i++;
+
+    int j = 0;
+    while (src[j] && i < max - 1) {
+        dst[i++] = src[j++];
+    }
+    dst[i] = 0;
+}

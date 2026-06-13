@@ -15,11 +15,11 @@ OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.
        mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o \
        sound.o pci.o rtl8139.o mm.o forth.o syscalls.o sys_exit.o \
 	   sys_getpid.o sys_open.o sys_read.o sys_time.o sys_uname.o \
-	   sys_write.o paging.o
+	   sys_write.o paging.o cwl.o
 
 vpath %.c kernel/main drivers/cmos drivers/video drivers/mouse utils drivers/keyboard \
           drivers/video/font cpu/idt cpu/idt/tasks cpu/mm drivers/ata drivers/fat drivers/sound drivers/pci \
-		  drivers/rtl8139 forth cpu/paging
+		  drivers/rtl8139 forth cpu/paging cwl
 
 vpath %.asm cpu/boot drivers/keyboard/asm utils/asm drivers/mouse/asm cpu/idt/asm
 
@@ -32,6 +32,7 @@ os-image.img: boot.bin KERNEL.SYS
 	mformat -i $@ -f 1440 ::
 	dd if=$< of=$@ conv=notrunc bs=512 count=1
 	mcopy -i $@ KERNEL.SYS ::KERNEL.SYS
+	mcopy -i $@ WELCOME.CWL ::WELCOME.CWL 
 
 boot.bin: cpu/boot/entry.asm
 	$(AS) $(ASFLAGS_BIN) $< -o $@
@@ -56,8 +57,8 @@ cleane:
 
 run: os-image.img
 	qemu-system-i386 -drive file=os-image.img,format=raw \
-	-audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
-	-netdev user,id=net0 \
+    -audiodev pa,id=snd0 -machine pcspk-audiodev=snd0 \
+    -netdev user,id=net0,hostfwd=udp::51131-:51131 \
     -object filter-dump,id=f1,netdev=net0,file=traffic.pcap \
     -device rtl8139,netdev=net0
 

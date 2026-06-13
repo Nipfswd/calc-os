@@ -86,148 +86,159 @@ uint8_t read_pack() {
     }
     
     uint8_t* header = rtl_rx_buffer + rx_offset;
-
     uint16_t status = header[0] | (header[1] << 8);
     if (!(status & 0x01)) {
         return 0;
     }
 
     uint16_t length = header[2] | (header[3] << 8);
-
     uint8_t* payload = header + 4;
-    
     uint16_t ethertype = (payload[12] << 8) | payload[13];
     
-    if (ethertype == 0x88B5) {
-        char c = payload[14];
-        put_char(c, 15);
-    } 
-    else if (ethertype == 0x0800 && length >= 42 && length < 1600) {
-        uint16_t offset = 14 + 20 + 8;
-        uint8_t* icmp_data = payload + offset;
-        for (int i = 0; i < length - offset - 4; i++) {
-            char c = icmp_data[i];
-            put_char(c, 15);
+    if (ethertype == 0x0800) {
+        uint8_t protocol = payload[23];
+        if (protocol == 17) {
+            uint16_t dst_port = (payload[14 + 20 + 2] << 8) | payload[14 + 20 + 3];
+            if (dst_port == 51131) {
+                uint16_t udp_length = (payload[14 + 20 + 4] << 8) | payload[14 + 20 + 5];
+                uint16_t udp_payload_size = udp_length - 8;
+                uint8_t* udp_payload = payload + 42;
+
+                if (udp_payload_size + 42 > length) {
+                    udp_payload_size = length - 42;
+                }
+
+                for (int i = 0; i < udp_payload_size; i++) {
+                    put_char(udp_payload[i], 15);
+                }
+            }
         }
     }
 
     rx_offset = (rx_offset + length + 4 + 3) & ~3;
     rx_offset = rx_offset % RX_BUFFER_SIZE;
-
     *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
 
     return 1;
 }
 
-void send_pack(uint8_t data, uint8_t dest_mac[6]) {
+void send_pack(uint8_t* payload, uint16_t payload_size, uint8_t dest_mac[6]) {
     int is_rtl8139_found = rtl8139_find();
     if (!is_rtl8139_found) return;
-    uint32_t phys_tx_buf = (uint32_t)rtl_tx_buffer[tx_counter]; 
+
+    uint32_t phys_tx_buf = (uint32_t)rtl_tx_buffer[tx_counter];
 
     for (int i = 0; i < 6; i++) {
         rtl_tx_buffer[tx_counter][i] = dest_mac[i];
-    }
-    for (int i = 0; i < 6; i++) {
         rtl_tx_buffer[tx_counter][i + 6] = mac_addr[i];
     }
 
-    rtl_tx_buffer[tx_counter][12] = 0x88;
-    rtl_tx_buffer[tx_counter][13] = 0xB5;
-    rtl_tx_buffer[tx_counter][14] = data;
+    rtl_tx_buffer[tx_counter][12] = 0x08;
+    rtl_tx_buffer[tx_counter][13] = 0x00;
+    rtl_tx_buffer[tx_counter][14] = 0x45;
+    rtl_tx_buffer[tx_counter][15] = 0x00;
 
-    for (int i = 15; i < 60; i++) {
-        rtl_tx_buffer[tx_counter][i] = 0;
+    uint16_t udp_length = 8 + payload_size;
+    uint16_t ip_total = 20 + udp_length;
+
+    rtl_tx_buffer[tx_counter][16] = (ip_total >> 8) & 0xFF;
+    rtl_tx_buffer[tx_counter][17] = ip_total & 0xFF;
+    rtl_tx_buffer[tx_counter][18] = 0x00;
+    rtl_tx_buffer[tx_counter][19] = 0x00;
+    rtl_tx_buffer[tx_counter][20] = 0x00;
+    rtl_tx_buffer[tx_counter][21] = 0x00;
+    rtl_tx_buffer[tx_counter][22] = 0x40;
+    rtl_tx_buffer[tx_counter][23] = 0x11;
+    rtl_tx_buffer[tx_counter][24] = 0x00;
+    rtl_tx_buffer[tx_counter][25] = 0x00;
+    rtl_tx_buffer[tx_counter][26] = 0xC0;
+    rtl_tx_buffer[tx_counter][27] = 0xA8;
+    rtl_tx_buffer[tx_counter][28] = 0x01;
+    rtl_tx_buffer[tx_counter][29] = 0x03;
+    rtl_tx_buffer[tx_counter][30] = 0xFF;
+    rtl_tx_buffer[tx_counter][31] = 0xFF;
+    rtl_tx_buffer[tx_counter][32] = 0xFF;
+    rtl_tx_buffer[tx_counter][33] = 0xFF;
+    rtl_tx_buffer[tx_counter][34] = 0xC8;
+    rtl_tx_buffer[tx_counter][35] = 0x5F;
+    rtl_tx_buffer[tx_counter][36] = 0xC7;
+    rtl_tx_buffer[tx_counter][37] = 0xBB;
+    rtl_tx_buffer[tx_counter][38] = (udp_length >> 8) & 0xFF;
+    rtl_tx_buffer[tx_counter][39] = udp_length & 0xFF;
+    rtl_tx_buffer[tx_counter][40] = 0x00;
+    rtl_tx_buffer[tx_counter][41] = 0x00;
+
+    for (int i = 0; i < payload_size; i++) {
+        rtl_tx_buffer[tx_counter][42 + i] = payload[i];
     }
-    
-    uint32_t length = 60; 
+
+    uint32_t frame_len = 42 + payload_size;
+    if (frame_len < 60) frame_len = 60;
+
     uint8_t tx_reg_offset = tx_counter * 4;
-
-    __asm__ __volatile__("" : : : "memory");
-
-    uint32_t tsad_addr = (uint32_t)rtl_mmio + 0x20 + tx_reg_offset;
-    uint32_t tsd_addr  = (uint32_t)rtl_mmio + 0x10 + tx_reg_offset;
-
-    *(volatile uint32_t*)tsad_addr = phys_tx_buf;
-
-    __asm__ __volatile__("mfence" : : : "memory");
-
-    *(volatile uint32_t*)tsd_addr = length;
-
-    uint32_t tx_timeout = 200000;
-    while (!((*(volatile uint32_t*)tsd_addr) & (1 << 13)) && tx_timeout > 0) {
-        tx_timeout--;
-    }
+    *(volatile uint32_t*)((uint32_t)rtl_mmio + 0x20 + tx_reg_offset) = phys_tx_buf;
+    *(volatile uint32_t*)((uint32_t)rtl_mmio + 0x10 + tx_reg_offset) = frame_len;
 
     tx_counter = (tx_counter + 1) % 4;
 }
 
-int draw_pack_icons() {
+int recv_cwl(uint8_t *out, int max_len) {
     int is_rtl8139_found = rtl8139_find();
     if (!is_rtl8139_found) return 0;
-    if (rtl_mmio[0x37] & 0x01) {
-        return 0;
-    }
-    
-    uint8_t* header = rtl_rx_buffer + rx_offset;
 
-    uint16_t status = header[0] | (header[1] << 8);
-    if (!(status & 0x01)) {
-        return 0;
-    }
-
-    uint16_t length = header[2] | (header[3] << 8);
-
-    uint8_t* payload = header + 4;
-    
-    uint16_t ethertype = (payload[12] << 8) | payload[13];
-    
-    static int pack_index = 0;
-    int col = pack_index % 6;
-    int row = pack_index / 6;
-    int icon_x = 20 + col * 180;
-    int icon_y = 100 + row * 100;
-    
-    if (ethertype == 0x88B5) {
-        draw_rect(icon_x, icon_y, 130, 30, 15);
-        x = icon_x + 8;
-        y = icon_y + 8;
-        
-        char packet_buf[2] = { (char)payload[14], '\0' };
-        print(packet_buf, 0);
-        
-        pack_index++;
-    } 
-    else if (ethertype == 0x0800 && length >= 42 && length < 1600) {
-        uint16_t offset = 14 + 20 + 8;
-        uint8_t* icmp_data = payload + offset;
-        int data_len = length - offset - 4;
-        
-        if (data_len > 0) {
-            draw_rect(icon_x, icon_y, 130, 30, 15);
-            x = icon_x + 8;
-            y = icon_y + 8;
-            
-            char packet_buf[16];
-            int i = 0;
-            for (i = 0; i < data_len && i < 15; i++) {
-                packet_buf[i] = (char)icmp_data[i];
-            }
-            packet_buf[i] = '\0';
-            
-            print(packet_buf, 0);
-            
-            pack_index++;
+    while (1) {
+        if (rtl_mmio[0x37] & 0x01) {
+            print("WAITING...\n", 12);
+            continue;
         }
+
+        uint8_t* header = rtl_rx_buffer + rx_offset;
+        uint16_t status = header[0] | (header[1] << 8);
+        if (!(status & 0x01)) {
+            return 0;
+        }
+
+        uint16_t length = header[2] | (header[3] << 8);
+        uint8_t* payload = header + 4;
+
+        uint16_t ethertype = (payload[12] << 8) | payload[13];
+        if (ethertype == 0x0800) {
+
+            uint8_t protocol = payload[23];
+            if (protocol == 17) { 
+                uint16_t dst_port =
+                    (payload[14 + 20 + 2] << 8) |
+                     payload[14 + 20 + 3];
+
+                if (dst_port == 51131) {
+                    uint16_t udp_length =
+                        (payload[14 + 20 + 4] << 8) |
+                         payload[14 + 20 + 5];
+
+                    uint16_t udp_payload_size = udp_length - 8;
+                    uint8_t* udp_payload = payload + 42;
+
+                    if (udp_payload_size + 42 > length) {
+                        udp_payload_size = length - 42;
+                    }
+                    if (udp_payload_size > max_len) {
+                        udp_payload_size = max_len;
+                    }
+                    for (int i = 0; i < udp_payload_size; i++) {
+                        out[i] = udp_payload[i];
+                    }
+
+                    rx_offset = (rx_offset + length + 4 + 3) & ~3;
+                    rx_offset = rx_offset % RX_BUFFER_SIZE;
+                    *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
+
+                    return udp_payload_size;
+                }
+            }
+        }
+
+        rx_offset = (rx_offset + length + 4 + 3) & ~3;
+        rx_offset = rx_offset % RX_BUFFER_SIZE;
+        *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
     }
-
-    if (pack_index >= 6) {
-        pack_index = 0;
-    }
-
-    rx_offset = (rx_offset + length + 4 + 3) & ~3;
-    rx_offset = rx_offset % RX_BUFFER_SIZE;
-
-    *(volatile uint16_t*)(rtl_mmio + 0x3A) = rx_offset - 16;
-
-    return 1;
 }

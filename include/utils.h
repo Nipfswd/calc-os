@@ -25,4 +25,11 @@ void draw_file_icons();
 void play_startup_sound();
 int atoi_super(const char* str);
 
+void clear_string(char *s, int size);
+int starts_with(const char *line, const char *prefix);
+void trim_left(char *s);
+void trim_right(char *s);
+void trim(char *s);
+void append(char *dst, const char *src, int max);
+
 #endif

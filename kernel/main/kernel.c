@@ -12,6 +12,7 @@
 #include <mm.h>
 #include <forth.h>
 #include <task.h>
+#include <cwl.h>
 
 char command[256];
 char name[128];
@@ -171,29 +172,7 @@ refresh:
             draw_button(65, 85, 15, 15, "r", 0, 15);
         }
 
-        draw_pack_icons();
-
-        draw_button(0, 728, 1024, 40, "F2 - Send a pack", COLOR_BLUE, 15);
-
-        if (is_window_send == 1) {
-            int wx = 296; 
-            int wy = 244;
-
-            draw_rect(wx + 4, wy + 4, 432, 260, 0);
-            draw_rect(wx,     wy,     432, 260, 15);
-            draw_rect(wx + 4, wy + 4, 424, 252, 7);
-            draw_rect(wx + 4, wy + 4, 424, 32, 0);
-
-            x = wx + 18;
-            y = wy + 8;
-            print("Send a pack", 15);
-
-            x = wx + 18;
-            y = wy + 44;
-            print("Byte:", 15);
-            draw_rect(wx + 18, wy + 56, 404, 24, 15);
-            draw_rect(wx + 20, wy + 58, 400, 20, 0);
-        }
+        create_task(3);
     }
     else {
         is_scaled = 0;
@@ -485,7 +464,7 @@ refresh:
             }
             else if (compare_strings(command, "send")) {
                 while (get_scancode() != 0); 
-                print("Enter a byte: ", 15);
+                print("Enter a pack: ", 15);
                 for (int i = 0; i < 16; i++) byte_str[i] = 0;
                 for (volatile int j = 0; j < 200000; j++);
 
@@ -499,13 +478,11 @@ refresh:
                     break;
                 }
 
-                int byte_val = atoi_super(byte_str);
+                int payload = atoi_super(byte_str);
+                uint32_t payload_size = sizeof(payload);
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                if (byte_val < 0 || byte_val > 255) {
-                    print("Invalid byte value. Must be between 0 and 255.\n", 15);
-                } else {
-                    send_pack((uint8_t)byte_val, dest_mac);
-                }
+                send_pack((uint8_t)payload, payload_size, dest_mac);
+
                 print("\n", 15);
             }
             else if (compare_strings(command, "behave")) {
@@ -591,41 +568,9 @@ refresh:
             int code = get_scancode();
             if (code != 0) {
                 handle_hotkeys(code);
-                if (code == 0x3C) {
-                    is_window_send = 1;
-                    ncount = 1;
-                }
             }
 
             if (ncount == 1) goto refresh;
-
-            if (is_window_send == 1) {
-                while (get_scancode() != 0); 
-                for (int i = 0; i < 16; i++) byte_str[i] = 0;
-                for (volatile int j = 0; j < 200000; j++);
-
-                while (1) {
-                    ncount = 0; 
-
-                    int wx = 296; 
-                    int wy = 244;
-
-                    x = wx + 26;
-                    y = wy + 60;
-                    input_wait_string(byte_str);
-                    if (byte_str[0] == '\0') {
-                        ncount = 0;
-                        continue;
-                    }
-                    break;
-                }
-
-                int byte_val = atoi_super(byte_str);
-                uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                send_pack((uint8_t)byte_val, dest_mac);
-                is_window_send = 0;
-                ncount = 1;
-            }
         }
         else {
             int code = get_scancode();
@@ -666,6 +611,8 @@ void boot() {
 
     x = 0;
     y = 10;
+
+    is_scaled = 1;
 
     print("Welcome to CalcOS!", 0);
     play_startup_sound();
