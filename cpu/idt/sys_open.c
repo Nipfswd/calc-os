@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-uint16_t sys_open(const char* filename_11) {
-    return (uint16_t)_syscall(SYS_OPEN, (uint32_t)filename_11, 0, 0);
+int sys_open(const char* path) {
+    return (int)_syscall(SYS_OPEN, (uint32_t)path, 0, 0);
 }

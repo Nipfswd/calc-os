@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <sound.h>
 #include <forth.h>
-#include <cwl.h>
 
 struct idt_entry   idt_entry[256];
 struct idt_pointer idtp;
@@ -48,7 +47,7 @@ uint32_t timer_handler(struct registers *regs) {
 
     int next_task = current_task;
     while (1) {
-        next_task = (next_task + 1) % 4;
+        next_task = (next_task + 1) % 3;
         
         if (next_task == 0 || task_list[next_task].is_active == 1) {
             break;
@@ -240,33 +239,6 @@ void prepare_task3() {
     task_list[2].esp = (uint32_t)st;
 }
 
-unsigned int task2_stack[1024]; 
-
-void task4_main() {
-    if (current_mode == 5) {
-        browser_main();
-    }
-}
-
-void prepare_task4() {
-    uint32_t* st = &task2_stack[1024];
-
-    *(--st) = 0x202;       
-    *(--st) = 0x08;    
-    *(--st) = (uint32_t)task2_main; 
-
-    *(--st) = 0;
-    *(--st) = 0;
-
-    for (int i = 0; i < 8; i++) {
-        *(--st) = 0;
-    }
-
-    *(--st) = 0x10;
-
-    task_list[1].esp = (uint32_t)st;
-}
-
 void create_task(int task_id) {
     if (task_id < 1 || task_id > 3) return; 
 
@@ -276,9 +248,6 @@ void create_task(int task_id) {
         prepare_task2();
     } else if (task_id == 2) {
         prepare_task3();
-    }
-    else if (task_id == 3) {
-        prepare_task4();
     }
 
     task_list[task_id].id = task_id;
@@ -329,8 +298,6 @@ void init_idt() {
 
     prepare_task2();
     prepare_task3();
-    prepare_task4();
-
     current_task = 0; 
     task_list[0].id = 0;
 
@@ -338,7 +305,6 @@ void init_idt() {
 
     task_list[1].is_active = 1;
     task_list[2].is_active = 0;
-    task_list[3].is_active = 0;
 
     __asm__ __volatile__("lidt (%0)" : : "r" (&idtp));
     __asm__ __volatile__("sti");

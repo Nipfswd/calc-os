@@ -121,7 +121,7 @@ align 4
 disk_packet:
     db 0x10      
     db 0             
-    dw 100             
+    dw 120             
     dw 0x0000        
     dw 0x1000       
     dq 0            

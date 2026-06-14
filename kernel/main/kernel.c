@@ -12,7 +12,6 @@
 #include <mm.h>
 #include <forth.h>
 #include <task.h>
-#include <cwl.h>
 
 char command[256];
 char name[128];
@@ -465,6 +464,7 @@ refresh:
             else if (compare_strings(command, "send")) {
                 while (get_scancode() != 0); 
                 print("Enter a pack: ", 15);
+                
                 for (int i = 0; i < 16; i++) byte_str[i] = 0;
                 for (volatile int j = 0; j < 200000; j++);
 
@@ -478,10 +478,11 @@ refresh:
                     break;
                 }
 
-                int payload = atoi_super(byte_str);
-                uint32_t payload_size = sizeof(payload);
+                uint32_t payload_size = strlen((char*)byte_str); 
+                
                 uint8_t dest_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                send_pack((uint8_t)payload, payload_size, dest_mac);
+                
+                send_pack((uint8_t*)byte_str, payload_size, dest_mac);
 
                 print("\n", 15);
             }
@@ -613,8 +614,8 @@ void boot() {
     y = 10;
 
     is_scaled = 1;
-
     print("Welcome to CalcOS!", 0);
+    is_scaled = 2;
     play_startup_sound();
 
     is_scaled = 0;

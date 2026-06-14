@@ -9,6 +9,6 @@
 #include <sound.h>
 #include <forth.h>
 
-uint8_t sys_read(void) {
-    return (uint8_t)_syscall(SYS_READ, 0, 0, 0);
+int sys_read(int fd, char* buf, uint32_t count) {
+    return (int)_syscall(SYS_READ, (uint32_t)fd, (uint32_t)buf, (uint32_t)count);
 }
