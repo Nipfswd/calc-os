@@ -1,3 +1,5 @@
-What's the point of a digital calculator in the OS if there's a physical calculator? Why write an ACPI driver if there's a power button? What's the point of Windows if there's CalcOS? People didn't create processors to play around with basic things, but to perform complex operations.
+A powerful operating system does not need to have an ACPI driver or security rings. Its strength lies in performing complex operations at maximum speed and without intermediaries.
+
+Project Description: CalcOS is a minimalist, bare-metal operating system built with a focus on raw performance and hardware control
 
 Project Description: CalcOS is a minimalist, bare-metal operating system built with a focus on raw performance and hardware control
