@@ -11,7 +11,6 @@ CFLAGS      := -m32 -ffreestanding -fno-stack-protector -fno-leading-underscore 
                -fno-pic -fno-asynchronous-unwind-tables
 
 LDFLAGS     := -m elf_i386 -T linker.ld --nostdlib --static
-USER_LDFLAGS := -m elf_i386 -Ttext 0x400000 --oformat binary --nostdlib
 
 OBJ := kernel.o cmos.o video.o mouse_asm.o utils.o keyboard.o font.o io.o inout.o \
        mouse.o irq_hndlr.o idt.o isr.o task.o ata.o fat.o read.o write.o \
@@ -52,8 +51,8 @@ KERNEL.SYS: $(OBJ)
 app.o: app.c
 	$(CC) $(CFLAGS) $< -o $@
 
-APP.BIN: app.o
-	$(LD) -m elf_i386 -Ttext 0x400000 -e _start --oformat binary app.o -o $@
+APP.BIN: app.o app.ld
+	$(LD) -m elf_i386 -T app.ld app.o -o $@
 
 clean:
 	$(RM) *.o *.bin *.elf KERNEL.SYS
