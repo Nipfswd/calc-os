@@ -92,6 +92,13 @@ extern volatile int ata_interrupt_received;
 #define SYS_CLOSE   6
 #define SYS_EXEC    11
 
+#define SYS_GET_BATTERY  123
+#define SYS_GET_TICKS    124
+#define SYS_PCI_PRINT    125
+#define SYS_LIST_FILES   126
+#define SYS_DRAW_RECT    127
+#define SYS_CREATE_FILE  128
+
 #define EPERM            1
 #define ENOENT           2
 #define ESRCH            3
