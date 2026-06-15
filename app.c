@@ -24,6 +24,7 @@ void print(char *msg, unsigned char color) {
     sys_write(1, msg, color);
 }
 
+__attribute__((section(".text.prologue")))
 void _start() {
     print("Hello, World!\n", 15);
     sys_exit();
