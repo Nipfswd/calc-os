@@ -9,6 +9,7 @@
 #include <sound.h>
 #include <forth.h>
 #include <fat.h>
+#include <mm.h>
 
 file_descriptor_t fd_table[10];
 
@@ -112,6 +113,31 @@ uint32_t syscall_handler(struct registers *regs) {
             return 0; 
         }
         
+       case SYS_EXEC: {
+            const char* filename_11 = (const char*)arg1; 
+
+            if (filename_11 == 0) return -EFAULT;
+
+            uint16_t start_cluster = find_file_in_root(filename_11);
+            if (start_cluster == 0) return -ENOENT;
+
+            uint8_t* load_address = (uint8_t*)0x400000;
+            
+            uint32_t page_idx = (uint32_t)load_address / 0x400000; 
+            
+            uint32_t phys_addr = 0x400000; 
+
+            page_directory[page_idx] = phys_addr | 0x83;
+
+            __asm__ __volatile__("mov %%cr3, %%eax; mov %%eax, %%cr3" ::: "eax");
+
+            read_file(filename_11, load_address);
+
+            void (*program_entry)(void) = (void (*)(void))load_address;
+            program_entry(); 
+
+            return 0; 
+        }
 
         default:
             return -ENOSYS; 
