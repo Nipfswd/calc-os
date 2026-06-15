@@ -23,5 +23,6 @@ void kfree(void* ptr);
 
 void init_paging();
 void enable_paging();
+extern __attribute__((section(".bss.safe"), aligned(4096))) uint32_t page_directory[1024];
 
 #endif 

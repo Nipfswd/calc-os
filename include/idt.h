@@ -42,9 +42,38 @@ extern void mouse_wrapper();
 extern void ata_wrapper();
 
 extern void isr0();
+extern void isr1();
+extern void isr2();
+extern void isr3();
+extern void isr4();
+extern void isr5();
+extern void isr6();
+extern void isr7();
 extern void isr8();
+extern void isr9();
+extern void isr10();
+extern void isr11();
+extern void isr12();
 extern void isr13();
 extern void isr14();
+extern void isr15();
+extern void isr16();
+extern void isr17();
+extern void isr18();
+extern void isr19();
+extern void isr20();
+extern void isr21();
+extern void isr22();
+extern void isr23();
+extern void isr24();
+extern void isr25();
+extern void isr26();
+extern void isr27();
+extern void isr28();
+extern void isr29();
+extern void isr30();
+extern void isr31();
+
 void delay_ticks(uint32_t ticks);
 extern void syscall_wrapper();
 
@@ -61,6 +90,14 @@ extern volatile int ata_interrupt_received;
 #define SYS_GETPID  20
 #define SYS_UNAME   122
 #define SYS_CLOSE   6
+#define SYS_EXEC    11
+
+#define SYS_GET_BATTERY  123
+#define SYS_GET_TICKS    124
+#define SYS_PCI_PRINT    125
+#define SYS_LIST_FILES   126
+#define SYS_DRAW_RECT    127
+#define SYS_CREATE_FILE  128
 
 #define EPERM            1
 #define ENOENT           2
@@ -144,5 +181,6 @@ int sys_read(int fd, char* buf, uint32_t count);
 uint32_t sys_time(void);
 void sys_uname(char *buffer);
 int sys_write(int fd, const char* str, uint8_t color);
+int sys_exec(const char* filename);
 
 #endif

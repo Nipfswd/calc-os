@@ -630,6 +630,19 @@ void __attribute__((section(".text.entry"))) kernel_main() {
 	screen_clear();
     init_idt();
     asm volatile("sti");
-    boot();
-    system();
+    /*boot();
+    system();*/
+    char name_11[11];
+    
+    format_fat_name("APP.BIN", name_11);
+
+    int res = sys_exec(name_11);
+    
+    if (res < 0) {
+        sys_write(1, "Error: APP.BIN not found!\n", 15);
+    } else {
+        sys_write(1, "Returned from APP.BIN\n", 15); 
+    }
+
+    while(1);
 }

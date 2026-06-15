@@ -9,6 +9,7 @@
 #include <sound.h>
 #include <forth.h>
 #include <fat.h>
+#include <mm.h>
 
 file_descriptor_t fd_table[10];
 
@@ -25,6 +26,7 @@ uint32_t syscall_handler(struct registers *regs) {
                 fd_table[i].offset = 0;
                 fd_table[i].used = 0;
             }
+            
             delete_task(current_task);
             return 0;
 
@@ -67,7 +69,6 @@ uint32_t syscall_handler(struct registers *regs) {
             } 
             
             if (fd < 3 || fd >= 10 || !fd_table[fd].used) return -EBADF; 
-            if (fd < 3 || fd >= 10 || !fd_table[fd].used) return -EBADF; 
 
             uint16_t cluster = fd_table[fd].cluster;
             uint32_t offset = fd_table[fd].offset;
@@ -90,8 +91,6 @@ uint32_t syscall_handler(struct registers *regs) {
             fd_table[fd].offset = fd_table[fd].offset + bytes_to_copy;
 
             return bytes_to_copy;
-            
-            return 0; 
         }
 
         case SYS_WRITE: {
@@ -112,6 +111,83 @@ uint32_t syscall_handler(struct registers *regs) {
             return 0; 
         }
         
+        case SYS_EXEC: {
+            const char* filename_11 = (const char*)arg1; 
+
+            if (filename_11 == 0) return -EFAULT;
+
+            uint16_t start_cluster = find_file_in_root(filename_11);
+            if (start_cluster == 0) return -ENOENT;
+
+            uint8_t* load_address = (uint8_t*)0x400000;
+            
+            uint32_t page_idx = (uint32_t)load_address / 0x400000; 
+            
+            uint32_t phys_addr = 0x400000; 
+
+            page_directory[page_idx] = phys_addr | 0x83;
+
+            __asm__ __volatile__("mov %%cr3, %%eax; mov %%eax, %%cr3" ::: "eax");
+
+            read_file(filename_11, load_address);
+
+            void (*program_entry)(void) = (void (*)(void))load_address;
+            program_entry(); 
+
+            return 0; 
+        }
+
+        case SYS_TIME: {
+            return (uint32_t)timer_ticks;
+        }
+
+        case SYS_GETPID: {
+            return (uint32_t)current_task;
+        }
+
+        case SYS_UNAME: {
+            char* user_buf = (char*)arg1;
+            if (user_buf < (char*)(13 * 4096)) return -EFAULT;
+            memcpy(user_buf, "CalcOS 9.5", 15);
+            return 0;
+        }
+
+        case SYS_GET_BATTERY: {
+            return (uint32_t)check_battery();
+        }
+
+        case SYS_GET_TICKS: {
+            return (uint32_t)timer_ticks;
+        }
+
+        case SYS_PCI_PRINT: {
+            pci_print_devices();
+            return 0;
+        }
+
+        case SYS_LIST_FILES: {
+            list_files();
+            return 0;
+        }
+
+        case SYS_DRAW_RECT: {
+            int r_x = (int)(arg1 >> 16);
+            int r_y = (int)(arg1 & 0xFFFF);
+            int r_w = (int)(arg2 >> 16);
+            int r_h = (int)(arg2 & 0xFFFF);
+            uint8_t r_color = (uint8_t)arg3;
+            draw_rect(r_x, r_y, r_w, r_h, r_color);
+            return 0;
+        }
+
+        case SYS_CREATE_FILE: {
+            const char* name_11 = (const char*)arg1;
+            uint8_t* buffer = (uint8_t*)arg2;
+            uint32_t length = arg3;
+            if (name_11 == 0 || buffer == 0) return -EFAULT;
+            create_file((char*)name_11, buffer, (int)length);
+            return 0;
+        }
 
         default:
             return -ENOSYS; 
