@@ -55,10 +55,10 @@ APP.BIN: app.o app.ld
 	$(LD) -m elf_i386 -T app.ld app.o -o $@
 
 clean:
-	$(RM) *.o *.bin *.elf KERNEL.SYS
+	$(RM) *.o *.bin *.elf KERNEL.SYS APP.BIN
 
 cleane:
-	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS
+	$(RM) *.o *.bin *.elf *.img *.vdi KERNEL.SYS APP.BIN
 	$(RM) traffic.pcap
 	touch traffic.pcap
 
